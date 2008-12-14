@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
+import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
 import com.prosyst.mprm.backend.proxy.ref.AndRef;
 import com.prosyst.mprm.backend.proxy.ref.NotRef;
@@ -17,6 +18,7 @@ import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefImpl;
 
 /**
+ * Houses the DSL and the Ref list.
  * 
  * @author Todor Boev
  * @version $Revision$
@@ -34,18 +36,12 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    */
   {
     refs = new ArrayList();
-    fact = new ProxyFactoryImpl(getClass().getClassLoader());
+    fact = new ProxyFactoryImpl(new ProxyClassLoader(getClass().getClassLoader()));
     
     /* Create the root external service */
     bcRef = new RefImpl(BundleContext.class);
     bc = (BundleContext) fact.proxy(bcRef);
     
-    /* Call the user code to create the app dependencies */
-    try {
-      configure();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
   
   public ImporterBuilder importer() {
@@ -100,6 +96,12 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
   }
 
   public final void start(BundleContext bc) throws Exception {
+    try {
+      configure();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  	
     try {
       bcRef.open();
       bcRef.bind(bc, null);

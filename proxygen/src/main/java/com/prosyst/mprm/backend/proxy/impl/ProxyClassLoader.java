@@ -71,25 +71,14 @@ public class ProxyClassLoader extends ClassLoader {
     }
   }
   
-//  private final ClassLoader proxySpace;
   private final Map loaded;
   private int no;
   
-//  /**
-//   * @param proxiedSpace The loader from where the classes we proxy come.
-//   * @param proxySpace The loader where the proxy library lives. 
-//   */
-//  public ProxyClassLoader(ClassLoader proxiedSpace, ClassLoader proxySpace) {
-//    super(proxiedSpace);
-//    this.proxySpace = proxySpace;
-//    this.loaded = new ConcurrentHashMap();
-//  }
-  
   /**
-   * @param proxiedSpace
+   * @param proxied
    */
-  public ProxyClassLoader(ClassLoader proxiedSpace) {
-    super(proxiedSpace);
+  public ProxyClassLoader(ClassLoader proxied) {
+  	super (proxied);
     this.loaded = new ConcurrentHashMap();
   }
   
@@ -129,12 +118,4 @@ public class ProxyClassLoader extends ClassLoader {
     loaded.put(k, res);
     return res;
   }
-  
-//  /**
-//   * @see java.lang.ClassLoader#findClass(java.lang.String)
-//   */
-//  protected Class findClass(String name) throws ClassNotFoundException {
-//  	System.out.println(this + ": findClass(" + name + ")");
-//		return proxySpace.loadClass(name);
-//  }
 }

@@ -36,7 +36,7 @@
     <Export-Package>com.prosyst.mprm.backend.proxy.*</Export-Package>
     <!--
       <Private-Package>org.foo.myproject.*</Private-Package>
-      <Bundle-Activator>org.foo.myproject.impl1.Activator</Bundle-Activator>
     -->
+    <Bundle-Activator>com.prosyst.mprm.backend.proxy.impl.Activator</Bundle-Activator>
   </properties>
 </project>

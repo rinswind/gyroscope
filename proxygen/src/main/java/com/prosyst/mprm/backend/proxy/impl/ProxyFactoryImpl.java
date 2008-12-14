@@ -16,8 +16,8 @@ public class ProxyFactoryImpl implements ProxyFactory {
   /**
    * @param loader
    */
-  public ProxyFactoryImpl(ClassLoader loader) {
-    this.loader = new ProxyClassLoader(loader);
+  public ProxyFactoryImpl(ProxyClassLoader loader) {
+    this.loader = loader;
   }
   
   /**
