@@ -2,6 +2,7 @@ package com.prosyst.mrpm.backen.proxy;
 
 import junit.framework.TestCase;
 
+import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
 import com.prosyst.mprm.backend.proxy.ref.RefImpl;
 
@@ -84,7 +85,7 @@ public class ProxyPerfTest extends TestCase {
     RefImpl ref = new RefImpl(Sum.class);
     ref.open();
     ref.bind(new SumImpl(), null);
-    return (Sum) new ProxyFactoryImpl(ProxyPerfTest.class.getClassLoader()).proxy(ref);
+    return (Sum) new ProxyFactoryImpl(new ProxyClassLoader(ProxyPerfTest.class.getClassLoader())).proxy(ref);
   }
   
   /**
