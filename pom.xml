@@ -14,18 +14,16 @@
   <modules>
     <module>proxygen</module>
     <module>asm</module>
-    <!--
     <module>autowire</module>
-
+    
     <module>test-exporter-hello</module>
     <module>test-exporter-format</module>
     <module>test-exporter-date</module>
     <module>test-exporter-worker</module>
 
     <module>test-importer-ref</module>
+    <module>test-importer-refchain</module>
     <module>test-importer-collection</module>
     <module>test-importer-map</module>
-    <module>test-importer-refchain</module>
-      -->
   </modules>
 </project>

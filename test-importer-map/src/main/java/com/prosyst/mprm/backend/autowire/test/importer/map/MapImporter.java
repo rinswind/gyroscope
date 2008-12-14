@@ -9,7 +9,8 @@ import com.prosyst.mprm.backend.autowire.ObjectFactory;
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
 import com.prosyst.mprm.backend.proxy.ref.RefListener;
 import com.prosyst.mprm.backend.proxy.ref.RefUnboundException;
-import com.prosyst.test.mprm.backend.autowire.exporter.hello.Hello;
+import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
+import com.prosyst.mprm.backend.autowire.test.exporter.worker.Worker; 
 
 public class MapImporter extends RefContainerImpl {
   private Map services;
