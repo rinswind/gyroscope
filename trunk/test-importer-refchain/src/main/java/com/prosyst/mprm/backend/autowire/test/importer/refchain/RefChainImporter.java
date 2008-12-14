@@ -5,11 +5,12 @@ import org.osgi.framework.ServiceReference;
 
 import com.prosyst.mprm.backend.autowire.ServiceComparators;
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
+import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
+import com.prosyst.mprm.backend.autowire.test.exporter.worker.Worker;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefListener;
-import com.prosyst.test.mprm.backend.autowire.exporter.hello.Hello;
 
-public class RefChain extends RefContainerImpl {
+public class RefChainImporter extends RefContainerImpl {
   private Hello service;
   private Worker worker;
   

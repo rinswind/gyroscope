@@ -16,6 +16,10 @@ import com.prosyst.mprm.backend.proxy.ref.Ref;
 public class ProxyClassLoader extends ClassLoader {
   private static final String PREFIX = "$proxy";
   
+  /**
+	 * Key under which generated proxy classes are stored. This allows us to
+	 * re-use proxy classes if we discover they proxy the same class.
+	 */
   private static class Key {
     private final List classes;
     private int hash;
@@ -67,16 +71,33 @@ public class ProxyClassLoader extends ClassLoader {
     }
   }
   
+//  private final ClassLoader proxySpace;
   private final Map loaded;
   private int no;
   
+//  /**
+//   * @param proxiedSpace The loader from where the classes we proxy come.
+//   * @param proxySpace The loader where the proxy library lives. 
+//   */
+//  public ProxyClassLoader(ClassLoader proxiedSpace, ClassLoader proxySpace) {
+//    super(proxiedSpace);
+//    this.proxySpace = proxySpace;
+//    this.loaded = new ConcurrentHashMap();
+//  }
+  
   /**
-   * @param parent
-   * @param prefix
+   * @param proxiedSpace
    */
-  public ProxyClassLoader(ClassLoader parent) {
-    super(parent);
+  public ProxyClassLoader(ClassLoader proxiedSpace) {
+    super(proxiedSpace);
     this.loaded = new ConcurrentHashMap();
+  }
+  
+  /**
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return "ProxyClassLoader[ " + getParent() + " ]";
   }
   
   /**
@@ -86,14 +107,17 @@ public class ProxyClassLoader extends ClassLoader {
   public Class loadProxyClass(Ref ref) {
     Key k = new Key(ref);
     
+    /* Check if we have an appropriate proxy class created already */
     Class res = (Class) loaded.get(k);
     if (res != null) {
       return res;
     }
     
+    /* Build the name of the new proxy class */
     String name = PREFIX + (no++) + "." + k.toString();
     ProxyClassBuilder gen = new ProxyClassBuilder(name, this);
     
+    /* Create the new class */
     for (Iterator iter = ref.type().iterator(); iter.hasNext();) {
       gen.add(((Class) iter.next()).getName());
     }
@@ -101,7 +125,16 @@ public class ProxyClassLoader extends ClassLoader {
     byte[] raw = gen.generate();
     res = defineClass(name, raw, 0, raw.length);
     
+    /* Cache the new class for later use */
     loaded.put(k, res);
     return res;
   }
+  
+//  /**
+//   * @see java.lang.ClassLoader#findClass(java.lang.String)
+//   */
+//  protected Class findClass(String name) throws ClassNotFoundException {
+//  	System.out.println(this + ": findClass(" + name + ")");
+//		return proxySpace.loadClass(name);
+//  }
 }

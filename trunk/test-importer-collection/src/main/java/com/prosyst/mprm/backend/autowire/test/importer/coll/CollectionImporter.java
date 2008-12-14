@@ -6,10 +6,11 @@ import java.util.Map;
 
 import com.prosyst.mprm.backend.autowire.ObjectFactory;
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
+import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
+import com.prosyst.mprm.backend.autowire.test.exporter.worker.Worker;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.ref.RefListener;
 import com.prosyst.mprm.backend.proxy.ref.RefUnboundException;
-import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 
 /**
  * @author Todor Boev
