@@ -39,10 +39,10 @@ public class OsgiImporterCollection extends RefCollectionImpl {
 
       protected void removed(ServiceReference ref) {
         for (Iterator iter = iterator(); iter.hasNext();) {
-          OsgiImporterRef lref = (OsgiImporterRef) iter.next();
-          if (lref.hasRef(ref)) {
-            OsgiImporterCollection.this.remove(lref);
-            lref.close();
+          OsgiImporterRef iref = (OsgiImporterRef) iter.next();
+          if (iref.hasRef(ref)) {
+            OsgiImporterCollection.this.remove(iref);
+            iref.close();
           }
         }
       }

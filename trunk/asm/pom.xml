@@ -17,7 +17,7 @@
   <packaging>bundle</packaging>
   
   <properties>
-    <Export-Package>org.objectweb.asm.*</Export-Package>
+    <Export-Package>org.objectweb.asm.*;version=${pom.version}</Export-Package>
   </properties>
   
   <dependencies>
