@@ -43,20 +43,19 @@ public class Activator extends RefContainerImpl {
     final Ref required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
     
     for (int i = 0; i < NO; i++) {
-      final int no = i;
       /* Use guice to create the export */
-      final Hello hello = injector.getInstance(Hello.class);
+      Hello hello = injector.getInstance(Hello.class);
       
       Ref export = exporter().of(Hello.class).asSingleton();
       
       from(required)
       .bind(export)
-      .to(Hello.PROP, Integer.valueOf(no))
-      .to(Constants.SERVICE_RANKING, Integer.valueOf(NO - no))
+      .to(Hello.PROP, Integer.valueOf(i))
+      .to(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))
       .to(hello);
       
       /* Use guice to create the listener */
-      from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(no));
+      from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(i));
     }
   }
 }
