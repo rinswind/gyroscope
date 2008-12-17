@@ -1,4 +1,4 @@
-package com.prosyst.mprm.backend.autowire.test.exporter.hello;
+package com.prosyst.mprm.backend.autowire.test.exporter.hello.impl;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -9,35 +9,42 @@ import com.google.inject.Injector;
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
 import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
+import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
 
 /**
  * @author Todor Boev
  * @version $Revision$
  */
-public class HelloExporter extends RefContainerImpl {
+public class Activator extends RefContainerImpl {
   private static final int NO = 10;
   
   @Override
   public void configure() throws Exception {
-    final Format format = (Format) importer().of(Format.class).asSingleton().proxy();
-    final Date date = (Date) importer().of(Date.class).asSingleton().proxy();
-    
-    final Ref required = and(format, date);
-   
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(Format.class).toInstance(format);
-        bind(Date.class).toInstance(date);
+        /* Define the service imports - they are effectively singletons */
+        bind(Format.class).toInstance((Format) importer().of(Format.class).asSingleton().proxy());
+        bind(Date.class).toInstance((Date) importer().of(Date.class).asSingleton().proxy());
+        
+        /* Define the service impl we will export */
         bind(Hello.class).to(HelloImpl.class);
+        bind(PrintingRefListenerFactory.class);
       }
     });
     
+    /*
+     * Define a signal that becomes true only if both imports are available. Use
+     * Guice to get the service proxies. Since they are singletons we know we
+     * will define the signal over the appropriate instances.
+     */
+    final Ref required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
+    
     for (int i = 0; i < NO; i++) {
       final int no = i;
+      /* Use guice to create the export */
       final Hello hello = injector.getInstance(Hello.class);
       
       Ref export = exporter().of(Hello.class).asSingleton();
@@ -48,17 +55,8 @@ public class HelloExporter extends RefContainerImpl {
       .to(Constants.SERVICE_RANKING, Integer.valueOf(NO - no))
       .to(hello);
       
-      from(export).notify(new RefListener.Adapter() {
-        @Override
-        public void bound() {
-          System.out.println("Bound " + no);
-        }
-        
-        @Override
-        public void unbinding() {
-          System.out.println("Unbinding " + no);
-        }
-      });
+      /* Use guice to create the listener */
+      from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(no));
     }
   }
 }
