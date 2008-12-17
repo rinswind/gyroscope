@@ -15,8 +15,8 @@ public class Printer extends RefListener.Adapter implements Runnable {
   private final Collection<RichHello> services;
   
   @Inject
-  public Printer(Collection<RichHello> services) {
-    this.worker = new Worker("Proxy test", this);
+  public Printer(Worker worker, Collection<RichHello> services) {
+    this.worker = worker;
     this.services = services;
   }
   
