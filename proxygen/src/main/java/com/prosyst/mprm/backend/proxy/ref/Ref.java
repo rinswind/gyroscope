@@ -24,7 +24,7 @@ public interface Ref<T> {
   }
   
   /**
-   * @return type of the object returned by delegate()
+   * @return type of the object returned by delegate(). 
    */
   List<Class<?>> type();
   

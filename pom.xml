@@ -26,5 +26,6 @@
     <module>test-exporter-guicy-hello</module>
     <module>guice-wrapped</module>
     <module>aopalliance-wrapped</module>
+    <module>test-importer-guicy-collection</module>
   </modules>
 </project>
