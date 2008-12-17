@@ -30,6 +30,17 @@
     </dependency>
     <dependency>
       <groupId>edu.unseen</groupId>
+      <artifactId>aopalliance-wrapped</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <!--  Why does maven require this when aopalliance-wrapped already provides it?!! -->
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.unseen</groupId>
       <artifactId>test-exporter-date</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>

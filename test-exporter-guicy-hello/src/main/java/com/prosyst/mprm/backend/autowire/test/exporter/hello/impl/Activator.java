@@ -1,6 +1,8 @@
 package com.prosyst.mprm.backend.autowire.test.exporter.hello.impl;
 
 import static com.google.inject.Guice.createInjector;
+import static com.google.inject.matcher.Matchers.*;
+import static com.google.inject.name.Names.named;
 
 import org.osgi.framework.Constants;
 
@@ -11,7 +13,6 @@ import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-
 
 /**
  * @author Todor Boev
@@ -32,6 +33,9 @@ public class Activator extends RefContainerImpl {
         /* Define the service impl we will export */
         bind(Hello.class).to(HelloImpl.class);
         bind(PrintingRefListenerFactory.class);
+        
+        /* Add an interceptor to test Guice's class loading bridges */
+        bindInterceptor(any(), annotatedWith(named("log")), new Logger());
       }
     });
     
