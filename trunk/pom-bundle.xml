@@ -32,8 +32,13 @@
         <version>1.4.3</version>
         <extensions>true</extensions>
         <configuration>
+          <supportedProjectTypes>
+            <supportedProjectType>jar</supportedProjectType>
+            <supportedProjectType>bundle</supportedProjectType>
+          </supportedProjectTypes>
+        
           <instructions>
-            <Embed-Dependency>*;scope=provided;inline=true</Embed-Dependency>
+            <Embed-Dependency>*;scope=provided|system;inline=true</Embed-Dependency>
             <split-package>merge-first</split-package>
           </instructions>
         </configuration>
