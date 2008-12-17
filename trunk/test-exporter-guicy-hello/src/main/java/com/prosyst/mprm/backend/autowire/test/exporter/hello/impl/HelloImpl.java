@@ -1,8 +1,9 @@
-package com.prosyst.mprm.backend.autowire.test.exporter.hello;
+package com.prosyst.mprm.backend.autowire.test.exporter.hello.impl;
 
 import com.google.inject.Inject;
 import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
+import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 
 public class HelloImpl implements Hello {
   private final Format format;
