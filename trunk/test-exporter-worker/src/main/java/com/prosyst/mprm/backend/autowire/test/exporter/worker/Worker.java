@@ -19,6 +19,7 @@ public class Worker {
     this.task = task;
   }
   
+  @Override
   public String toString() {
     return thread != null ? thread.getName() : "not running";
   }
@@ -28,6 +29,7 @@ public class Worker {
    */
   public synchronized void start() {
     thread = new Thread(name) {
+      @Override
       public void run() {
         try {
           while (true) {
