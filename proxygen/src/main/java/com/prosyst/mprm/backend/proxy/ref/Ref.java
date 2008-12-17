@@ -8,35 +8,25 @@ import java.util.concurrent.locks.Lock;
  * @author Todor Boev
  * @version $Revision$
  */
-public interface Ref {
+public interface Ref<T> {
   /**
    * Lifecycle of a dynamic reference.
    */
-  public static class State {
-    public static final State CLOSED = new State("closed");
-    public static final State OPENING = new State("opening");
-    public static final State CLOSING = new State("closing");
-    public static final State UNBOUND = new State("unbound");
-    public static final State BINDING = new State("binding");
-    public static final State UNBINDING = new State("unbinding");
-    public static final State BOUND = new State("bound");
-    public static final State UPDATED = new State("updated");
-    
-    private final String name;
-    
-    private State(String name) {
-      this.name = name;
-    }
-    
-    public String toString() {
-      return name;
-    }
+  public enum State {
+    CLOSED,
+    OPENING,
+    CLOSING,
+    UNBOUND,
+    BINDING,
+    UNBINDING,
+    BOUND,
+    UPDATED;
   }
   
   /**
    * @return type of the object returned by delegate()
    */
-  List type();
+  List<Class<?>> type();
   
   /**
    * Thread-unsafe method intended for calls from dynamic proxies. If you need
@@ -45,13 +35,13 @@ public interface Ref {
    * 
    * @return
    */
-  Object delegate();
+  T delegate();
   
   /**
    * @return a random set of properties that applications may associate with the
    *         delegate.
    */
-  Map props();
+  Map<String, ?> props();
   
   /**
    * @return current state of this reference.
@@ -66,9 +56,9 @@ public interface Ref {
   
   void open();
   
-  void bind(Object delegate, Map props);
+  void bind(T delegate, Map<String, ?> props);
   
-  void update(Object delegate, Map props);
+  void update(T delegate, Map<String, ?> props);
   
   void unbind();
 

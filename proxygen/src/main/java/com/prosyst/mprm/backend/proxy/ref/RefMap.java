@@ -1,18 +1,19 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
-public interface RefMap extends Ref {
-  void put(Object key, Ref proxy);
+public interface RefMap<K, T> extends Ref<Map<K, T>> {
+  void put(K key, Ref<T> proxy);
   
-  Ref get(Object key);
+  Ref<T> get(K key);
   
-  Ref remove(Object key);
+  Ref<T> remove(K key);
   
-  Set entries();
+  Set<Map.Entry<K, Ref<T>>> entries();
   
-  Set keys();
+  Set<K> keys();
   
-  Collection values();
+  Collection<Ref<T>> values();
 }
