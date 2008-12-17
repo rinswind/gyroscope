@@ -28,7 +28,8 @@ public class Activator extends RefContainerImpl {
       @SuppressWarnings("unchecked")
       @Override
       protected void configure() {
-        bind(get(new TypeLiteral<Collection<RichHello>>(){})).toInstance((Collection<RichHello>) 
+        bind(get(new TypeLiteral<Collection<RichHello>>(){}))
+        .toInstance((Collection<RichHello>) 
           importer()
           .of(Hello.class)
           .asCollection()
