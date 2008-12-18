@@ -14,12 +14,14 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefCollection<T> {
+public class RefCollectionImpl<T, I> extends RefImpl<Collection<T>, Collection<I>> implements
+    RefCollection<T, I> {
+  
   private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(Collection.class);
 
   private final ProxyFactory fact;
   
-  private final Collection<Ref<T>> refs;
+  private final Collection<Ref<T, I>> refs;
   private final Collection<T> proxies;
   
   /**
@@ -29,11 +31,11 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
     super(TYPE);
     
     this.fact = fact;
-    this.refs = new ConcurrentLinkedQueue<Ref<T>>();
+    this.refs = new ConcurrentLinkedQueue<Ref<T, I>>();
     this.proxies = new ConcurrentLinkedQueue<T>();
   }
 
-  public final void add(Ref<T> ref) {
+  public final void add(Ref<T, I> ref) {
     lock().lock();
     try {
       refs.add(ref);
@@ -43,7 +45,7 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
     }
   }
   
-  public final boolean remove(Ref<T> ref) {
+  public final boolean remove(Ref<T, I> ref) {
     lock().lock();
     try {
       if (!refs.remove(ref)) {
@@ -71,7 +73,7 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
   /**
    * Weakly consistent Iterator over all existing proxies.
    */
-  public final Iterator<Ref<T>> iterator() {
+  public final Iterator<Ref<T, I>> iterator() {
     return refs.iterator(); 
   }
   
@@ -79,7 +81,7 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
    * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#bindImpl(java.lang.Object, java.util.Map)
    */
   @Override
-  protected Collection<T> bindImpl(Collection<T> ignored1, Map<String, ?> ignored2) {
+  protected Collection<T> bindImpl(Collection<I> ignored1, Map<String, ?> ignored2) {
     return Collections.unmodifiableCollection(proxies);
   }
   
@@ -88,7 +90,7 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
    */
   @Override
   protected void closeImpl() {
-    for (Ref<T> ref : refs) {
+    for (Ref<T, I> ref : refs) {
       remove(ref);
     }
   }

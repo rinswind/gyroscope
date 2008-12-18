@@ -9,12 +9,12 @@ import java.util.Map;
  * @author Todor Boev
  * @version $Revision$
  */
-public class ImplicationRef<T> extends DependentRef {
-  private final Ref<T> target;
-  private final T delegate;
+public class ImplicationRef<T, I> extends DependentRef {
+  private final Ref<T, I> target;
+  private final I delegate;
   private final Map<String, ?> props;
 
-  public ImplicationRef(Ref<?> source, Ref<T> target, T delegate, Map<String, ?> props) {
+  public ImplicationRef(Ref<?, ?> source, Ref<T, I> target, I delegate, Map<String, ?> props) {
     super();
 
     this.target = target;

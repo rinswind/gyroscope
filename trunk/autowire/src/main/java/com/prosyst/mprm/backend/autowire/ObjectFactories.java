@@ -7,8 +7,8 @@ import java.util.Map;
  * @version $Revision$
  */
 public class ObjectFactories {
-  private static final ObjectFactory VAL = new ObjectFactory() {
-    public Object create(Object delegate, Map props) {
+  private static final ObjectFactory<Object, Object> IDENTITY = new ObjectFactory<Object, Object>() {
+    public Object create(Object delegate, Map<String, ?> props) {
       return delegate;
     }
 
@@ -17,10 +17,10 @@ public class ObjectFactories {
     }
   };
   
-  public static ObjectFactory key(final String prop) {
-    return new ObjectFactory() {
-      public Object create(Object delegate, Map props) {
-        return props.get(prop);
+  public static <T> ObjectFactory<T, ?> key(final String prop) {
+    return new ObjectFactory<T, Object>() {
+      public T create(Object delegate, Map<String, ?> props) {
+        return (T) props.get(prop);
       }
 
       public void destroy(Object created) {
@@ -29,7 +29,8 @@ public class ObjectFactories {
     };
   }
   
-  public static ObjectFactory val() {
-    return VAL;
+  @SuppressWarnings("unchecked")
+  public static <T> ObjectFactory<T, T> identity() {
+    return (ObjectFactory<T, T>) IDENTITY;
   }
 }

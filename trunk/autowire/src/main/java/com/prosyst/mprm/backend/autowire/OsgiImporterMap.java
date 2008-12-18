@@ -7,29 +7,32 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
+import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefMapImpl;
 
 /**
  * @author Todor Boev
  * @version $Revision$
  */
-public class OsgiImporterMap extends RefMapImpl {
+public class OsgiImporterMap<K, T, I> extends RefMapImpl<K, T, ServiceReference/*I*/> {
   private final OsgiTracker tracker;
   
-  public OsgiImporterMap(final Class valType, final ObjectFactory val, final Class keyType,
-      final ObjectFactory key, final ProxyFactory fact, final BundleContext bc, String filter) {
+  public OsgiImporterMap(final Class<T> valType, final ObjectFactory<T, I> val, final Class<K> keyType,
+      final ObjectFactory<K, T> key, final ProxyFactory fact, final BundleContext bc, String filter) {
     
     super(fact);
     
     this.tracker = new OsgiTracker(bc, filter, null) {
+      @Override
       protected void added(ServiceReference ref) {
-        OsgiImporterRef r = new OsgiImporterRef(valType, val, bc);
+        OsgiImporterRef<T, I> r = new OsgiImporterRef<T, I>(valType, val, bc);
         r.open();
         r.bind(ref, props(ref));
         
         put(key.create(r.delegate(), r.props()), r);
       }
 
+      @Override
       protected void modified(ServiceReference sref) {
         for (Iterator iter = values().iterator(); iter.hasNext();) {
           OsgiImporterRef ref = (OsgiImporterRef) iter.next();
@@ -39,12 +42,13 @@ public class OsgiImporterMap extends RefMapImpl {
         }
       }
 
+      @Override
       protected void removed(ServiceReference sref) {
-        for (Iterator iter = entries().iterator(); iter.hasNext();) {
-          Entry e = (Entry) iter.next();
-          OsgiImporterRef ref = (OsgiImporterRef) e.getValue();
+        for (Entry<K, Ref<T, ServiceReference>> e : entries()) {
+          OsgiImporterRef<T, I> ref = (OsgiImporterRef<T, I>) e.getValue();
+          
           if (ref.hasRef(sref)) {
-            Object k = e.getKey();
+            K k = e.getKey();
             
             OsgiImporterMap.this.remove(k);
             ref.close();
@@ -56,10 +60,12 @@ public class OsgiImporterMap extends RefMapImpl {
     };
   }
   
+  @Override
   protected void openImpl() {
     tracker.open();
   }
   
+  @Override
   protected void closeImpl() {
     tracker.close();
   }

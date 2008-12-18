@@ -1,7 +1,7 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
 public class NotRef extends DependentRef {
-  public NotRef(Ref<?> target) {
+  public NotRef(Ref<?, ?> target) {
     dependsOn(target);
   }
   

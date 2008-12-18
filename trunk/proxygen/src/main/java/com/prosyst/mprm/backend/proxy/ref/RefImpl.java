@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefImpl<T> implements Ref<T> {
+public class RefImpl<T, I> implements Ref<T, I> {
   /**
    * Controls the correct transition from state to state as well as the event
    * dispatching on the appropriate state entries.
@@ -19,33 +19,33 @@ public class RefImpl<T> implements Ref<T> {
     CLOSED(State.CLOSED),
     OPENING(State.OPENING) {
       @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
+      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
         ll.open(lc);
       }
     },
     CLOSING(State.CLOSING) {
       @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
+      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
         ll.closed(lc);
       }
     },
     UNBOUND(State.UNBOUND),
     BINDING(State.BINDING) {
       @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
+      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
         ll.bound(lc);
       }
     },
     UNBINDING(State.UNBINDING) {
       @Override
-      protected <T> void dispatchOnEntry(Ref<T> lc, RefListener<T> ll) {
+      protected <T, I> void dispatchOnEntry(Ref<T, I> lc, RefListener<T, I> ll) {
         ll.unbinding(lc);
       }
     },
     BOUND(State.BOUND),
     UPDATING(State.UPDATED) {
       @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
+      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
         ll.updated(lc);
       }
     };
@@ -103,8 +103,8 @@ public class RefImpl<T> implements Ref<T> {
       return rollback;
     }
     
-    public <T> void dispatchOnEntry(Ref<T> ref, Collection<RefListener<T>> listeners) {
-      for (RefListener<T> l : listeners) {
+    public <T, I> void dispatchOnEntry(Ref<T, I> ref, Collection<RefListener<T, I>> listeners) {
+      for (RefListener<T, I> l : listeners) {
         try {
           dispatchOnEntry(ref, l);
         } catch (Throwable thr) {
@@ -113,8 +113,8 @@ public class RefImpl<T> implements Ref<T> {
       }
     }
     
-    public <T> void dispatchOnExit(Ref<T> ref, Collection<RefListener<T>> listeners) {
-      for (RefListener<T> l : listeners) {
+    public <T, I> void dispatchOnExit(Ref<T, I> ref, Collection<RefListener<T, I>> listeners) {
+      for (RefListener<T, I> l : listeners) {
         try {
           dispatchOnExit(ref, l);
         } catch (Throwable thr) {
@@ -123,17 +123,17 @@ public class RefImpl<T> implements Ref<T> {
       }
     }
     
-    protected <T> void dispatchOnEntry(Ref<T> lc, RefListener<T> ll) {
+    protected <T, I> void dispatchOnEntry(Ref<T, I> lc, RefListener<T, I> ll) {
       /* By default do not call the listener */
     }
     
-    protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
+    protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
       /* By default do not call the listener */
     }
   }
   
   private final List<Class<?>> type;
-  private final Collection<RefListener<T>> listeners;
+  private final Collection<RefListener<T, I>> listeners;
   private final ReadWriteLock lock;
 
   private StateHandler state;
@@ -156,7 +156,7 @@ public class RefImpl<T> implements Ref<T> {
     modType.addAll(type);
     
     this.type = Collections.unmodifiableList(modType);
-    this.listeners = new ConcurrentLinkedQueue<RefListener<T>>();
+    this.listeners = new ConcurrentLinkedQueue<RefListener<T, I>>();
     this.lock = new ReentrantReadWriteLock();
     
     this.state = StateHandler.CLOSED;
@@ -208,14 +208,14 @@ public class RefImpl<T> implements Ref<T> {
   /**
    * @see com.prosyst.mprm.backend.proxy.gen.Proxy#addListener(com.prosyst.mprm.backend.autowire.ServiceProxyListener)
    */
-  public final void addListener(RefListener<T> listener) {
+  public final void addListener(RefListener<T, I> listener) {
     listeners.add(listener);
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#removeListener(com.prosyst.mprm.backend.proxy.ref.RefListener)
    */
-  public final void removeListener(RefListener<T> listener) {
+  public final void removeListener(RefListener<T, I> listener) {
     listeners.remove(listener);
   }
 
@@ -286,7 +286,7 @@ public class RefImpl<T> implements Ref<T> {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */
-  public final void bind(T delegate, Map<String, ?> props) {
+  public final void bind(I delegate, Map<String, ?> props) {
     toState(StateHandler.BINDING);
     
     try {
@@ -308,14 +308,15 @@ public class RefImpl<T> implements Ref<T> {
    * @param delegate
    * @return
    */
-  protected T bindImpl(T delegate, Map<String, ?> props) {
-    return delegate;
+  @SuppressWarnings("unchecked")
+  protected T bindImpl(I delegate, Map<String, ?> props) {
+    return (T) delegate;
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#update(java.lang.Object, java.util.Map)
    */
-  public final void update(T delegate, Map<String, ?> props) {
+  public final void update(I delegate, Map<String, ?> props) {
     if (delegate == null && props == null) {
       throw new RefException(this + ": Must update something");
     }
@@ -340,7 +341,7 @@ public class RefImpl<T> implements Ref<T> {
    * @param delegate
    * @return
    */
-  protected <N extends T> T updateImpl(N delegate, Map<String, ?> props) {
+  protected T updateImpl(I delegate, Map<String, ?> props) {
     return bindImpl(delegate, props);
   }
   

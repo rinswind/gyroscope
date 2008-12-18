@@ -15,22 +15,22 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
+public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements RefMap<K,T,I> {
   private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Map.class});
   
   private final ProxyFactory fact;
-  private final Map<K, Ref<V>> refs;
-  private final Map<K, V> proxies;
+  private final Map<K, Ref<T,I>> refs;
+  private final Map<K, T> proxies;
   
   public RefMapImpl(ProxyFactory fact) {
     super(TYPE);
     
     this.fact = fact;
-    this.refs = new ConcurrentHashMap<K, Ref<V>>();
-    this.proxies = new ConcurrentHashMap<K,V>();
+    this.refs = new ConcurrentHashMap<K, Ref<T,I>>();
+    this.proxies = new ConcurrentHashMap<K,T>();
   }
 
-  public void put(K key, Ref<V> ref) {
+  public void put(K key, Ref<T,I> ref) {
     lock().lock();
     try {
       refs.put(key, ref);
@@ -40,14 +40,14 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
     }
   }
 
-  public Ref<V> remove(K key) {
+  public Ref<T,I> remove(K key) {
     lock().lock();
     try {
       if (proxies.remove(key) == null) {
         return null;
       }
       
-      Ref<V> ref = refs.remove(key);
+      Ref<T,I> ref = refs.remove(key);
       ref.close();
       return ref;
     } finally {
@@ -55,7 +55,7 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
     }
   }
 
-  public Ref<V> get(K key) {
+  public Ref<T,I> get(K key) {
     lock().lock();
     try {
       return refs.get(key);
@@ -64,7 +64,7 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
     }
   }
 
-  public Set<Map.Entry<K, Ref<V>>> entries() {
+  public Set<Map.Entry<K, Ref<T,I>>> entries() {
     lock().lock();
     try {
       return refs.entrySet();
@@ -82,7 +82,7 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
     }
   }
 
-  public Collection<Ref<V>> values() {
+  public Collection<Ref<T,I>> values() {
     lock().lock();
     try {
       return refs.values();
@@ -92,13 +92,16 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
   }
 
   @Override
-  protected Map<K,V> bindImpl(Map<K,V> ignored1, Map<String, ?> ignored2) {
+  protected Map<K,T> bindImpl(Map<K,I> ignored1, Map<String, ?> ignored2) {
+    /*
+     * FIX Process the input map and the properties okay?
+     */
     return Collections.unmodifiableMap(proxies);
   }
   
   @Override
   protected void closeImpl() {
-    for (Entry<K, Ref<V>> e : entries()) {
+    for (Entry<K, Ref<T,I>> e : entries()) {
       remove(e.getKey());
     }
   }
