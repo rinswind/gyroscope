@@ -16,7 +16,7 @@
   
   <properties>
     <Private-Package>com.prosyst.mprm.backend.autowire.test.importer.coll</Private-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.coll.CollectionImporter</Bundle-Activator>
+    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.coll.Activator</Bundle-Activator>
     <Import-Package>*, com.prosyst.mprm.backend.proxy.gen, org.osgi.framework</Import-Package>
   </properties>
   
