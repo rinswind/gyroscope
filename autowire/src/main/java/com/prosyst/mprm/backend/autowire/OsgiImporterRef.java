@@ -12,12 +12,12 @@ import com.prosyst.mprm.backend.proxy.ref.RefImpl;
  * @author Todor Boev
  * @version $Revision$
  */
-public class OsgiImporterRef extends RefImpl {
+public class OsgiImporterRef<T, N> extends RefImpl<T> {
   private BundleContext bc;
   private ServiceReference ref;
   private ObjectFactory val;
   
-  public OsgiImporterRef(Class type, ObjectFactory val, BundleContext bc) {
+  public OsgiImporterRef(Class<T> type, ObjectFactory<T, N> val, BundleContext bc) {
     super(type);
     this.bc = bc;
     this.val = val;

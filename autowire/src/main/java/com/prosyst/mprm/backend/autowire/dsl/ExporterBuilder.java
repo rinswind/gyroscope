@@ -1,15 +1,14 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
+import com.prosyst.mprm.backend.autowire.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
-
-
-public interface ExporterBuilder {
-  ExporterBuilder of(Class iface);
+public interface ExporterBuilder<T> {
+  ExporterBuilder<T> of(Class<T> iface);
   
-  ExporterBuilder withSuperinterfaces();
+  ExporterBuilder<T> withSuperinterfaces();
 
-  Ref asSingleton();
+  Ref<T> asSingleton();
   
-  Ref asFactory();
+  Ref<ObjectFactory<T, T>> asFactory();
 }

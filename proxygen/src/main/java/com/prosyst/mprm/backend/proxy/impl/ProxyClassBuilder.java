@@ -59,12 +59,12 @@ public class ProxyClassBuilder implements Opcodes {
   private class MixinGenerator implements ClassVisitor {
     private final String ifName;
     private final String fieldName;
-    private final Set visitedMethods;
+    private final Set<String> visitedMethods;
     
     public MixinGenerator(String ifName) {
       this.ifName = toInternalName(ifName);
       this.fieldName = toIdentifier(ifName);
-      this.visitedMethods = new HashSet();
+      this.visitedMethods = new HashSet<String>();
     }
     
     /**
@@ -300,8 +300,8 @@ public class ProxyClassBuilder implements Opcodes {
   private final String implName;
   private final ClassLoader loader;
   
-  private final List mixins; 
-  private final List classSig;
+  private final List<MixinGenerator> mixins; 
+  private final List<String> classSig;
   
   private String constrSig = "";
   
@@ -315,8 +315,8 @@ public class ProxyClassBuilder implements Opcodes {
     this.implName = toInternalName(implName);
     this.loader = loader;
     
-    this.mixins = new ArrayList();
-    this.classSig = new ArrayList();
+    this.mixins = new ArrayList<MixinGenerator>();
+    this.classSig = new ArrayList<String>();
     
     this.cv = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
   }
@@ -415,7 +415,7 @@ public class ProxyClassBuilder implements Opcodes {
    * @param name
    * @return
    */
-  private static String toInternalName(Class cl) {
+  private static String toInternalName(Class<?> cl) {
     return toInternalName(cl.getName());
   }
   

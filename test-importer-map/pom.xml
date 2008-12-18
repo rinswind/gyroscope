@@ -17,7 +17,6 @@
   <properties>
     <Private-Package>com.prosyst.mprm.backend.autowire.test.importer.map</Private-Package>
     <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.map.MapImporter</Bundle-Activator>
-    <Import-Package>*, com.prosyst.mprm.backend.proxy.gen, org.osgi.framework</Import-Package>
   </properties>
   
   <dependencies>

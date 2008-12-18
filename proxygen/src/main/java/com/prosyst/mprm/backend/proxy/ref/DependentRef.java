@@ -3,48 +3,53 @@ package com.prosyst.mprm.backend.proxy.ref;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 
 /**
- * A Ref whos lifecycle depends on the lifecycles of other Refs. This Ref must
- * not be bound explicitry. It binds itself automatically when it determines
- * it's dependencies have the appropriate states.
+ * A {@link Ref} whose lifecycle depends on the lifecycles of other {@link Ref}
+ * s. This {@link Ref} must not be bound explicitly. It binds itself
+ * automatically when it determines it's dependencies have the appropriate
+ * states.
  * 
  * @author Todor Boev
  * @version $Revision$
  */
-public abstract class DependentRef extends RefImpl {
-  private static final List TYPE = Arrays.asList(new Class[] {Void.class});
+public abstract class DependentRef extends RefImpl<Object> {
+  private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Void.class});
   
-  private final List deps;
-  private final RefListener listener;
+  private final List<Ref<?>> deps;
+  private final RefListener<?> listener;
   
   public DependentRef() {
     super(TYPE);
     
-    this.deps = new ArrayList();
-    this.listener = new RefListener.Adapter() {
+    this.deps = new ArrayList<Ref<?>>();
+    this.listener = new RefListener.Adapter<Object>() {
+      @Override
       public void open() {
         update();
       }
       
+      @Override
       public void bound() {
         update();
       }
 
+      @Override
       public void unbinding() {
         update();
       }
       
+      @Override
       public void closed() {
         update();
       }
     };
     
-    addListener(new RefListener.Adapter() {
+    addListener(new RefListener.Adapter<Object>() {
+      @Override
       public void open() {
         update();      
       }
@@ -52,10 +57,10 @@ public abstract class DependentRef extends RefImpl {
   }
   
   protected void dependsOn(Object proxy) {
-    dependsOn(((Proxy) proxy).proxyControl());
+    dependsOn(((Proxy<?>) proxy).proxyControl());
   }
   
-  protected void dependsOn(Ref ref) {
+  protected void dependsOn(Ref<?> ref) {
     if (State.CLOSED != state()) {
       throw new IllegalStateException();
     }
@@ -63,19 +68,23 @@ public abstract class DependentRef extends RefImpl {
     deps.add(ref);
   }
   
-  protected List deps() {
+  protected List<Ref<?>> deps() {
     return Collections.unmodifiableList(deps);
   }
   
+  @SuppressWarnings("unchecked")
+  @Override
   protected void openImpl() {
-    for (Iterator iter = deps.iterator(); iter.hasNext();) {
-      ((Ref) iter.next()).addListener(listener);
+    for (Ref dep : deps) {
+      dep.addListener(listener);
     }
   }
   
+  @SuppressWarnings("unchecked")
+  @Override
   protected void closeImpl() {
-    for (Iterator iter = deps.iterator(); iter.hasNext();) {
-      ((Ref) iter.next()).removeListener(listener);
+    for (Ref dep : deps) {
+      dep.removeListener(listener);
     }
   }
   
@@ -122,19 +131,19 @@ public abstract class DependentRef extends RefImpl {
     }
   }
   
-  protected static boolean isBound(Ref ref) {
+  protected static boolean isBound(Ref<?> ref) {
     return State.BOUND == ref.state();
   }
   
-  protected static boolean isUnbound(Ref ref) {
+  protected static boolean isUnbound(Ref<?> ref) {
     return State.UNBOUND == ref.state();
   }
   
-  protected static boolean isUnbinding(Ref ref) {
+  protected static boolean isUnbinding(Ref<?> ref) {
     return State.UNBINDING == ref.state();
   }
   
-  protected static boolean isClosed(Ref ref) {
+  protected static boolean isClosed(Ref<?> ref) {
     return State.CLOSED == ref.state();
   }
 }
