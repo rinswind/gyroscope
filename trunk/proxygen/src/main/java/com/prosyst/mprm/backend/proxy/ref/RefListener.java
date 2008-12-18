@@ -4,43 +4,49 @@ package com.prosyst.mprm.backend.proxy.ref;
  * @author Todor Boev
  * @version $Revision$
  */
-public interface RefListener {
-  void open(Ref r);
+public interface RefListener<T> {
+  void open(Ref<T> r);
   
-  void bound(Ref r);
+  void bound(Ref<T> r);
   
-  void unbinding(Ref r);
+  void unbinding(Ref<T> r);
   
-  void updated(Ref r);
+  void updated(Ref<T> r);
   
-  void closed(Ref r);
+  void closed(Ref<T> r);
   
-  public static class DirectAdapter implements RefListener {
-    public void bound(Ref r) {
+  /**
+   * The classic adapter pattern.
+   */
+  public static class DirectAdapter<T> implements RefListener<T> {
+    public void bound(Ref<T> r) {
     }
 
-    public void closed(Ref r) {
+    public void closed(Ref<T> r) {
     }
 
-    public void open(Ref r) {
+    public void open(Ref<T> r) {
     }
 
-    public void unbinding(Ref r) {
+    public void unbinding(Ref<T> r) {
     }
 
-    public void updated(Ref r) {
+    public void updated(Ref<T> r) {
     }
   }
   
-  public static class Adapter implements RefListener {
-    public final void open(Ref r) {
+  /**
+   * Makes listening to the state of a single {@link Ref} as easy as possible.
+   */
+  public static class Adapter<T> implements RefListener<T> {
+    public final void open(Ref<T> r) {
       open();
     }
     
     public void open() {
     }
 
-    public final void bound(Ref r) {
+    public final void bound(Ref<T> r) {
       try {
         bound();
       } catch (RuntimeException re) {
@@ -53,7 +59,7 @@ public interface RefListener {
     public void bound() throws Exception {
     }
 
-    public final void updated(Ref r) {
+    public final void updated(Ref<T> r) {
       try {
         updated();
       } catch (RuntimeException re) {
@@ -66,7 +72,7 @@ public interface RefListener {
     public void updated() throws Exception {
     }
 
-    public final void unbinding(Ref r) {
+    public final void unbinding(Ref<T> r) {
       try {
         unbinding();
       } catch (RuntimeException re) {
@@ -79,7 +85,7 @@ public interface RefListener {
     public void unbinding() throws Exception {
     }
 
-    public final void closed(Ref r) {
+    public final void closed(Ref<T> r) {
       try {
         closed();
       } catch (RuntimeException re) {

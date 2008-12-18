@@ -3,42 +3,46 @@ package com.prosyst.mprm.backend.proxy.ref;
 import java.util.Map;
 
 /**
- * Maintains two refs in the "implies" relation. Where the source implies the
- * target.
+ * Maintains two {@link Ref} objects in the "implies" relation where the source
+ * implies the target.
  * 
  * @author Todor Boev
  * @version $Revision$
  */
-public class ImplicationRef extends DependentRef {
-  private final Ref target;
-  private final Object delegate;
-  private final Map props;
- 
-  public ImplicationRef(Ref source, Ref target, Object delegate, Map props) {
+public class ImplicationRef<T> extends DependentRef {
+  private final Ref<T> target;
+  private final T delegate;
+  private final Map<String, ?> props;
+
+  public ImplicationRef(Ref<?> source, Ref<T> target, T delegate, Map<String, ?> props) {
     super();
-    
+
     this.target = target;
     this.delegate = delegate;
     this.props = props;
-    
+
     dependsOn(source);
     dependsOn(target);
   }
-  
+
+  @Override
   protected boolean mustBind() {
-    return isBound((Ref) deps().get(0)) && isUnbound((Ref) deps().get(1));
+    return isBound(deps().get(0)) && isUnbound(deps().get(1));
   }
-    
+
+  @Override
   protected boolean mustUnbind() {
-    return !isBound((Ref) deps().get(0));
+    return !isBound(deps().get(0));
   }
-  
-  protected Object bindImpl(Object ignored1, Map ignored2) {
+
+  @Override
+  protected Object bindImpl(Object ignored1, Map<String, ?> ignored2) {
     target.bind(delegate, props);
     return null;
   }
-    
-  protected void unbindImpl(Object ignored1, Map ignored2) {
+
+  @Override
+  protected void unbindImpl(Object ignored1, Map<String, ?> ignored2) {
     target.unbind();
   }
 }

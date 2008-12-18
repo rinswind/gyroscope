@@ -10,7 +10,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 public class ProxyFactoryServiceFactory implements ServiceFactory {
 	public Object getService(Bundle bundle, ServiceRegistration registration) {
-		return new ProxyFactoryImpl(new ProxyClassLoader(new BundleDelegationClassLoader(bundle)));
+		return new ProxyFactoryImpl(new ProxyClassLoader(new BundleClassLoader(bundle)));
 	}
 
 	public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {

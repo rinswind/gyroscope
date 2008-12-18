@@ -3,7 +3,6 @@ package com.prosyst.mprm.backend.proxy.ref;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,22 +15,22 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefMapImpl extends RefImpl implements RefMap {
-  private static final List TYPE = Arrays.asList(new Class[] {Map.class});
+public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
+  private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Map.class});
   
   private final ProxyFactory fact;
-  private final Map refs;
-  private final Map proxies;
+  private final Map<K, Ref<V>> refs;
+  private final Map<K, V> proxies;
   
   public RefMapImpl(ProxyFactory fact) {
     super(TYPE);
     
     this.fact = fact;
-    this.refs = new ConcurrentHashMap();
-    this.proxies = new ConcurrentHashMap();
+    this.refs = new ConcurrentHashMap<K, Ref<V>>();
+    this.proxies = new ConcurrentHashMap<K,V>();
   }
 
-  public void put(Object key, Ref ref) {
+  public void put(K key, Ref<V> ref) {
     lock().lock();
     try {
       refs.put(key, ref);
@@ -41,14 +40,14 @@ public class RefMapImpl extends RefImpl implements RefMap {
     }
   }
 
-  public Ref remove(Object key) {
+  public Ref<V> remove(K key) {
     lock().lock();
     try {
       if (proxies.remove(key) == null) {
         return null;
       }
       
-      Ref ref = (Ref) refs.remove(key);
+      Ref<V> ref = refs.remove(key);
       ref.close();
       return ref;
     } finally {
@@ -56,16 +55,16 @@ public class RefMapImpl extends RefImpl implements RefMap {
     }
   }
 
-  public Ref get(Object key) {
+  public Ref<V> get(K key) {
     lock().lock();
     try {
-      return (Ref) refs.get(key);
+      return refs.get(key);
     } finally {
       lock().unlock();
     }
   }
 
-  public Set entries() {
+  public Set<Map.Entry<K, Ref<V>>> entries() {
     lock().lock();
     try {
       return refs.entrySet();
@@ -74,7 +73,7 @@ public class RefMapImpl extends RefImpl implements RefMap {
     }
   }
 
-  public Set keys() {
+  public Set<K> keys() {
     lock().lock();
     try {
       return refs.keySet();
@@ -83,7 +82,7 @@ public class RefMapImpl extends RefImpl implements RefMap {
     }
   }
 
-  public Collection values() {
+  public Collection<Ref<V>> values() {
     lock().lock();
     try {
       return refs.values();
@@ -92,15 +91,15 @@ public class RefMapImpl extends RefImpl implements RefMap {
     }
   }
 
-  protected Object bindImpl(Object ignored1, Map ignored2) {
+  @Override
+  protected Map<K,V> bindImpl(Map<K,V> ignored1, Map<String, ?> ignored2) {
     return Collections.unmodifiableMap(proxies);
   }
   
+  @Override
   protected void closeImpl() {
-    for (Iterator iter = entries().iterator(); iter.hasNext();) {
-      Entry e = (Entry) iter.next();
+    for (Entry<K, Ref<V>> e : entries()) {
       remove(e.getKey());
     }
   }
 }
-

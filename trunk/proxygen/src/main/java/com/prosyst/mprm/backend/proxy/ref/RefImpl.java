@@ -10,41 +10,47 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefImpl implements Ref {
+public class RefImpl<T> implements Ref<T> {
   /**
    * Controls the correct transition from state to state as well as the event
    * dispatching on the appropriate state entries.
    */
-  public static class StateHandler {
-    public static final StateHandler CLOSED = new StateHandler(State.CLOSED);
-    public static final StateHandler OPENING = new StateHandler(State.OPENING) {
-      protected void dispatchOnExit(Ref lc, RefListener ll) {
+  public enum StateHandler {
+    CLOSED(State.CLOSED),
+    OPENING(State.OPENING) {
+      @Override
+      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
         ll.open(lc);
       }
-    };
-    public static final StateHandler CLOSING = new StateHandler(State.CLOSING) {
-      protected void dispatchOnExit(Ref lc, RefListener ll) {
+    },
+    CLOSING(State.CLOSING) {
+      @Override
+      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
         ll.closed(lc);
       }
-    };
-    public static final StateHandler UNBOUND = new StateHandler(State.UNBOUND);
-    public static final StateHandler BINDING = new StateHandler(State.BINDING) {
-      protected void dispatchOnExit(Ref lc, RefListener ll) {
+    },
+    UNBOUND(State.UNBOUND),
+    BINDING(State.BINDING) {
+      @Override
+      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
         ll.bound(lc);
       }
-    };
-    public static final StateHandler UNBINDING = new StateHandler(State.UNBINDING) {
-      protected void dispatchOnEntry(Ref lc, RefListener ll) {
+    },
+    UNBINDING(State.UNBINDING) {
+      @Override
+      protected <T> void dispatchOnEntry(Ref<T> lc, RefListener<T> ll) {
         ll.unbinding(lc);
       }
-    };
-    public static final StateHandler BOUND = new StateHandler(State.BOUND);
-    public static final StateHandler UPDATING = new StateHandler(State.UPDATED) {
-      protected void dispatchOnExit(Ref lc, RefListener ll) {
+    },
+    BOUND(State.BOUND),
+    UPDATING(State.UPDATED) {
+      @Override
+      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
         ll.updated(lc);
       }
     };
     
+    /* Once all nodes are created link the state machine together */
     static {
       CLOSED.addTransit(OPENING);
       
@@ -66,12 +72,12 @@ public class RefImpl implements Ref {
     }
     
     private final State state;
-    private final Set transits;
+    private final Set<StateHandler> transits;
     private StateHandler rollback;
     
     private StateHandler(State state) {
       this.state = state;
-      this.transits = new HashSet();
+      this.transits = new HashSet<StateHandler>();
     }
     
     private void addTransit(StateHandler state) {
@@ -97,68 +103,70 @@ public class RefImpl implements Ref {
       return rollback;
     }
     
-    public void dispatchOnEntry(Ref lc, Collection listeners) {
-      for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+    public <T> void dispatchOnEntry(Ref<T> ref, Collection<RefListener<T>> listeners) {
+      for (RefListener<T> l : listeners) {
         try {
-          dispatchOnEntry(lc, (RefListener) iter.next());
+          dispatchOnEntry(ref, l);
         } catch (Throwable thr) {
           thr.printStackTrace();
         }
       }
     }
     
-    public void dispatchOnExit(Ref lc, Collection listeners) {
-      for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+    public <T> void dispatchOnExit(Ref<T> ref, Collection<RefListener<T>> listeners) {
+      for (RefListener<T> l : listeners) {
         try {
-          dispatchOnExit(lc, (RefListener) iter.next());
+          dispatchOnExit(ref, l);
         } catch (Throwable thr) {
           thr.printStackTrace();
         }
       }
     }
     
-    protected void dispatchOnEntry(Ref lc, RefListener ll) {
+    protected <T> void dispatchOnEntry(Ref<T> lc, RefListener<T> ll) {
       /* By default do not call the listener */
     }
     
-    protected void dispatchOnExit(Ref lc, RefListener ll) {
+    protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
       /* By default do not call the listener */
     }
   }
   
-  private final List type;
-  private final Collection listeners;
+  private final List<Class<?>> type;
+  private final Collection<RefListener<T>> listeners;
   private final ReadWriteLock lock;
 
   private StateHandler state;
-  private Object delegate;
-  private Map props;
+  private T delegate;
+  private Map<String, Object> props;
   
   /**
    * @param type
    */
-  public RefImpl(Class type) {
-    this (Arrays.asList(new Class[] {type}));
+  public RefImpl(Class<?> type) {
+    this (Arrays.<Class<?>>asList(type));
   }
   
   /**
    * @param type
    */
-  public RefImpl(List type) {
-    List modType = new ArrayList(type.size());
+  public RefImpl(List<Class<?>> type) {
+    /* Do a defensive copy */
+    List<Class<?>> modType = new ArrayList<Class<?>>(type.size());
     modType.addAll(type);
     
     this.type = Collections.unmodifiableList(modType);
-    this.listeners = new ConcurrentLinkedQueue();
+    this.listeners = new ConcurrentLinkedQueue<RefListener<T>>();
     this.lock = new ReentrantReadWriteLock();
     
     this.state = StateHandler.CLOSED;
-    this.props = Collections.EMPTY_MAP;
+    this.props = Collections.emptyMap();
   }
   
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return "Ref(" + type + ")[ " + state() + " ]";
   }
@@ -166,7 +174,7 @@ public class RefImpl implements Ref {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#type()
    */
-  public List type() {
+  public List<Class<?>> type() {
     return type;
   }
   
@@ -177,7 +185,7 @@ public class RefImpl implements Ref {
    * 
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#delegate()
    */
-  public final Object delegate() {
+  public final T delegate() {
     if (State.BOUND != state.state) {
       throw new RefUnboundException(this);
     }
@@ -188,7 +196,7 @@ public class RefImpl implements Ref {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#props()
    */
-  public final Map props() {
+  public final Map<String, ?> props() {
     lock.readLock().lock();
     try {
       return Collections.unmodifiableMap(props);
@@ -200,14 +208,14 @@ public class RefImpl implements Ref {
   /**
    * @see com.prosyst.mprm.backend.proxy.gen.Proxy#addListener(com.prosyst.mprm.backend.autowire.ServiceProxyListener)
    */
-  public final void addListener(RefListener listener) {
+  public final void addListener(RefListener<T> listener) {
     listeners.add(listener);
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#removeListener(com.prosyst.mprm.backend.proxy.ref.RefListener)
    */
-  public final void removeListener(RefListener listener) {
+  public final void removeListener(RefListener<T> listener) {
     listeners.remove(listener);
   }
 
@@ -278,12 +286,12 @@ public class RefImpl implements Ref {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */
-  public final void bind(Object delegate, Map props) {
+  public final void bind(T delegate, Map<String, ?> props) {
     toState(StateHandler.BINDING);
     
     try {
       if (props != null) {
-        this.props = new HashMap();
+        this.props = new HashMap<String, Object>();
         this.props.putAll(props);
       }
       
@@ -300,14 +308,14 @@ public class RefImpl implements Ref {
    * @param delegate
    * @return
    */
-  protected Object bindImpl(Object delegate, Map props) {
+  protected T bindImpl(T delegate, Map<String, ?> props) {
     return delegate;
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#update(java.lang.Object, java.util.Map)
    */
-  public final void update(Object delegate, Map props) {
+  public final void update(T delegate, Map<String, ?> props) {
     if (delegate == null && props == null) {
       throw new RefException(this + ": Must update something");
     }
@@ -316,7 +324,7 @@ public class RefImpl implements Ref {
     
     try {
       if (props != null) {
-        this.props = new HashMap();
+        this.props = new HashMap<String, Object>();
         this.props.putAll(props);
       }
       
@@ -332,7 +340,7 @@ public class RefImpl implements Ref {
    * @param delegate
    * @return
    */
-  protected Object updateImpl(Object delegate, Map props) {
+  protected <N extends T> T updateImpl(N delegate, Map<String, ?> props) {
     return bindImpl(delegate, props);
   }
   
@@ -348,7 +356,7 @@ public class RefImpl implements Ref {
       unbindImpl(delegate, props);
     } finally {
       this.delegate = null;
-      this.props = Collections.EMPTY_MAP;
+      this.props = Collections.emptyMap();
       
       toState(StateHandler.UNBOUND);
     }
@@ -357,7 +365,7 @@ public class RefImpl implements Ref {
   /**
    * 
    */
-  protected void unbindImpl(Object delegate, Map props) {
+  protected void unbindImpl(T delegate, Map<String, ?> props) {
   }
   
   /**

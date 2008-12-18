@@ -17,7 +17,6 @@
   <properties>
     <Private-Package>com.prosyst.mprm.backend.autowire.test.importer.refchain</Private-Package>
     <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.refchain.RefChainImporter</Bundle-Activator>
-    <Import-Package>*, com.prosyst.mprm.backend.proxy.gen, org.osgi.framework</Import-Package>
   </properties>
   
   <dependencies>

@@ -36,6 +36,13 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    */
   {
     refs = new ArrayList();
+    /*
+     * The proxy class loader will delegate to the class space of the client
+     * bundle. This happens because this is an abstract class, therefore the
+     * user must extend it and load the extension from his bundle's class
+     * loader. Finally getClass() returns the extension class - not
+     * RefContainerImpl.class
+     */
     fact = new ProxyFactoryImpl(new ProxyClassLoader(getClass().getClassLoader()));
     
     /* Create the root external service */

@@ -18,11 +18,11 @@ import com.prosyst.mprm.backend.proxy.ref.RefImpl;
  * @author Todor Boev
  * @version $Revision$
  */
-public class OsgiExporterRef extends RefImpl {
+public class OsgiExporterRef<T> extends RefImpl<T> {
   private final BundleContext bc;
   private ServiceRegistration reg;
   
-  public OsgiExporterRef(List ifaces, BundleContext bc) {
+  public OsgiExporterRef(List<Class<?>> ifaces, BundleContext bc) {
     super (ifaces);
     this.bc = bc;
   }

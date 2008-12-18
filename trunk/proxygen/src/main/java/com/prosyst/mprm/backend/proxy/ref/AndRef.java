@@ -1,27 +1,28 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
-import java.util.Iterator;
-
 /**
  * @author Todor Boev
  * @version $Revision$
  */
 public class AndRef extends DependentRef {
+  @Override
   public String toString() {
     return "and" + deps();
   }
   
-  public void dependsOn(Ref ref) {
+  @Override
+  public void dependsOn(Ref<?> ref) {
     super.dependsOn(ref);
   }
   
+  @Override
   public void dependsOn(Object proxy) {
     super.dependsOn(proxy);
   }
   
+  @Override
   protected boolean mustBind() {
-    for (Iterator iter = deps().iterator(); iter.hasNext();) {
-      Ref dep = (Ref) iter.next();
+    for (Ref<?> dep : deps()) {
       if (!isBound(dep)) {
         return false;
       }
@@ -29,6 +30,7 @@ public class AndRef extends DependentRef {
     return true;
   }
   
+  @Override
   protected boolean mustUnbind() {
     return !mustBind();
   }

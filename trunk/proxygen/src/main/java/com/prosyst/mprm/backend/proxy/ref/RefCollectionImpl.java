@@ -14,13 +14,13 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefCollectionImpl extends RefImpl implements RefCollection {
-  private static final List TYPE = Arrays.asList(new Class[] {Collection.class});
+public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefCollection<T> {
+  private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(Collection.class);
 
   private final ProxyFactory fact;
   
-  private final Collection refs;
-  private final Collection proxies;
+  private final Collection<Ref<T>> refs;
+  private final Collection<T> proxies;
   
   /**
    * @param elemType
@@ -29,11 +29,11 @@ public class RefCollectionImpl extends RefImpl implements RefCollection {
     super(TYPE);
     
     this.fact = fact;
-    this.refs = new ConcurrentLinkedQueue();
-    this.proxies = new ConcurrentLinkedQueue();
+    this.refs = new ConcurrentLinkedQueue<Ref<T>>();
+    this.proxies = new ConcurrentLinkedQueue<T>();
   }
 
-  public final void add(Ref ref) {
+  public final void add(Ref<T> ref) {
     lock().lock();
     try {
       refs.add(ref);
@@ -43,7 +43,7 @@ public class RefCollectionImpl extends RefImpl implements RefCollection {
     }
   }
   
-  public final boolean remove(Ref ref) {
+  public final boolean remove(Ref<T> ref) {
     lock().lock();
     try {
       if (!refs.remove(ref)) {
@@ -54,7 +54,7 @@ public class RefCollectionImpl extends RefImpl implements RefCollection {
        * Must compare proxy.equals(delegate) in order to get true. The normal
        * remove() method compares delegate.equals(proxy) and fails
        */
-      for (Iterator iter = proxies.iterator(); iter.hasNext();) {
+      for (Iterator<T> iter = proxies.iterator(); iter.hasNext();) {
         if (iter.next().equals(ref.delegate())) {
           iter.remove();
           ref.close();
@@ -71,23 +71,25 @@ public class RefCollectionImpl extends RefImpl implements RefCollection {
   /**
    * Weakly consistent Iterator over all existing proxies.
    */
-  public final Iterator iterator() {
+  public final Iterator<Ref<T>> iterator() {
     return refs.iterator(); 
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#bindImpl(java.lang.Object, java.util.Map)
    */
-  protected Object bindImpl(Object ignored1, Map ignored2) {
+  @Override
+  protected Collection<T> bindImpl(Collection<T> ignored1, Map<String, ?> ignored2) {
     return Collections.unmodifiableCollection(proxies);
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#closeImpl()
    */
+  @Override
   protected void closeImpl() {
-    for (Iterator iter = iterator(); iter.hasNext();) {
-      remove((Ref) iter.next());
+    for (Ref<T> ref : refs) {
+      remove(ref);
     }
   }
 }

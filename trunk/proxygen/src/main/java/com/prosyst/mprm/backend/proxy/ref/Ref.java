@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
+/*
+ * FIX How should the RefListener be generified? Should it be generified at all?
+ */
+
 /**
  * @author Todor Boev
  * @version $Revision$
@@ -22,9 +26,14 @@ public interface Ref<T> {
     BOUND,
     UPDATED;
   }
-  
+
   /**
-   * @return type of the object returned by delegate(). 
+   * Lists the types of the delegate in which we are interested. These are going
+   * to be some of the interfaces, which the object returned from delegate()
+   * implements e.g. <code>T</code> must extend all the members of this list
+   * except if some of these members is <code>T</code> itself.
+   * 
+   * @return type of the object returned by delegate().
    */
   List<Class<?>> type();
   
@@ -64,7 +73,7 @@ public interface Ref<T> {
 
   void close();
   
-  void addListener(RefListener l);
+  void addListener(RefListener<T> l);
   
-  void removeListener(RefListener l);
+  void removeListener(RefListener<T> l);
 }
