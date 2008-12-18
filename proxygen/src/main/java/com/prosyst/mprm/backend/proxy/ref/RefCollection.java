@@ -1,12 +1,9 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
 import java.util.Collection;
-import java.util.Iterator;
 
-public interface RefCollection<T> extends Ref<Collection<T>> {
-  void add(Ref<T> ref);
+public interface RefCollection<T, I> extends Ref<Collection<T>, Collection<I>>, Iterable<Ref<T, I>> {
+  void add(Ref<T, I> ref);
   
-  boolean remove(Ref<T> ref);
-  
-  Iterator<Ref<T>> iterator();
+  boolean remove(Ref<T, I> ref);
 }

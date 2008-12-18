@@ -31,7 +31,7 @@ public class ProxyClassLoader extends ClassLoader {
     private final List<Class<?>> classes;
     private int hash;
 
-    public Key(Ref<?> ref) {
+    public Key(Ref<?, ?> ref) {
       this.classes = new ArrayList<Class<?>>(ref.type().size());
 
       this.hash = 17;
@@ -100,7 +100,7 @@ public class ProxyClassLoader extends ClassLoader {
    * @return
    */
   @SuppressWarnings("unchecked")
-  public <T> Class<? extends T> loadProxyClass(Ref<T> ref) {
+  public <T> Class<? extends T> loadProxyClass(Ref<T, ?> ref) {
     Key k = new Key(ref);
 
     /* Check if we have an appropriate proxy class created already */

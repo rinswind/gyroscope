@@ -23,7 +23,7 @@ public class ProxyFactoryImpl implements ProxyFactory {
   /**
    * @see com.prosyst.mprm.backend.proxy.gen.ProxyFactory#proxy(com.prosyst.mprm.backend.proxy.ref.Ref)
    */
-  public <T> T proxy(Ref<T> ref) {
+  public <T> T proxy(Ref<T, ?> ref) {
     try {
       Class<? extends T> pclass = loader.loadProxyClass(ref);
       List<Class<?>> types = ref.type();

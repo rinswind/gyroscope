@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Lock;
  * @author Todor Boev
  * @version $Revision$
  */
-public interface Ref<T> {
+public interface Ref<T, I> {
   /**
    * Lifecycle of a dynamic reference.
    */
@@ -31,7 +31,7 @@ public interface Ref<T> {
    * Lists the types of the delegate in which we are interested. These are going
    * to be some of the interfaces, which the object returned from delegate()
    * implements e.g. <code>T</code> must extend all the members of this list
-   * except if some of these members is <code>T</code> itself.
+   * except if one of these members is <code>T</code> itself.
    * 
    * @return type of the object returned by delegate().
    */
@@ -65,15 +65,15 @@ public interface Ref<T> {
   
   void open();
   
-  void bind(T delegate, Map<String, ?> props);
+  void bind(I delegate, Map<String, ?> props);
   
-  void update(T delegate, Map<String, ?> props);
+  void update(I delegate, Map<String, ?> props);
   
   void unbind();
 
   void close();
   
-  void addListener(RefListener<T> l);
+  void addListener(RefListener<T, I> l);
   
-  void removeListener(RefListener<T> l);
+  void removeListener(RefListener<T, I> l);
 }

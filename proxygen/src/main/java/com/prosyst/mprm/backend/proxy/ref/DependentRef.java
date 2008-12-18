@@ -16,17 +16,17 @@ import com.prosyst.mprm.backend.proxy.gen.Proxy;
  * @author Todor Boev
  * @version $Revision$
  */
-public abstract class DependentRef extends RefImpl<Object> {
+public abstract class DependentRef extends RefImpl<Object, Object> {
   private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Void.class});
   
-  private final List<Ref<?>> deps;
-  private final RefListener<?> listener;
+  private final List<Ref<?,?>> deps;
+  private final RefListener<?,?> listener;
   
   public DependentRef() {
     super(TYPE);
     
-    this.deps = new ArrayList<Ref<?>>();
-    this.listener = new RefListener.Adapter<Object>() {
+    this.deps = new ArrayList<Ref<?,?>>();
+    this.listener = new RefListener.Adapter() {
       @Override
       public void open() {
         update();
@@ -48,7 +48,7 @@ public abstract class DependentRef extends RefImpl<Object> {
       }
     };
     
-    addListener(new RefListener.Adapter<Object>() {
+    addListener(new RefListener.Adapter() {
       @Override
       public void open() {
         update();      
@@ -57,10 +57,10 @@ public abstract class DependentRef extends RefImpl<Object> {
   }
   
   protected void dependsOn(Object proxy) {
-    dependsOn(((Proxy<?>) proxy).proxyControl());
+    dependsOn(((Proxy<?, ?>) proxy).proxyControl());
   }
   
-  protected void dependsOn(Ref<?> ref) {
+  protected void dependsOn(Ref<?, ?> ref) {
     if (State.CLOSED != state()) {
       throw new IllegalStateException();
     }
@@ -68,11 +68,10 @@ public abstract class DependentRef extends RefImpl<Object> {
     deps.add(ref);
   }
   
-  protected List<Ref<?>> deps() {
+  protected List<Ref<?, ?>> deps() {
     return Collections.unmodifiableList(deps);
   }
   
-  @SuppressWarnings("unchecked")
   @Override
   protected void openImpl() {
     for (Ref dep : deps) {
@@ -80,7 +79,6 @@ public abstract class DependentRef extends RefImpl<Object> {
     }
   }
   
-  @SuppressWarnings("unchecked")
   @Override
   protected void closeImpl() {
     for (Ref dep : deps) {
@@ -131,19 +129,19 @@ public abstract class DependentRef extends RefImpl<Object> {
     }
   }
   
-  protected static boolean isBound(Ref<?> ref) {
+  protected static boolean isBound(Ref<?, ?> ref) {
     return State.BOUND == ref.state();
   }
   
-  protected static boolean isUnbound(Ref<?> ref) {
+  protected static boolean isUnbound(Ref<?, ?> ref) {
     return State.UNBOUND == ref.state();
   }
   
-  protected static boolean isUnbinding(Ref<?> ref) {
+  protected static boolean isUnbinding(Ref<?, ?> ref) {
     return State.UNBINDING == ref.state();
   }
   
-  protected static boolean isClosed(Ref<?> ref) {
+  protected static boolean isClosed(Ref<?, ?> ref) {
     return State.CLOSED == ref.state();
   }
 }

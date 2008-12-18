@@ -11,7 +11,7 @@ public class AndRef extends DependentRef {
   }
   
   @Override
-  public void dependsOn(Ref<?> ref) {
+  public void dependsOn(Ref<?, ?> ref) {
     super.dependsOn(ref);
   }
   
@@ -22,7 +22,7 @@ public class AndRef extends DependentRef {
   
   @Override
   protected boolean mustBind() {
-    for (Ref<?> dep : deps()) {
+    for (Ref<?, ?> dep : deps()) {
       if (!isBound(dep)) {
         return false;
       }

@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public interface RefMap<K,V> extends Ref<Map<K,V>> {
-  void put(K key, Ref<V> ref);
+public interface RefMap<K,T,I> extends Ref<Map<K,T>, Map<K, I>> {
+  void put(K key, Ref<T, I> ref);
   
-  Ref<V> get(K key);
+  Ref<T, I> get(K key);
   
-  Ref<V> remove(K key);
+  Ref<T, I> remove(K key);
   
-  Set<Map.Entry<K, Ref<V>>> entries();
+  Set<Map.Entry<K, Ref<T, I>>> entries();
   
   Set<K> keys();
   
-  Collection<Ref<V>> values();
+  Collection<Ref<T, I>> values();
 }

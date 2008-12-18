@@ -12,12 +12,12 @@ import com.prosyst.mprm.backend.proxy.ref.RefImpl;
  * @author Todor Boev
  * @version $Revision$
  */
-public class OsgiImporterRef<T, N> extends RefImpl<T> {
+public class OsgiImporterRef<T, I> extends RefImpl<T, ServiceReference/* <I> */> {
   private BundleContext bc;
   private ServiceReference ref;
-  private ObjectFactory val;
+  private ObjectFactory<T, I> val;
   
-  public OsgiImporterRef(Class<T> type, ObjectFactory<T, N> val, BundleContext bc) {
+  public OsgiImporterRef(Class<T> type, ObjectFactory<T, I> val, BundleContext bc) {
     super(type);
     this.bc = bc;
     this.val = val;
@@ -32,26 +32,27 @@ public class OsgiImporterRef<T, N> extends RefImpl<T> {
     }
   }
   
-  protected Object bindImpl(Object delegate, Map props) {
-    ServiceReference ref = (ServiceReference) delegate;
-    
-    Object service = bc.getService(ref);
-    if (service == null) {
+  @SuppressWarnings("unchecked")
+  @Override
+  protected T bindImpl(ServiceReference/*<I>*/ delegate, Map<String, ?> props) {
+    I inpout = (I) bc.getService(delegate);
+    if (inpout == null) {
       throw new RefException("Obtained a null service from reference " + ref);
     }
     
-    service = val.create(service, props);
+    T service = val.create(inpout, props);
     
     /* If we're hot-swapping we need to drop the previous service */
     if (State.BINDING == state()) { 
       bc.ungetService(ref);
     }
       
-    this.ref = ref;
+    this.ref = delegate;
     return service;
   }
   
-  protected void unbindImpl(Object delegate, Map props) {
+  @Override
+  protected void unbindImpl(T delegate, Map<String, ?> props) {
     val.destroy(delegate);
     
     bc.ungetService(ref);

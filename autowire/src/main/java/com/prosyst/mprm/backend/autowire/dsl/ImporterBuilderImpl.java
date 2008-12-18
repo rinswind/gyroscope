@@ -52,7 +52,7 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
     
     /* Default value */
     this.valType = Object.class;
-    this.val = ObjectFactories.val();
+    this.val = ObjectFactories.identity();
   }
   
   public ImporterBuilder of(Class filter) {
