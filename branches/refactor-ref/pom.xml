@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>edu.unseen</groupId>
+  <artifactId>autowire-modules</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <name>Autowire: OSGi service layer runtime</name>
+  
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>proxygen</module>
+    <module>asm</module>
+    <module>autowire</module>
+    <module>test-exporter-hello</module>
+    <module>test-exporter-format</module>
+    <module>test-exporter-date</module>
+    <module>test-exporter-worker</module>
+    <module>test-importer-ref</module>
+    <module>test-importer-refchain</module>
+    <module>test-importer-collection</module>
+    <module>test-importer-map</module>
+    <module>test-exporter-guicy-hello</module>
+    <module>guice-wrapped</module>
+    <module>aopalliance-wrapped</module>
+    <module>test-importer-guicy-collection</module>
+  </modules>
+</project>
