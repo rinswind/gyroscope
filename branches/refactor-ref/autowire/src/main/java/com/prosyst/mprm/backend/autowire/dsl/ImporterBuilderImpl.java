@@ -6,14 +6,14 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
-import com.prosyst.mprm.backend.autowire.ObjectFactories;
-import com.prosyst.mprm.backend.autowire.ObjectFactory;
 import com.prosyst.mprm.backend.autowire.OsgiImporterCollection;
 import com.prosyst.mprm.backend.autowire.OsgiImporterMap;
 import com.prosyst.mprm.backend.autowire.OsgiImporterSingleton;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.ref.ImplicationRef;
+import com.prosyst.mprm.backend.proxy.ref.ObjectFactories;
+import com.prosyst.mprm.backend.proxy.ref.ObjectMapper;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 /**
@@ -37,10 +37,10 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
   private int current;
   
   private Class keyType;
-  private ObjectFactory key;
+  private ObjectMapper key;
   
   private Class valType;
-  private ObjectFactory val;
+  private ObjectMapper val;
   
   private Comparator comp;
   private boolean hotswap;
@@ -52,7 +52,7 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
     
     /* Default value */
     this.valType = Object.class;
-    this.val = ObjectFactories.val();
+    this.val = ObjectFactories.identity();
   }
   
   public ImporterBuilder of(Class filter) {
@@ -121,7 +121,7 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
   public ImporterObjectFactoryBuilder withKey(Class type) {
     keyType = type;
     return new ImporterObjectFactoryBuilder() {
-      public ImporterValBuilder createdBy(ObjectFactory fact) {
+      public ImporterValBuilder createdBy(ObjectMapper fact) {
         key = fact;
         return ImporterBuilderImpl.this;
       }
@@ -135,7 +135,7 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
   public ImporterObjectFactoryBuilder withVal(Class type) {
     valType = type;
     return new ImporterObjectFactoryBuilder() {
-      public ImporterValBuilder createdBy(ObjectFactory fact) {
+      public ImporterValBuilder createdBy(ObjectMapper fact) {
         val = fact;
         return ImporterBuilderImpl.this;
       }

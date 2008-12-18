@@ -5,12 +5,16 @@ import java.util.Comparator;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
+/**
+ *
+ * @author Todor Boev
+ */
 public class ServiceComparators {
   /**
    * The standard "max rank or min id" service comparator. 
    */
-  public static final Comparator STANDARD = new Comparator() {
-    public int compare(Object fst, Object sec) {
+  public static final Comparator<ServiceReference> STANDARD = new Comparator<ServiceReference>() {
+    public int compare(ServiceReference fst, ServiceReference sec) {
       ServiceReference sfst = (ServiceReference) fst;
       ServiceReference ssec = (ServiceReference) sec;
       
@@ -31,14 +35,14 @@ public class ServiceComparators {
   /**
    * Reverses any passed comparator
    */
-  public static class Reverse implements Comparator {
-    private final Comparator comp;
+  public static class Reverse<T> implements Comparator<T> {
+    private final Comparator<T> comp;
     
-    public Reverse(Comparator comp) {
+    public Reverse(Comparator<T> comp) {
       this.comp = comp;
     }
     
-    public int compare(Object a, Object b) {
+    public int compare(T a, T b) {
       return comp.compare(b, a);
     }
   }
@@ -47,8 +51,8 @@ public class ServiceComparators {
    * Recognizes a default service and keeps it last. For all other services
    * delegates comparison to the STANDARD comparator.
    */
-  public static abstract class DefaultComesLast implements Comparator {
-    public int compare(Object a, Object b) {
+  public static abstract class DefaultComesLast implements Comparator<ServiceReference> {
+    public int compare(ServiceReference a, ServiceReference b) {
       ServiceReference ra = (ServiceReference) a;
       ServiceReference rb = (ServiceReference) b;
 

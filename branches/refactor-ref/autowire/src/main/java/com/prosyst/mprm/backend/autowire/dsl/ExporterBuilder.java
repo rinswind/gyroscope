@@ -1,6 +1,6 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
-import com.prosyst.mprm.backend.autowire.ObjectFactory;
+import com.prosyst.mprm.backend.proxy.ref.ObjectMapper;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 public interface ExporterBuilder<T> {
@@ -10,5 +10,5 @@ public interface ExporterBuilder<T> {
 
   Ref<T> asSingleton();
   
-  Ref<ObjectFactory<T, T>> asFactory();
+  Ref<ObjectMapper<T, T>> asFactory();
 }

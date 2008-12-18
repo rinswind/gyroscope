@@ -7,6 +7,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
+import com.prosyst.mprm.backend.proxy.ref.ObjectMapper;
 import com.prosyst.mprm.backend.proxy.ref.RefMapImpl;
 
 /**
@@ -16,14 +17,14 @@ import com.prosyst.mprm.backend.proxy.ref.RefMapImpl;
 public class OsgiImporterMap extends RefMapImpl {
   private final OsgiTracker tracker;
   
-  public OsgiImporterMap(final Class valType, final ObjectFactory val, final Class keyType,
-      final ObjectFactory key, final ProxyFactory fact, final BundleContext bc, String filter) {
+  public OsgiImporterMap(final Class valType, final ObjectMapper val, final Class keyType,
+      final ObjectMapper key, final ProxyFactory fact, final BundleContext bc, String filter) {
     
     super(fact);
     
     this.tracker = new OsgiTracker(bc, filter, null) {
       protected void added(ServiceReference ref) {
-        OsgiImporterRef r = new OsgiImporterRef(valType, val, bc);
+        OsgiImporterSingleton r = new OsgiImporterSingleton(valType, val, bc);
         r.open();
         r.bind(ref, props(ref));
         
@@ -32,7 +33,7 @@ public class OsgiImporterMap extends RefMapImpl {
 
       protected void modified(ServiceReference sref) {
         for (Iterator iter = values().iterator(); iter.hasNext();) {
-          OsgiImporterRef ref = (OsgiImporterRef) iter.next();
+          OsgiImporterSingleton ref = (OsgiImporterSingleton) iter.next();
           if (ref.hasRef(sref)) {
             ref.update(null, props(sref));
           }
@@ -42,7 +43,7 @@ public class OsgiImporterMap extends RefMapImpl {
       protected void removed(ServiceReference sref) {
         for (Iterator iter = entries().iterator(); iter.hasNext();) {
           Entry e = (Entry) iter.next();
-          OsgiImporterRef ref = (OsgiImporterRef) e.getValue();
+          OsgiImporterSingleton ref = (OsgiImporterSingleton) e.getValue();
           if (ref.hasRef(sref)) {
             Object k = e.getKey();
             

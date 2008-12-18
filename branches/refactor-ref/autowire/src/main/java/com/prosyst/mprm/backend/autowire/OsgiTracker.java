@@ -25,14 +25,14 @@ public abstract class OsgiTracker {
   private final BundleContext bc;
   private final String filter;
   private final ServiceListener tracker;
-  private final SortedSet refs;
+  private final SortedSet<ServiceReference> refs;
   
   /**
    * @param bc
    * @param iface
    * @param filter
    */
-  public OsgiTracker(BundleContext bc, Class iface, Comparator comp) {
+  public OsgiTracker(BundleContext bc, Class<?> iface, Comparator<ServiceReference> comp) {
     this (bc, filter(bc, iface, null), comp);
   }
   
@@ -41,7 +41,7 @@ public abstract class OsgiTracker {
    * @param iface
    * @param filter
    */
-  public OsgiTracker(BundleContext bc, Class iface, String filter, Comparator comp) {
+  public OsgiTracker(BundleContext bc, Class<?> iface, String filter, Comparator<ServiceReference> comp) {
     this (bc, filter(bc, iface, filter), comp);
   }
   
@@ -49,10 +49,10 @@ public abstract class OsgiTracker {
    * @param bc 
    * @param filter
    */
-  public OsgiTracker(BundleContext bc, String filter, Comparator comp) {
+  public OsgiTracker(BundleContext bc, String filter, Comparator<ServiceReference> comp) {
     this.bc = bc;
     this.filter = filter;
-    this.refs = new TreeSet(comp != null ? comp : ServiceComparators.STANDARD);
+    this.refs = new TreeSet<ServiceReference>(comp != null ? comp : ServiceComparators.STANDARD);
     
     this.tracker = new ServiceListener() {
       public void serviceChanged(ServiceEvent event) {
@@ -86,8 +86,8 @@ public abstract class OsgiTracker {
           refs.add(srefs[i]);
         }
       
-        for (Iterator iter = refs.iterator(); iter.hasNext();) {
-          added((ServiceReference) iter.next());
+        for (ServiceReference ref : refs) {
+          added(ref);
         }
       }
     
@@ -101,7 +101,7 @@ public abstract class OsgiTracker {
     bc.removeServiceListener(tracker);
     
     synchronized (refs) {
-      for (Iterator iter = refs.iterator(); iter.hasNext();) {
+      for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
         ServiceReference ref = (ServiceReference) iter.next();
         iter.remove();
         removed(ref);
@@ -124,14 +124,21 @@ public abstract class OsgiTracker {
    */
   protected abstract void modified(ServiceReference ref);
   
+  /**
+   * @return
+   */
   protected ServiceReference getBest() {
     synchronized (refs) {
       return refs.isEmpty() ? null : (ServiceReference) refs.first();
     }
   }
   
-  public static Map props(ServiceReference ref) {
-    Map props = new HashMap();
+  /**
+   * @param ref
+   * @return
+   */
+  protected static Map<String, ?> props(ServiceReference ref) {
+    Map<String, Object> props = new HashMap<String, Object>();
     
     String[] keys = ref.getPropertyKeys();
     for (int i = 0; i < keys.length; i++) {
@@ -142,7 +149,13 @@ public abstract class OsgiTracker {
     return props;
   }
   
-  private static String filter(BundleContext bc, Class iface, String filter) {
+  /**
+   * @param bc
+   * @param iface
+   * @param filter
+   * @return
+   */
+  private static String filter(BundleContext bc, Class<?> iface, String filter) {
     if (iface == null) {
       throw new RefException("Interface not specified");
     }

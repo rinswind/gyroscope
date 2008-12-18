@@ -11,6 +11,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 
+import com.prosyst.mprm.backend.proxy.ref.ObjectMapper;
 import com.prosyst.mprm.backend.proxy.ref.RefImpl;
 
 /**
@@ -30,14 +31,14 @@ public class OsgiExporterRef<T> extends RefImpl<T> {
   protected Object bindImpl(final Object delegate, final Map props) {
     Object service = null;
     
-    if (delegate instanceof ObjectFactory) {
+    if (delegate instanceof ObjectMapper) {
       service = new ServiceFactory() {
         public Object getService(Bundle bundle, ServiceRegistration reg) {
-          return ((ObjectFactory) delegate).create(bundle, props);
+          return ((ObjectMapper) delegate).create(bundle, props);
         }
 
         public void ungetService(Bundle bundle, ServiceRegistration reg, Object service) {
-          ((ObjectFactory) delegate).destroy(service);
+          ((ObjectMapper) delegate).destroy(service);
         }
       };
     } else {
