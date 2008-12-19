@@ -1,7 +1,5 @@
 package com.prosyst.mprm.backend.proxy.impl;
 
-import java.util.List;
-
 import com.prosyst.mprm.backend.proxy.gen.ProxyException;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
@@ -25,17 +23,9 @@ public class ProxyFactoryImpl implements ProxyFactory {
    */
   public <T> T proxy(Ref<T, ?> ref) {
     try {
-      Class<? extends T> pclass = loader.loadProxyClass(ref);
-      List<Class<?>> types = ref.type();
-      
-      Class<?>[] args = new Class[types.size()];
-      Object[] vals = new Object[types.size()];
-      for (int i = 0; i < ref.type().size(); i++) {
-        args[i] = Ref.class;
-        vals[i] = ref;
-      }
-      
-      return pclass.getConstructor(args).newInstance(vals);
+      Class<T> type = ref.type();
+      Class<? extends T> pclass = loader.loadProxyClass(type);
+      return pclass.getConstructor(new Class[] {ref.type()}).newInstance(new Object[] {ref});
     } catch (Throwable thr) {
       throw new ProxyException(thr);
     }

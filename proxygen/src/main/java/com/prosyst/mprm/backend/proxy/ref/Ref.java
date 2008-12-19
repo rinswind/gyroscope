@@ -1,6 +1,5 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
@@ -28,7 +27,7 @@ public interface Ref<T, I> {
    * 
    * @return type of the object returned by delegate().
    */
-  List<Class<?>> type();
+  Class<T> type();
   
   /**
    * Thread-unsafe method intended for calls from dynamic proxies. If you need

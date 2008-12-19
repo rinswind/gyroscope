@@ -1,5 +1,6 @@
 package com.prosyst.mprm.backend.autowire;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -21,8 +22,8 @@ public class OsgiExporterRef<T> extends RefImpl<T, Object> {
   private final BundleContext bc;
   private ServiceRegistration reg;
   
-  public OsgiExporterRef(List<Class<?>> ifaces, BundleContext bc) {
-    super (ifaces);
+  public OsgiExporterRef(Class<T> iface, BundleContext bc) {
+    super (iface);
     this.bc = bc;
   }
 
@@ -44,31 +45,25 @@ public class OsgiExporterRef<T> extends RefImpl<T, Object> {
       service = delegate;
     }
     
-    reg = bc.registerService(toNameList(type()), service, toPropsDictionary(props));
+    reg = bc.registerService(toInterfaceList(type()), service, toPropsDictionary(props));
     return (T) delegate;
   }
 
-//  protected Object updateImpl(Object delegate, Map props) {
-//    if (delegate != null) {
-//      throw new RefException("Exported objects can not be hotswapped");
-//    }
-//    
-//    reg.setProperties(toPropsDictionary(props));
-//    return null;
-//  }
-  
   @Override
   protected void unbindImpl(T delegate, Map<String, ?> props) {
     reg.unregister();
   }
   
-  private static String[] toNameList(List<Class<?>> ifaces) {
-    String[] res = new String[ifaces.size()];
-    int i = 0;
-    for (Class<?> cl : ifaces) {
-      res[i++] = cl.getName();
-    }
-    return res;
+  private static String[] toInterfaceList(Class<?> type) {
+  	List<String> names = new ArrayList<String>();
+  	
+  	for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
+  		for (Class<?> iface : cl.getInterfaces()) {
+  			names.add(iface.getName());
+  		}
+  	}
+  	
+    return names.toArray(new String[names.size()]);
   }
   
   private static <V> Dictionary<String, V> toPropsDictionary(Map<String, V> props) {

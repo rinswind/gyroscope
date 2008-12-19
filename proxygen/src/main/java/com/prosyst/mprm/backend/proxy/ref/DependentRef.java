@@ -1,7 +1,6 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,14 +15,12 @@ import com.prosyst.mprm.backend.proxy.gen.Proxy;
  * @author Todor Boev
  * @version $Revision$
  */
-public abstract class DependentRef extends RefImpl<Object, Object> {
-  private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Void.class});
-  
+public abstract class DependentRef extends RefImpl<Void, Void> {
   private final List<Ref<?,?>> deps;
   private final RefListener listener;
   
   public DependentRef() {
-    super(TYPE);
+    super(Void.class);
     
     this.deps = new ArrayList<Ref<?,?>>();
     this.listener = new RefListener.Adapter() {
