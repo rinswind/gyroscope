@@ -85,7 +85,6 @@ public class ProxyPerfTest extends TestCase {
   
   private static Sum dynamic() {
     Ref<Sum> ref = new RefImpl<Sum>(Sum.class);
-    ref.open();
     ref.bind(new SumImpl(), null);
     
     ProxyClassLoader loader = new ProxyClassLoader(ProxyPerfTest.class.getClassLoader());

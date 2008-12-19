@@ -48,7 +48,7 @@ public class RefMapImpl<K,V> extends RefImpl<Map<K,V>> implements RefMap<K,V> {
       }
       
       Ref<V> ref = refs.remove(key);
-      ref.close();
+      ref.unbind();
       return ref;
     } finally {
       lock().unlock();

@@ -57,7 +57,7 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
       for (Iterator<T> iter = proxies.iterator(); iter.hasNext();) {
         if (iter.next().equals(ref.delegate())) {
           iter.remove();
-          ref.close();
+          ref.unbind();
           return true;
         }
       }

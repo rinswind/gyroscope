@@ -16,19 +16,6 @@ public class RefImpl<T> implements Ref<T> {
    * dispatching on the appropriate state entries.
    */
   public enum StateHandler {
-    CLOSED(State.CLOSED),
-    OPENING(State.OPENING) {
-      @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
-        ll.open(lc);
-      }
-    },
-    CLOSING(State.CLOSING) {
-      @Override
-      protected <T> void dispatchOnExit(Ref<T> lc, RefListener<T> ll) {
-        ll.closed(lc);
-      }
-    },
     UNBOUND(State.UNBOUND),
     BINDING(State.BINDING) {
       @Override
@@ -52,14 +39,6 @@ public class RefImpl<T> implements Ref<T> {
     
     /* Once all nodes are created link the state machine together */
     static {
-      CLOSED.addTransit(OPENING);
-      
-      OPENING.addTransit(UNBOUND);
-      OPENING.setRollback(CLOSED);
-      
-      UNBOUND.addTransit(CLOSING);
-      CLOSING.addTransit(CLOSED);
-      
       UNBOUND.addTransit(BINDING);
       BINDING.addTransit(BOUND);
       BINDING.setRollback(UNBOUND);
@@ -159,7 +138,7 @@ public class RefImpl<T> implements Ref<T> {
     this.listeners = new ConcurrentLinkedQueue<RefListener<T>>();
     this.lock = new ReentrantReadWriteLock();
     
-    this.state = StateHandler.CLOSED;
+    this.state = StateHandler.UNBOUND;
     this.props = Collections.emptyMap();
   }
   
@@ -239,42 +218,9 @@ public class RefImpl<T> implements Ref<T> {
   }
 
   /**
-   * @see com.prosyst.mprm.backend.proxy.gen.Proxy#open()
-   */
-  public final void open() {
-    toState(StateHandler.OPENING);
-    
-    try {
-      openImpl();
-      
-      toState(StateHandler.UNBOUND);
-    } catch (Throwable thr) {
-      rollback();
-      throw new RefException(thr);
-    }
-  }
-
-  /**
    * The extending classes can override this at their own discretion.
    */
   protected void openImpl() {
-  }
-  
-  /**
-   * @see com.prosyst.mprm.backend.proxy.gen.Proxy#close()
-   */
-  public final void close() {
-    unbind();
-    
-    if (!tryState(StateHandler.CLOSING)) {
-      return;
-    }
-    
-    try {
-      closeImpl();
-    } finally {
-      toState(StateHandler.CLOSED);
-    }
   }
   
   /**
@@ -290,6 +236,7 @@ public class RefImpl<T> implements Ref<T> {
     toState(StateHandler.BINDING);
     
     try {
+    	/* Do a defensive copy of the properties */
       if (props != null) {
         this.props = new HashMap<String, Object>();
         this.props.putAll(props);
@@ -309,7 +256,7 @@ public class RefImpl<T> implements Ref<T> {
    * @return
    */
   protected T bindImpl(T delegate, Map<String, ?> props) {
-    return delegate;
+  	return delegate;
   }
   
   /**
@@ -340,8 +287,8 @@ public class RefImpl<T> implements Ref<T> {
    * @param delegate
    * @return
    */
-  protected <N extends T> T updateImpl(N delegate, Map<String, ?> props) {
-    return bindImpl(delegate, props);
+  protected T updateImpl(T delegate, Map<String, ?> props) {
+  	return bindImpl(delegate, props);
   }
   
   /**

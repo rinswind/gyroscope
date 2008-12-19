@@ -5,33 +5,26 @@ package com.prosyst.mprm.backend.proxy.ref;
  * @version $Revision$
  */
 public interface RefListener<T> {
-  void open(Ref<T> r);
-  
   void bound(Ref<T> r);
   
   void unbinding(Ref<T> r);
   
   void updated(Ref<T> r);
   
-  void closed(Ref<T> r);
-  
   /**
    * The classic adapter pattern.
    */
   public static class DirectAdapter<T> implements RefListener<T> {
     public void bound(Ref<T> r) {
-    }
-
-    public void closed(Ref<T> r) {
-    }
-
-    public void open(Ref<T> r) {
+    	/* Used code comes here */
     }
 
     public void unbinding(Ref<T> r) {
+    	/* Used code comes here */
     }
 
     public void updated(Ref<T> r) {
+    	/* Used code comes here */
     }
   }
   
@@ -39,13 +32,6 @@ public interface RefListener<T> {
    * Makes listening to the state of a single {@link Ref} as easy as possible.
    */
   public static class Adapter<T> implements RefListener<T> {
-    public final void open(Ref<T> r) {
-      open();
-    }
-    
-    public void open() {
-    }
-
     public final void bound(Ref<T> r) {
       try {
         bound();
@@ -57,6 +43,7 @@ public interface RefListener<T> {
     }
     
     public void bound() throws Exception {
+    	/* Used code comes here */
     }
 
     public final void updated(Ref<T> r) {
@@ -70,6 +57,7 @@ public interface RefListener<T> {
     }
     
     public void updated() throws Exception {
+    	/* Used code comes here */
     }
 
     public final void unbinding(Ref<T> r) {
@@ -83,19 +71,7 @@ public interface RefListener<T> {
     }
     
     public void unbinding() throws Exception {
-    }
-
-    public final void closed(Ref<T> r) {
-      try {
-        closed();
-      } catch (RuntimeException re) {
-        throw re;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    public void closed() throws Exception {
+    	/* Used code comes here */
     }
   }
 }

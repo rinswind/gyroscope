@@ -28,11 +28,6 @@ public abstract class DependentRef extends RefImpl<Object> {
     this.deps = new ArrayList<Ref<?>>();
     this.listener = new RefListener.Adapter<Object>() {
       @Override
-      public void open() {
-        update();
-      }
-      
-      @Override
       public void bound() {
         update();
       }
@@ -41,19 +36,7 @@ public abstract class DependentRef extends RefImpl<Object> {
       public void unbinding() {
         update();
       }
-      
-      @Override
-      public void closed() {
-        update();
-      }
     };
-    
-    addListener(new RefListener.Adapter<Object>() {
-      @Override
-      public void open() {
-        update();      
-      }
-    });
   }
   
   protected void dependsOn(Object proxy) {
@@ -61,10 +44,6 @@ public abstract class DependentRef extends RefImpl<Object> {
   }
   
   protected void dependsOn(Ref<?> ref) {
-    if (State.CLOSED != state()) {
-      throw new IllegalStateException();
-    }
-    
     deps.add(ref);
   }
   
@@ -72,7 +51,6 @@ public abstract class DependentRef extends RefImpl<Object> {
     return Collections.unmodifiableList(deps);
   }
   
-  @SuppressWarnings("unchecked")
   @Override
   protected void openImpl() {
     for (Ref dep : deps) {
@@ -80,7 +58,6 @@ public abstract class DependentRef extends RefImpl<Object> {
     }
   }
   
-  @SuppressWarnings("unchecked")
   @Override
   protected void closeImpl() {
     for (Ref dep : deps) {
@@ -141,9 +118,5 @@ public abstract class DependentRef extends RefImpl<Object> {
   
   protected static boolean isUnbinding(Ref<?> ref) {
     return State.UNBINDING == ref.state();
-  }
-  
-  protected static boolean isClosed(Ref<?> ref) {
-    return State.CLOSED == ref.state();
   }
 }
