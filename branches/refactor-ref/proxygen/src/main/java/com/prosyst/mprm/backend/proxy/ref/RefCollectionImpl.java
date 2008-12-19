@@ -82,14 +82,4 @@ public class RefCollectionImpl<T> extends RefImpl<Collection<T>> implements RefC
   protected Collection<T> bindImpl(Collection<T> ignored1, Map<String, ?> ignored2) {
     return Collections.unmodifiableCollection(proxies);
   }
-  
-  /**
-   * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#closeImpl()
-   */
-  @Override
-  protected void closeImpl() {
-    for (Ref<T> ref : refs) {
-      remove(ref);
-    }
-  }
 }

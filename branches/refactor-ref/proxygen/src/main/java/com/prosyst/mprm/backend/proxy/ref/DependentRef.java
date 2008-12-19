@@ -20,7 +20,7 @@ public abstract class DependentRef extends RefImpl<Object> {
   private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Void.class});
   
   private final List<Ref<?>> deps;
-  private final RefListener<?> listener;
+  private final RefListener listener;
   
   public DependentRef() {
     super(TYPE);
@@ -44,25 +44,12 @@ public abstract class DependentRef extends RefImpl<Object> {
   }
   
   protected void dependsOn(Ref<?> ref) {
+    ref.addListener(listener);
     deps.add(ref);
   }
   
   protected List<Ref<?>> deps() {
     return Collections.unmodifiableList(deps);
-  }
-  
-  @Override
-  protected void openImpl() {
-    for (Ref dep : deps) {
-      dep.addListener(listener);
-    }
-  }
-  
-  @Override
-  protected void closeImpl() {
-    for (Ref dep : deps) {
-      dep.removeListener(listener);
-    }
   }
   
   /**

@@ -16,12 +16,14 @@ public class ChainedRef<I, O> extends RefImpl<I> {
 		return next;
 	}
 	
-	protected I bindImpl(I delegate, Map<String, ?> props) {
+	@Override
+  protected I bindImpl(I delegate, Map<String, ?> props) {
 		next.bind(convertor.create(delegate, props), props);
 		return delegate;
 	}
 	
-	protected void unbindImpl(I delegate, Map<String, ?> props) {
+	@Override
+  protected void unbindImpl(I delegate, Map<String, ?> props) {
 		O created = next.delegate();
 		try {
 			next.unbind();
@@ -30,7 +32,8 @@ public class ChainedRef<I, O> extends RefImpl<I> {
 		}
 	}
 	
-	protected I updateImpl(I delegate, Map<String, ?> props) {
+	@Override
+  protected I updateImpl(I delegate, Map<String, ?> props) {
 		O created = next.delegate();
 		try {
 			next.update(convertor.create(delegate, props), props);

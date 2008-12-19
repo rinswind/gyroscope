@@ -218,18 +218,6 @@ public class RefImpl<T> implements Ref<T> {
   }
 
   /**
-   * The extending classes can override this at their own discretion.
-   */
-  protected void openImpl() {
-  }
-  
-  /**
-   * The extending classes can override this at their own discretion.
-   */
-  protected void closeImpl() { 
-  }
-  
-  /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */
   public final void bind(T delegate, Map<String, ?> props) {
