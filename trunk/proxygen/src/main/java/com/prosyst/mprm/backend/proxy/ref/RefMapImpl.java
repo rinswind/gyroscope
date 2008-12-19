@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
@@ -48,7 +47,7 @@ public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements Re
       }
       
       Ref<T,I> ref = refs.remove(key);
-      ref.close();
+      ref.unbind();
       return ref;
     } finally {
       lock().unlock();
@@ -97,12 +96,5 @@ public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements Re
      * FIX Process the input map and the properties okay?
      */
     return Collections.unmodifiableMap(proxies);
-  }
-  
-  @Override
-  protected void closeImpl() {
-    for (Entry<K, Ref<T,I>> e : entries()) {
-      remove(e.getKey());
-    }
   }
 }

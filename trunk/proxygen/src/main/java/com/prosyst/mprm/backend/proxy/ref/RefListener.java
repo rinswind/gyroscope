@@ -5,27 +5,17 @@ package com.prosyst.mprm.backend.proxy.ref;
  * @version $Revision$
  */
 public interface RefListener<T, I> {
-  void open(Ref<T, I> r);
-  
   void bound(Ref<T, I> r);
   
   void unbinding(Ref<T, I> r);
   
   void updated(Ref<T, I> r);
   
-  void closed(Ref<T, I> r);
-  
   /**
    * The classic adapter pattern.
    */
   public static class DirectAdapter<T, I> implements RefListener<T, I> {
     public void bound(Ref<T, I> r) {
-    }
-
-    public void closed(Ref<T, I> r) {
-    }
-
-    public void open(Ref<T, I> r) {
     }
 
     public void unbinding(Ref<T, I> r) {
@@ -39,13 +29,6 @@ public interface RefListener<T, I> {
    * Makes listening to the state of a single {@link Ref} as easy as possible.
    */
   public static class Adapter implements RefListener<Object, Object> {
-    public final void open(Ref<Object, Object> r) {
-      open();
-    }
-    
-    public void open() {
-    }
-
     public final void bound(Ref<Object, Object> r) {
       try {
         bound();
@@ -83,19 +66,6 @@ public interface RefListener<T, I> {
     }
     
     public void unbinding() throws Exception {
-    }
-
-    public final void closed(Ref<Object, Object> r) {
-      try {
-        closed();
-      } catch (RuntimeException re) {
-        throw re;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    public void closed() throws Exception {
     }
   }
 }

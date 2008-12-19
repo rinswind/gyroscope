@@ -67,7 +67,7 @@ public class Activator extends RefContainerImpl {
     
     from(services).notify(new RefListener.Adapter() {
       @Override
-      public void open() {
+      public void bound() {
         worker = new Worker("Proxy test", task);
         worker.start();
       }

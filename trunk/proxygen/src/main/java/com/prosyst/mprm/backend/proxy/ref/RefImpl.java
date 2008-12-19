@@ -16,19 +16,6 @@ public class RefImpl<T, I> implements Ref<T, I> {
    * dispatching on the appropriate state entries.
    */
   public enum StateHandler {
-    CLOSED(State.CLOSED),
-    OPENING(State.OPENING) {
-      @Override
-      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
-        ll.open(lc);
-      }
-    },
-    CLOSING(State.CLOSING) {
-      @Override
-      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
-        ll.closed(lc);
-      }
-    },
     UNBOUND(State.UNBOUND),
     BINDING(State.BINDING) {
       @Override
@@ -52,14 +39,6 @@ public class RefImpl<T, I> implements Ref<T, I> {
     
     /* Once all nodes are created link the state machine together */
     static {
-      CLOSED.addTransit(OPENING);
-      
-      OPENING.addTransit(UNBOUND);
-      OPENING.setRollback(CLOSED);
-      
-      UNBOUND.addTransit(CLOSING);
-      CLOSING.addTransit(CLOSED);
-      
       UNBOUND.addTransit(BINDING);
       BINDING.addTransit(BOUND);
       BINDING.setRollback(UNBOUND);
@@ -159,7 +138,7 @@ public class RefImpl<T, I> implements Ref<T, I> {
     this.listeners = new ConcurrentLinkedQueue<RefListener<T, I>>();
     this.lock = new ReentrantReadWriteLock();
     
-    this.state = StateHandler.CLOSED;
+    this.state = StateHandler.UNBOUND;
     this.props = Collections.emptyMap();
   }
   
@@ -238,51 +217,6 @@ public class RefImpl<T, I> implements Ref<T, I> {
     return lock.readLock();
   }
 
-  /**
-   * @see com.prosyst.mprm.backend.proxy.gen.Proxy#open()
-   */
-  public final void open() {
-    toState(StateHandler.OPENING);
-    
-    try {
-      openImpl();
-      
-      toState(StateHandler.UNBOUND);
-    } catch (Throwable thr) {
-      rollback();
-      throw new RefException(thr);
-    }
-  }
-
-  /**
-   * The extending classes can override this at their own discretion.
-   */
-  protected void openImpl() {
-  }
-  
-  /**
-   * @see com.prosyst.mprm.backend.proxy.gen.Proxy#close()
-   */
-  public final void close() {
-    unbind();
-    
-    if (!tryState(StateHandler.CLOSING)) {
-      return;
-    }
-    
-    try {
-      closeImpl();
-    } finally {
-      toState(StateHandler.CLOSED);
-    }
-  }
-  
-  /**
-   * The extending classes can override this at their own discretion.
-   */
-  protected void closeImpl() { 
-  }
-  
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */

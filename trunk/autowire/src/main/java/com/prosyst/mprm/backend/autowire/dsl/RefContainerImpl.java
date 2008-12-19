@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.prosyst.mprm.backend.autowire.OsgiTracker;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
@@ -24,7 +25,7 @@ import com.prosyst.mprm.backend.proxy.ref.RefImpl;
  * @version $Revision$
  */
 public abstract class RefContainerImpl implements RefContainer, BundleActivator {
-  private final List refs;
+  private final List<OsgiTracker> trackers;
   private final ProxyFactory fact;
   private final Ref bcRef;
   private final BundleContext bc;
@@ -35,7 +36,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * the framework.
    */
   {
-    refs = new ArrayList();
+    trackers = new ArrayList<OsgiTracker>();
     /*
      * The proxy class loader will delegate to the class space of the client
      * bundle. This happens because this is an abstract class, therefore the
@@ -48,19 +49,18 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
     /* Create the root external service */
     bcRef = new RefImpl(BundleContext.class);
     bc = (BundleContext) fact.proxy(bcRef);
-    
   }
   
   public ImporterBuilder importer() {
-    return new ImporterBuilderImpl(bc, fact, refs);
+    return new ImporterBuilderImpl(bc, fact, trackers);
   }
 
   public ExporterBuilder exporter() {
-    return new ExporterBuilderImpl(bc, refs);
+    return new ExporterBuilderImpl(bc);
   }
   
   public LinkBuilder from(Ref ref) {
-    return new LinkBuilderImpl(ref, refs);
+    return new LinkBuilderImpl(ref);
   }
   
   public LinkBuilder from(Object proxy) {
@@ -84,7 +84,6 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
     AndRef res = new AndRef();
     res.dependsOn(left);
     res.dependsOn(right);
-    refs.add(res);
     return res;
   }
 
@@ -92,13 +91,11 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
     OrRef res = new OrRef();
     res.dependsOn(left);
     res.dependsOn(right);
-    refs.add(res);
     return res;
   }
   
   public Ref not(Object inverted) {
     NotRef res = new NotRef(inverted);
-    refs.add(res);
     return res;
   }
 
@@ -110,19 +107,16 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
     }
   	
     try {
-      bcRef.open();
-      bcRef.bind(bc, null);
-      
-      openRefs();
+      openTrackers(bc);
     } catch (Exception exc) {
-      closeRefs();
+      exc.printStackTrace();
+      closeTrackers();
       throw exc;
     }
   }
 
   public final void stop(BundleContext bc) {
-    closeRefs();
-    bcRef.close();
+    closeTrackers();
   }
 
   /**
@@ -130,20 +124,24 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    */
   public abstract void configure() throws Exception;
   
-  private void openRefs() {
-    for (ListIterator iter = refs.listIterator(); iter.hasNext();) {
-      ((Ref) iter.next()).open();
+  private void openTrackers(BundleContext bc) {
+    bcRef.bind(bc, null);
+    
+    for (ListIterator<OsgiTracker> iter = trackers.listIterator(); iter.hasNext();) {
+      iter.next().open();
     }
   }
   
-  private void closeRefs() {
+  private void closeTrackers() {
     /*
      * Stop in reverse order because the user will be forced to create the refs
      * which depend on other refs after their dependencies. So we shut down the
-     * dependents before we do their dependencies.
+     * trackers of the dependents before trackers of the dependencies.
      */
-    for (ListIterator iter = refs.listIterator(refs.size()); iter.hasPrevious();) {
-      ((Ref) iter.previous()).close();
+    for (ListIterator<OsgiTracker> iter = trackers.listIterator(trackers.size()); iter.hasPrevious();) {
+      iter.previous().close();
     }
+    
+    bcRef.unbind();
   }
 }

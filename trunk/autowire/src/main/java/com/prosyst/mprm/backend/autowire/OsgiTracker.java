@@ -92,6 +92,8 @@ public abstract class OsgiTracker {
       }
     
       bc.addServiceListener(tracker, filter.toString());
+      
+      opened();
     } catch (InvalidSyntaxException e) {
       throw new RefException("Bad filter syntax: \"" + filter + "\"", e);
     }
@@ -100,11 +102,15 @@ public abstract class OsgiTracker {
   public void close() {
     bc.removeServiceListener(tracker);
     
-    synchronized (refs) {
-      for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
-        ServiceReference ref = (ServiceReference) iter.next();
-        iter.remove();
-        removed(ref);
+    try {
+      closing();
+    } finally {
+      synchronized (refs) {
+        for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
+          ServiceReference ref = (ServiceReference) iter.next();
+          iter.remove();
+          removed(ref);
+        }
       }
     }
   }
@@ -123,6 +129,16 @@ public abstract class OsgiTracker {
    * @param ref
    */
   protected abstract void modified(ServiceReference ref);
+  
+  /**
+   * 
+   */
+  protected abstract void opened();
+  
+  /**
+   * 
+   */
+  protected abstract void closing();
   
   protected ServiceReference getBest() {
     synchronized (refs) {

@@ -24,9 +24,18 @@ public class OsgiImporterMap<K, T, I> extends RefMapImpl<K, T, ServiceReference/
     
     this.tracker = new OsgiTracker(bc, filter, null) {
       @Override
+      protected void opened() {
+        bind(null, null);
+      }
+      
+      @Override
+      protected void closing() {
+        unbind();
+      }
+      
+      @Override
       protected void added(ServiceReference ref) {
         OsgiImporterRef<T, I> r = new OsgiImporterRef<T, I>(valType, val, bc);
-        r.open();
         r.bind(ref, props(ref));
         
         put(key.create(r.delegate(), r.props()), r);
@@ -51,7 +60,7 @@ public class OsgiImporterMap<K, T, I> extends RefMapImpl<K, T, ServiceReference/
             K k = e.getKey();
             
             OsgiImporterMap.this.remove(k);
-            ref.close();
+            ref.unbind();
             
             key.destroy(k);
           }
@@ -60,13 +69,7 @@ public class OsgiImporterMap<K, T, I> extends RefMapImpl<K, T, ServiceReference/
     };
   }
   
-  @Override
-  protected void openImpl() {
-    tracker.open();
-  }
-  
-  @Override
-  protected void closeImpl() {
-    tracker.close();
+  public OsgiTracker tracker() {
+    return tracker;
   }
 }

@@ -20,18 +20,13 @@ public abstract class DependentRef extends RefImpl<Object, Object> {
   private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Void.class});
   
   private final List<Ref<?,?>> deps;
-  private final RefListener<?,?> listener;
+  private final RefListener listener;
   
   public DependentRef() {
     super(TYPE);
     
     this.deps = new ArrayList<Ref<?,?>>();
     this.listener = new RefListener.Adapter() {
-      @Override
-      public void open() {
-        update();
-      }
-      
       @Override
       public void bound() {
         update();
@@ -41,19 +36,7 @@ public abstract class DependentRef extends RefImpl<Object, Object> {
       public void unbinding() {
         update();
       }
-      
-      @Override
-      public void closed() {
-        update();
-      }
     };
-    
-    addListener(new RefListener.Adapter() {
-      @Override
-      public void open() {
-        update();      
-      }
-    });
   }
   
   protected void dependsOn(Object proxy) {
@@ -61,29 +44,12 @@ public abstract class DependentRef extends RefImpl<Object, Object> {
   }
   
   protected void dependsOn(Ref<?, ?> ref) {
-    if (State.CLOSED != state()) {
-      throw new IllegalStateException();
-    }
-    
+    ref.addListener(listener);
     deps.add(ref);
   }
   
   protected List<Ref<?, ?>> deps() {
     return Collections.unmodifiableList(deps);
-  }
-  
-  @Override
-  protected void openImpl() {
-    for (Ref dep : deps) {
-      dep.addListener(listener);
-    }
-  }
-  
-  @Override
-  protected void closeImpl() {
-    for (Ref dep : deps) {
-      dep.removeListener(listener);
-    }
   }
   
   /**
@@ -139,9 +105,5 @@ public abstract class DependentRef extends RefImpl<Object, Object> {
   
   protected static boolean isUnbinding(Ref<?, ?> ref) {
     return State.UNBINDING == ref.state();
-  }
-  
-  protected static boolean isClosed(Ref<?, ?> ref) {
-    return State.CLOSED == ref.state();
   }
 }

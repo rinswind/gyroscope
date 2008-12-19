@@ -7,7 +7,9 @@ import java.util.ListIterator;
 import org.osgi.framework.BundleContext;
 
 import com.prosyst.mprm.backend.autowire.OsgiExporterRef;
+import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
+import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
 /**
  * @author Todor Boev
@@ -15,14 +17,12 @@ import com.prosyst.mprm.backend.proxy.ref.Ref;
  */
 public class ExporterBuilderImpl implements ExporterBuilder {
   private final BundleContext bc;
-  private final List refs;
 
   private List<Class<?>> ifaces;
   private boolean superifaces;
 
-  public ExporterBuilderImpl(BundleContext bc, List refs) {
+  public ExporterBuilderImpl(BundleContext bc) {
     this.bc = bc;
-    this.refs = refs;
     this.ifaces = new ArrayList<Class<?>>();
   }
 
@@ -46,9 +46,7 @@ public class ExporterBuilderImpl implements ExporterBuilder {
 
   private Ref ref() {
     buildIfaceList();
-    OsgiExporterRef res = new OsgiExporterRef(ifaces, bc);
-    refs.add(res);
-    return res;
+    return new OsgiExporterRef(ifaces, bc);
   }
   
   private void buildIfaceList() {

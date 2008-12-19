@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
-/*
- * FIX How should the RefListener be generified? Should it be generified at all?
- */
-
 /**
  * @author Todor Boev
  * @version $Revision$
@@ -17,9 +13,6 @@ public interface Ref<T, I> {
    * Lifecycle of a dynamic reference.
    */
   public enum State {
-    CLOSED,
-    OPENING,
-    CLOSING,
     UNBOUND,
     BINDING,
     UNBINDING,
@@ -63,16 +56,12 @@ public interface Ref<T, I> {
    */
   Lock lock();
   
-  void open();
-  
   void bind(I delegate, Map<String, ?> props);
   
   void update(I delegate, Map<String, ?> props);
   
   void unbind();
 
-  void close();
-  
   void addListener(RefListener<T, I> l);
   
   void removeListener(RefListener<T, I> l);
