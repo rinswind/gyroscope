@@ -32,7 +32,7 @@ public class ServiceComparators {
     return STANDARD;
   }
   
-  public static Comparator<T> reverse(final Comparator<T> reversed) {
+  public static <T> Comparator<T> reverse(final Comparator<T> reversed) {
     return new Comparator<T>() {
       public int compare(T a, T b) {
         return reversed.compare(b, a);
