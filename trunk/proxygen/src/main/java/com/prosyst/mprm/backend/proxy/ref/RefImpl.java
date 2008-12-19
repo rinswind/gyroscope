@@ -111,7 +111,7 @@ public class RefImpl<T, I> implements Ref<T, I> {
     }
   }
   
-  private final List<Class<?>> type;
+  private final Class<?> type;
   private final Collection<RefListener<T, I>> listeners;
   private final ReadWriteLock lock;
 
@@ -123,18 +123,8 @@ public class RefImpl<T, I> implements Ref<T, I> {
    * @param type
    */
   public RefImpl(Class<?> type) {
-    this (Arrays.<Class<?>>asList(type));
-  }
-  
-  /**
-   * @param type
-   */
-  public RefImpl(List<Class<?>> type) {
-    /* Do a defensive copy */
-    List<Class<?>> modType = new ArrayList<Class<?>>(type.size());
-    modType.addAll(type);
+  	this.type = type;
     
-    this.type = Collections.unmodifiableList(modType);
     this.listeners = new ConcurrentLinkedQueue<RefListener<T, I>>();
     this.lock = new ReentrantReadWriteLock();
     
@@ -151,10 +141,13 @@ public class RefImpl<T, I> implements Ref<T, I> {
   }
   
   /**
+   * FIX How to do type tokens well with the damn generics?
+   * 
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#type()
    */
-  public List<Class<?>> type() {
-    return type;
+  @SuppressWarnings("unchecked")
+  public Class<T> type() {
+    return (Class<T>) type;
   }
   
   /**

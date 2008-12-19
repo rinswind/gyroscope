@@ -1,9 +1,7 @@
 package com.prosyst.mprm.backend.proxy.ref;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,14 +13,12 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @version $Revision$
  */
 public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements RefMap<K,T,I> {
-  private static final List<Class<?>> TYPE = Arrays.<Class<?>>asList(new Class[] {Map.class});
-  
   private final ProxyFactory fact;
   private final Map<K, Ref<T,I>> refs;
   private final Map<K, T> proxies;
   
   public RefMapImpl(ProxyFactory fact) {
-    super(TYPE);
+    super(Map.class);
     
     this.fact = fact;
     this.refs = new ConcurrentHashMap<K, Ref<T,I>>();
