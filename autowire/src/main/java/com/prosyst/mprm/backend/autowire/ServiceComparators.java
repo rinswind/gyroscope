@@ -9,7 +9,7 @@ public class ServiceComparators {
   /**
    * The standard "max rank or min id" service comparator. 
    */
-  public static final Comparator<ServiceReference> STANDARD = new Comparator<ServiceReference>() {
+  private static final Comparator<ServiceReference> STANDARD = new Comparator<ServiceReference>() {
     public int compare(ServiceReference fst, ServiceReference sec) {
       ServiceReference sfst = (ServiceReference) fst;
       ServiceReference ssec = (ServiceReference) sec;
@@ -28,47 +28,15 @@ public class ServiceComparators {
     }
   };
   
-  /**
-   * Reverses any passed comparator
-   */
-  public static class Reverse<T> implements Comparator<T> {
-    private final Comparator<T> comp;
-    
-    public Reverse(Comparator<T> comp) {
-      this.comp = comp;
-    }
-    
-    public int compare(T a, T b) {
-      return comp.compare(b, a);
-    }
+  public static Comparator<ServiceReference> standard() {
+    return STANDARD;
   }
   
-  /**
-   * Recognizes a default service and keeps it last. For all other services
-   * delegates comparison to the STANDARD comparator.
-   */
-  public static abstract class DefaultComesLast implements Comparator<ServiceReference> {
-    public int compare(ServiceReference a, ServiceReference b) {
-      ServiceReference ra = (ServiceReference) a;
-      ServiceReference rb = (ServiceReference) b;
-
-      if (isDefault(ra)) {
-        if (isDefault(rb)) {
-          return 0;
-        }
-        return 1;
+  public static Comparator<T> reverse(final Comparator<T> reversed) {
+    return new Comparator<T>() {
+      public int compare(T a, T b) {
+        return reversed.compare(b, a);
       }
-
-      if (isDefault(rb)) {
-        if (isDefault(ra)) {
-          return 0;
-        }
-        return -1;
-      }
-
-      return STANDARD.compare(a, b);
-    }
-
-    protected abstract boolean isDefault(ServiceReference r);
+    };
   }
 }
