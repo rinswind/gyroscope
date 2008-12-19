@@ -52,7 +52,7 @@ public abstract class OsgiTracker {
   public OsgiTracker(BundleContext bc, String filter, Comparator<ServiceReference> comp) {
     this.bc = bc;
     this.filter = filter;
-    this.refs = new TreeSet<ServiceReference>(comp != null ? comp : ServiceComparators.STANDARD);
+    this.refs = new TreeSet<ServiceReference>(comp != null ? comp : ServiceComparators.standard());
     
     this.tracker = new ServiceListener() {
       public void serviceChanged(ServiceEvent event) {
