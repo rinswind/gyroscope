@@ -21,7 +21,7 @@ public class Printer extends RefListener.Adapter implements Runnable {
   }
   
   @Override
-  public void open() {
+  public void bound() {
     worker.start();
   }
 

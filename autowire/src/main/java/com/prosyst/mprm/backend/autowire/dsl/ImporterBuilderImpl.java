@@ -11,9 +11,9 @@ import com.prosyst.mprm.backend.autowire.ObjectFactory;
 import com.prosyst.mprm.backend.autowire.OsgiImporterCollection;
 import com.prosyst.mprm.backend.autowire.OsgiImporterMap;
 import com.prosyst.mprm.backend.autowire.OsgiImporterSingleton;
+import com.prosyst.mprm.backend.autowire.OsgiTracker;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
-import com.prosyst.mprm.backend.proxy.ref.ImplicationRef;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 /**
@@ -30,7 +30,7 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
   
   private final BundleContext bc;
   private final ProxyFactory fact;
-  private final List refs;
+  private final List<OsgiTracker> trackers;
   
   private String filter;
   
@@ -45,10 +45,10 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
   private Comparator comp;
   private boolean hotswap;
   
-  public ImporterBuilderImpl(BundleContext bc, ProxyFactory fact, List refs) {
+  public ImporterBuilderImpl(BundleContext bc, ProxyFactory fact, List<OsgiTracker> trackers) {
     this.bc = bc;
     this.fact = fact;
-    this.refs = refs;
+    this.trackers = trackers;
     
     /* Default value */
     this.valType = Object.class;
@@ -154,29 +154,35 @@ public class ImporterBuilderImpl implements ImporterBuilder, ImporterSingletonBu
     Ref ref = null;
     
     switch (current) {
-    case SINGLETON:
+    case SINGLETON: {
       if (BundleContext.class == valType) {
         return rootRef(); 
       }
       
-      ref = new OsgiImporterSingleton(valType, val, bc, filter, comp, hotswap);
+      OsgiImporterSingleton res = new OsgiImporterSingleton(valType, val, bc, filter, comp, hotswap);
+      trackers.add(res.tracker());
+      ref = res;
       break;
-      
-    case COLLECTION:
-      ref = new OsgiImporterCollection(valType, val, fact, bc, filter);
-      refs.add(new ImplicationRef(rootRef(), ref, null, null));
+    }
+    
+    case COLLECTION: {
+      OsgiImporterCollection res = new OsgiImporterCollection(valType, val, fact, bc, filter);
+      trackers.add(res.tarcker());
+      ref = res;
       break;
-      
-    case MAP:
-      ref = new OsgiImporterMap(valType, val, keyType, key, fact, bc, filter);
-      refs.add(new ImplicationRef(rootRef(), ref, null, null));
+    }
+    
+    case MAP: {
+      OsgiImporterMap res = new OsgiImporterMap(valType, val, keyType, key, fact, bc, filter);
+      trackers.add(res.tracker());
+      ref = res;
       break;
+    }
       
     default:
       throw new RuntimeException("Unknown import type " + current);
     }
 
-    refs.add(ref);
     return ref;
   }
 

@@ -59,7 +59,7 @@ public class RefCollectionImpl<T, I> extends RefImpl<Collection<T>, Collection<I
       for (Iterator<T> iter = proxies.iterator(); iter.hasNext();) {
         if (iter.next().equals(ref.delegate())) {
           iter.remove();
-          ref.close();
+          ref.unbind();
           return true;
         }
       }
@@ -83,15 +83,5 @@ public class RefCollectionImpl<T, I> extends RefImpl<Collection<T>, Collection<I
   @Override
   protected Collection<T> bindImpl(Collection<I> ignored1, Map<String, ?> ignored2) {
     return Collections.unmodifiableCollection(proxies);
-  }
-  
-  /**
-   * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#closeImpl()
-   */
-  @Override
-  protected void closeImpl() {
-    for (Ref<T, I> ref : refs) {
-      remove(ref);
-    }
   }
 }

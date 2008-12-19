@@ -15,16 +15,25 @@ import com.prosyst.mprm.backend.proxy.ref.RefCollectionImpl;
 public class OsgiImporterCollection<T, I> extends RefCollectionImpl<T, ServiceReference/*I*/> {
   private final OsgiTracker tracker;
   
-  public OsgiImporterCollection(final Class<T> valType, final ObjectFactory<T, I> val, final ProxyFactory fact,
-      final BundleContext bc, String filter) {
+  public OsgiImporterCollection(final Class<T> valType, final ObjectFactory<T, I> val,
+      final ProxyFactory fact, final BundleContext bc, String filter) {
     
     super(fact);
     
-    this. tracker = new OsgiTracker(bc, filter, null) {
+    this.tracker = new OsgiTracker(bc, filter, null) {
+      @Override
+      protected void opened() {
+        bind(null, null);
+      }
+      
+      @Override
+      protected void closing() {
+        unbind();
+      }
+      
       @Override
       protected void added(ServiceReference ref) {
         OsgiImporterRef<T, I> iref = new OsgiImporterRef<T, I>(valType, val, bc);
-        iref.open();
         iref.bind(ref, props(ref));
         OsgiImporterCollection.this.add(iref);
       }
@@ -45,20 +54,14 @@ public class OsgiImporterCollection<T, I> extends RefCollectionImpl<T, ServiceRe
           OsgiImporterRef iref = (OsgiImporterRef) iter.next();
           if (iref.hasRef(ref)) {
             OsgiImporterCollection.this.remove(iref);
-            iref.close();
+            iref.unbind();
           }
         }
       }
     };
   }
   
-  @Override
-  protected void openImpl() {
-    tracker.open();
-  }
-  
-  @Override
-  protected void closeImpl() {
-    tracker.close();
+  public OsgiTracker tarcker() {
+    return tracker;
   }
 }

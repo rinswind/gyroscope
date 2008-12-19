@@ -1,24 +1,19 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.prosyst.mprm.backend.proxy.ref.ImplicationRef;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
 public class LinkBuilderImpl implements LinkBuilder, BindBuilder {
-  private final List refs;
-  
   private Ref source;
   private Ref target;
   private Map props;
  
-  public LinkBuilderImpl(Ref source, List refs) {
+  public LinkBuilderImpl(Ref source) {
     this.source = source;
     this.props = new HashMap();
-    this.refs = refs;
   }
 
   public void notify(RefListener listener) {
@@ -35,7 +30,19 @@ public class LinkBuilderImpl implements LinkBuilder, BindBuilder {
     return this;
   }
   
-  public void to(Object delegate) {
-    refs.add(new ImplicationRef(source, target, delegate, props));
+  public void to(final Object delegate) {
+    source.addListener(new RefListener.Adapter() {
+      private final Ref target = LinkBuilderImpl.this.target;
+      private final Map props = LinkBuilderImpl.this.props;
+      private final Object del = delegate;
+      
+      public void bound() {
+        target.bind(del, props);
+      }
+      
+      public void unbinding() {
+        target.unbind();
+      }
+    });
   }
 }
