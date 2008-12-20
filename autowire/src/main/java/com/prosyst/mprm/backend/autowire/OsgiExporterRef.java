@@ -54,13 +54,33 @@ public class OsgiExporterRef<T> extends RefImpl<T, Object> {
     reg.unregister();
   }
   
+  /**
+   * FIX Extract this code into a common utility that is used to build the
+   * interface list for both exports proxied imports.
+   * 
+   * @param type
+   * @return
+   */
   private static String[] toInterfaceList(Class<?> type) {
   	List<String> names = new ArrayList<String>();
+  	
+  	if (type.isInterface()) {
+  	  names.add(type.getName());
+  	}
   	
   	for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
   		for (Class<?> iface : cl.getInterfaces()) {
   			names.add(iface.getName());
   		}
+  	}
+  	
+  	if (names.isEmpty()) {
+  	  /*
+       * Export under the implementation class if no interfaces were collected.
+       * 
+       * FIX Add a warning here? We don't have a log service yet :P
+       */
+  	  names.add(type.getName());
   	}
   	
     return names.toArray(new String[names.size()]);

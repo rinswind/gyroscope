@@ -1,12 +1,5 @@
 package com.prosyst.mprm.backend.proxy.impl;
 
-
-/*
- * FIX maybe it's better to build canonical names out of the passed Ref's and use those
- * to check if an appropriate proxy class has already been generated. Do not use an
- * internal class cache because ClassLoader already has one.
- */
-
 /**
  * 
  * @author Todor Boev
@@ -15,6 +8,16 @@ package com.prosyst.mprm.backend.proxy.impl;
 public class ProxyClassLoader extends ClassLoader {
   private static final String PREFIX = "$proxy";
   private static final ClassLoader PROXYLIB_SPACE = ProxyClassLoader.class.getClassLoader();
+  
+//  /** 
+//   * The list of packages that this loader will provide via the proxy bundle's 
+//   * class loader.
+//   */
+//  private static final List<String> BRIDGED_PACKAGES = Arrays.asList(
+//      /* The public api of the proxy bundle */
+//      Proxy.class.getPackage().getName(),
+//      /* The private stuff used to support the proxy */
+//      ProxyClassLoader.class.getPackage().getName());
 
   /**
    * @param proxiedSpace
@@ -35,24 +38,48 @@ public class ProxyClassLoader extends ClassLoader {
   @SuppressWarnings("unchecked")
   public <T> Class<? extends T> loadProxyClass(Class<T> type) {
     String pname = PREFIX + "." + type.getName();
-    
+
     /* Check if we have an appropriate proxy class created already */
+    Class<?> res = null;
     try {
-    	return (Class<? extends T>) loadClass(pname);
+      res = loadClass(pname);
     } catch (ClassNotFoundException cnfe) {
-      /* Build the name of the new proxy class */
-      ProxyClassBuilder gen = new ProxyClassBuilder(pname, this);
-
-      /* Create the new class */
-      for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
-      	for (Class<?> iface : cl.getInterfaces()) {
-          gen.add(iface.getName());
-      	}
-      }
-
-      byte[] raw = gen.generate();
-      return (Class<? extends T>) defineClass(pname, raw, 0, raw.length);
+      res = defineProxyClass(type, pname);
     }
+    
+    return (Class<? extends T>) res;
+  }
+
+  /**
+   * @param <T>
+   * @param type
+   * @param pname
+   * @return
+   * @throws ClassFormatError
+   */
+  private <T> Class<?> defineProxyClass(Class<T> type, String pname) throws ClassFormatError {
+    Class<?> res;
+    /* Build the name of the new proxy class */
+    ProxyClassBuilder gen = new ProxyClassBuilder(pname, this);
+
+    /*
+     * Create the new class. Proxy the class itself and all of the interface it
+     * inherits from it's subclasses.
+     * 
+     * FIX Ain't it better to flatten the entire hierarchy? Or have a parameter
+     * that describes the policy?
+     */
+    gen.add(type.getName());
+    
+    for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
+      for (Class<?> iface : cl.getInterfaces()) {
+        gen.add(iface.getName());
+      }
+    }
+
+    byte[] raw = gen.generate();
+    res = defineClass(pname, raw, 0, raw.length);
+    return res;
   }
 
   /**
@@ -64,7 +91,10 @@ public class ProxyClassLoader extends ClassLoader {
    * imported by the client bundle.
    * 
    * FIX Can we have problems if the proxy library and the client bundle import
-   * the same package?
+   * the same package? We must make sure proxies NEVER use classes outside of
+   * the proxy generator bundle. This relates to RFP 118 and the problem of
+   * ensuring an extender bundle is wired to the same package as the bundle it
+   * extends.
    */
   @Override
   protected Class<?> findClass(String name) throws ClassNotFoundException {

@@ -13,6 +13,12 @@ import com.prosyst.mprm.backend.proxy.ref.RefImpl;
  * @version $Revision$
  */
 public class ProxyPerfTest extends TestCase {
+  /**
+   * The dynamic proxies can have up to 50% worse performance than a regular
+   * synchronized method
+   */
+  private final int THRESHOLD = 50;
+  
   public interface Sum {
     void add(int i);
     
@@ -53,7 +59,6 @@ public class ProxyPerfTest extends TestCase {
     }
   }
   
-  
   public void test() {
     int reps = 10000000;
     int warmup = reps;
@@ -64,15 +69,28 @@ public class ProxyPerfTest extends TestCase {
     Sum dynamic = dynamic();
     
     run("Control",new ProxyPerfDriver(control, reps, warmup));
-    run("SyncControl",new ProxyPerfDriver(syncControl, reps, warmup));
+    long syncTime = run("SyncControl",new ProxyPerfDriver(syncControl, reps, warmup));
+    
     run("Manual", new ProxyPerfDriver(manual, reps, warmup));
-    run("Dynamic", new ProxyPerfDriver(dynamic, reps, warmup));
+    long dynamicTime = run("Dynamic", new ProxyPerfDriver(dynamic, reps, warmup));
+    
+    long timeDiff = dynamicTime - syncTime;
+    float ratio = ((float) timeDiff)/syncTime;
+    int perc = (int) (100*ratio);
+    
+    System.out.println("Dynamic is " + perc + "% worse than synchronized");
+    
+    assertTrue("Difference between dynamic and syncronized is less than " + THRESHOLD + "%: "
+        + perc + "%", perc < THRESHOLD);
+    
   }
   
-  private static void run(String name, ProxyPerfDriver test) {
+  private static long run(String name, ProxyPerfDriver test) {
     long time = test.test();
     
     System.out.println(name + "(" + test.get() + "): " + time);
+    
+    return time;
   }
   
   private static Sum control() {

@@ -53,18 +53,18 @@ public class ProxyClassBuilder implements Opcodes {
   
   private static final String FIELD_DESC = "L" + REF_IFACE + ";";
   
+  private final Set<String> visitedMethods;
+  
   /**
    * 
    */
   private class MixinGenerator implements ClassVisitor {
     private final String ifName;
     private final String fieldName;
-    private final Set<String> visitedMethods;
     
     public MixinGenerator(String ifName) {
       this.ifName = toInternalName(ifName);
       this.fieldName = toIdentifier(ifName);
-      this.visitedMethods = new HashSet<String>();
     }
     
     /**
@@ -317,6 +317,7 @@ public class ProxyClassBuilder implements Opcodes {
     
     this.mixins = new ArrayList<MixinGenerator>();
     this.classSig = new ArrayList<String>();
+    this.visitedMethods = new HashSet<String>();
     
     this.cv = new ClassWriter(ClassWriter.COMPUTE_MAXS + ClassWriter.COMPUTE_FRAMES);
   }
@@ -343,6 +344,8 @@ public class ProxyClassBuilder implements Opcodes {
    * @return
    */
   public byte[] generate() {
+    visitedMethods.clear();
+    
     classSig.add(PROXY_IFACE);
     constrSig += ")V";
    
