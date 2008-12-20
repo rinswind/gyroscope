@@ -24,7 +24,7 @@ public class RefCollectionImpl<J, K> extends RefImpl<Collection<J>, Collection<K
    * @param elemType
    */
   public RefCollectionImpl(ProxyFactory fact) {
-    super(Collections.class);
+    super(Collection.class);
     
     this.fact = fact;
     this.refs = new ConcurrentLinkedQueue<Ref<J, K>>();

@@ -59,7 +59,7 @@ public class MapImporter extends RefContainerImpl {
       .proxy();
     
     from(services).notify(new RefListener.Adapter() {
-      public void open() {
+      public void bound() {
         worker = new Worker("Proxy test", task);
         worker.start();
       }
