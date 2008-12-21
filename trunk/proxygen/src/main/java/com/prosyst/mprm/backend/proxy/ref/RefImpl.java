@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefImpl<T, I> implements Ref<T, I> {
+public class RefImpl<A, V> implements Ref<A, V> {
   /**
    * Controls the correct transition from state to state as well as the event
    * dispatching on the appropriate state entries.
@@ -41,13 +41,14 @@ public class RefImpl<T, I> implements Ref<T, I> {
     static {
       UNBOUND.addTransit(BINDING);
       BINDING.addTransit(BOUND);
-      BINDING.setRollback(UNBOUND);
+      BINDING.setFailover(UNBOUND);
       
       BOUND.addTransit(UNBINDING);
       UNBINDING.addTransit(UNBOUND);
       
       BOUND.addTransit(UPDATING);
       UPDATING.addTransit(BOUND);
+      UPDATING.setFailover(UNBOUND);
     }
     
     private final State state;
@@ -63,7 +64,7 @@ public class RefImpl<T, I> implements Ref<T, I> {
       transits.add(state);
     }
     
-    private void setRollback(StateHandler rollback) {
+    private void setFailover(StateHandler rollback) {
       this.rollback = rollback;
     }
     
@@ -75,15 +76,15 @@ public class RefImpl<T, I> implements Ref<T, I> {
       return transits.contains(state);
     }
     
-    public StateHandler rollback() {
+    public StateHandler failover() {
       if (rollback == null) {
         throw new UnsupportedOperationException();
       }
       return rollback;
     }
     
-    public <T, I> void dispatchOnEntry(Ref<T, I> ref, Collection<RefListener<T, I>> listeners) {
-      for (RefListener<T, I> l : listeners) {
+    public <I, O> void dispatchOnEntry(Ref<I, O> ref, Collection<RefListener<I, O>> listeners) {
+      for (RefListener<I, O> l : listeners) {
         try {
           dispatchOnEntry(ref, l);
         } catch (Throwable thr) {
@@ -92,8 +93,8 @@ public class RefImpl<T, I> implements Ref<T, I> {
       }
     }
     
-    public <T, I> void dispatchOnExit(Ref<T, I> ref, Collection<RefListener<T, I>> listeners) {
-      for (RefListener<T, I> l : listeners) {
+    public <I, O> void dispatchOnExit(Ref<I, O> ref, Collection<RefListener<I, O>> listeners) {
+      for (RefListener<I, O> l : listeners) {
         try {
           dispatchOnExit(ref, l);
         } catch (Throwable thr) {
@@ -102,34 +103,44 @@ public class RefImpl<T, I> implements Ref<T, I> {
       }
     }
     
-    protected <T, I> void dispatchOnEntry(Ref<T, I> lc, RefListener<T, I> ll) {
+    protected <I, O> void dispatchOnEntry(Ref<I, O> lc, RefListener<I, O> ll) {
       /* By default do not call the listener */
     }
     
-    protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
+    protected <I, O> void dispatchOnExit(Ref<I, O> lc, RefListener<I, O> ll) {
       /* By default do not call the listener */
     }
   }
   
-  private final Class<?> type;
-  private final Collection<RefListener<T, I>> listeners;
-  private final ReadWriteLock lock;
+  private final Collection<RefListener<A, V>> listeners = new ConcurrentLinkedQueue<RefListener<A, V>>();
+  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+  
+  private ObjectFactory<A, V> factory;
 
-  private StateHandler state;
-  private T delegate;
   private Map<String, Object> props;
+  private A arg;
+  private V val;
+  
+  private StateHandler state = StateHandler.UNBOUND;
   
   /**
-   * @param type
+   * 
    */
-  public RefImpl(Class<?> type) {
-  	this.type = type;
-    
-    this.listeners = new ConcurrentLinkedQueue<RefListener<T, I>>();
-    this.lock = new ReentrantReadWriteLock();
-    
-    this.state = StateHandler.UNBOUND;
-    this.props = Collections.emptyMap();
+  public RefImpl() {
+  }
+  
+  /**
+   * @param factory
+   */
+  public RefImpl(ObjectFactory<A, V> factory) {
+    this.factory = factory;
+  }
+  
+  /**
+   * @param factory
+   */
+  protected void setup(ObjectFactory<A, V> factory) {
+    this.factory = factory;
   }
   
   /**
@@ -137,17 +148,12 @@ public class RefImpl<T, I> implements Ref<T, I> {
    */
   @Override
   public String toString() {
-    return "Ref(" + type + ")[ " + state() + " ]";
-  }
-  
-  /**
-   * FIX How to do type tokens well with the damn generics?
-   * 
-   * @see com.prosyst.mprm.backend.proxy.ref.Ref#type()
-   */
-  @SuppressWarnings("unchecked")
-  public Class<T> type() {
-    return (Class<T>) type;
+    lock().lock();
+    try {
+      return "Ref(" + state + ")[" + arg + "->" + val + "]";
+    } finally {
+      lock().unlock();
+    }
   }
   
   /**
@@ -155,14 +161,29 @@ public class RefImpl<T, I> implements Ref<T, I> {
    * which call here will already hold the lock() and we don't need to incur
    * more performance penalty by redundantly taking/releasing it again.
    * 
-   * @see com.prosyst.mprm.backend.proxy.ref.Ref#delegate()
+   * @see com.prosyst.mprm.backend.proxy.ref.Ref#val()
    */
-  public final T delegate() {
+  public final A arg() {
     if (State.BOUND != state.state) {
       throw new RefUnboundException(this);
     }
     
-    return delegate;
+    return arg;
+  }
+  
+  /**
+   * This one is thread-unsafe by design. The reason is that the proxy methods
+   * which call here will already hold the lock() and we don't need to incur
+   * more performance penalty by redundantly taking/releasing it again.
+   * 
+   * @see com.prosyst.mprm.backend.proxy.ref.Ref#val()
+   */
+  public final V val() {
+    if (State.BOUND != state.state) {
+      throw new RefUnboundException(this);
+    }
+    
+    return val;
   }
   
   /**
@@ -180,14 +201,14 @@ public class RefImpl<T, I> implements Ref<T, I> {
   /**
    * @see com.prosyst.mprm.backend.proxy.gen.Proxy#addListener(com.prosyst.mprm.backend.autowire.ServiceProxyListener)
    */
-  public final void addListener(RefListener<T, I> listener) {
+  public final void addListener(RefListener<A, V> listener) {
     listeners.add(listener);
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#removeListener(com.prosyst.mprm.backend.proxy.ref.RefListener)
    */
-  public final void removeListener(RefListener<T, I> listener) {
+  public final void removeListener(RefListener<A, V> listener) {
     listeners.remove(listener);
   }
 
@@ -213,65 +234,57 @@ public class RefImpl<T, I> implements Ref<T, I> {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */
-  public final void bind(I delegate, Map<String, ?> props) {
+  public final void bind(A arg, Map<String, ?> props) {
     toState(StateHandler.BINDING);
     
     try {
+      this.arg = arg;
+      this.val = factory.create(arg, props);
+      
       if (props != null) {
+        /* Defensive copy of the props */
         this.props = new HashMap<String, Object>();
         this.props.putAll(props);
       }
       
-      this.delegate = bindImpl(delegate, props);
-      
       toState(StateHandler.BOUND);
-    } catch (Throwable thr) {
-      rollback();
-      throw new RefException(thr);
+    } catch (Exception exc) {
+      failover();
+      throw new RefException(this + ": Bind failed", exc);
     }
-  }
-  
-  /**
-   * @param delegate
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  protected T bindImpl(I delegate, Map<String, ?> props) {
-    return (T) delegate;
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#update(java.lang.Object, java.util.Map)
    */
-  public final void update(I delegate, Map<String, ?> props) {
-    if (delegate == null && props == null) {
+  public final void update(A arg, Map<String, ?> props) {
+    if (arg == null && props == null) {
       throw new RefException(this + ": Must update something");
     }
     
     toState(StateHandler.UPDATING);
     
-    try {
-      if (props != null) {
-        this.props = new HashMap<String, Object>();
-        this.props.putAll(props);
-      }
-      
-      if (delegate != null) {
-        this.delegate = updateImpl(delegate, props);
-      }
-    } finally {
-      toState(StateHandler.BOUND);
+    if (props != null) {
+      /* Defensive copy */
+      this.props = new HashMap<String, Object>();
+      this.props.putAll(props);
     }
+    
+    if (arg != null) {
+      try {
+        factory.destroy(val, this.arg, props);
+        this.arg = arg;
+        
+        this.val = factory.create(arg, props);
+      } catch (Exception exc) {
+        failover();
+        throw new RefException(this + ": Update failed", exc);
+      }
+    }
+    
+    toState(StateHandler.BOUND);
   }
 
-  /**
-   * @param delegate
-   * @return
-   */
-  protected T updateImpl(I delegate, Map<String, ?> props) {
-    return bindImpl(delegate, props);
-  }
-  
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#unbind()
    */
@@ -281,19 +294,14 @@ public class RefImpl<T, I> implements Ref<T, I> {
     }
     
     try {
-      unbindImpl(delegate, props);
+      factory.destroy(val, arg, props);
     } finally {
-      this.delegate = null;
+      this.val = null;
+      this.arg = null;
       this.props = Collections.emptyMap();
       
       toState(StateHandler.UNBOUND);
     }
-  }
-  
-  /**
-   * 
-   */
-  protected void unbindImpl(T delegate, Map<String, ?> props) {
   }
   
   /**
@@ -314,10 +322,10 @@ public class RefImpl<T, I> implements Ref<T, I> {
   /**
    * 
    */
-  private void rollback() {
+  private void failover() {
     lock.writeLock().lock();
     try {
-      state = state.rollback();
+      state = state.failover();
     } finally {
       lock.writeLock().unlock();
     }

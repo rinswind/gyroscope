@@ -5,9 +5,11 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * @author Todor Boev
- * @version $Revision$
+ *
+ * @param <A> Argument
+ * @param <V> Value
  */
-public interface Ref<T, I> {
+public interface Ref<A, V> {
   /**
    * Lifecycle of a dynamic reference.
    */
@@ -20,14 +22,13 @@ public interface Ref<T, I> {
   }
 
   /**
-   * Lists the types of the delegate in which we are interested. These are going
-   * to be some of the interfaces, which the object returned from delegate()
-   * implements e.g. <code>T</code> must extend all the members of this list
-   * except if one of these members is <code>T</code> itself.
+   * Thread-unsafe method intended for calls from dynamic proxies. If you need
+   * to call this you must do so in a try/finally block taking and releasing the
+   * lock().
    * 
-   * @return type of the object returned by delegate().
+   * @return
    */
-  Class<T> type();
+  A arg();
   
   /**
    * Thread-unsafe method intended for calls from dynamic proxies. If you need
@@ -36,7 +37,7 @@ public interface Ref<T, I> {
    * 
    * @return
    */
-  T delegate();
+  V val();
   
   /**
    * @return a random set of properties that applications may associate with the
@@ -55,13 +56,13 @@ public interface Ref<T, I> {
    */
   Lock lock();
   
-  void bind(I delegate, Map<String, ?> props);
+  void bind(A arg, Map<String, ?> props);
   
-  void update(I delegate, Map<String, ?> props);
+  void update(A arg, Map<String, ?> props);
   
   void unbind();
 
-  void addListener(RefListener<T, I> l);
+  void addListener(RefListener<A, V> l);
   
-  void removeListener(RefListener<T, I> l);
+  void removeListener(RefListener<A, V> l);
 }

@@ -12,37 +12,41 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements RefMap<K,T,I> {
+public class RefMapImpl<K,A,V> extends RefImpl<Void, Map<K,V>> implements RefMap<K,A,V> {
   private final ProxyFactory fact;
-  private final Map<K, Ref<T,I>> refs;
-  private final Map<K, T> proxies;
+  private final Class<V> valType;
   
-  public RefMapImpl(ProxyFactory fact) {
-    super(Map.class);
-    
+  private final Map<K, Ref<A,V>> refs;
+  private final Map<K, V> proxies;
+  
+  public RefMapImpl(Class<V> valType, ProxyFactory fact) {
     this.fact = fact;
-    this.refs = new ConcurrentHashMap<K, Ref<T,I>>();
-    this.proxies = new ConcurrentHashMap<K,T>();
+    this.valType = valType;
+    
+    this.refs = new ConcurrentHashMap<K, Ref<A,V>>();
+    this.proxies = new ConcurrentHashMap<K,V>();
+    
+    setup(ObjectFactories.<Void, Map<K,V>>constant(Collections.unmodifiableMap(proxies)));
   }
 
-  public void put(K key, Ref<T,I> ref) {
+  public void put(K key, Ref<A,V> ref) {
     lock().lock();
     try {
       refs.put(key, ref);
-      proxies.put(key, fact.proxy(ref));
+      proxies.put(key, fact.proxy(valType, ref));
     } finally {
       lock().unlock();
     }
   }
 
-  public Ref<T,I> remove(K key) {
+  public Ref<A,V> remove(K key) {
     lock().lock();
     try {
       if (proxies.remove(key) == null) {
         return null;
       }
       
-      Ref<T,I> ref = refs.remove(key);
+      Ref<A,V> ref = refs.remove(key);
       ref.unbind();
       return ref;
     } finally {
@@ -50,7 +54,7 @@ public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements Re
     }
   }
 
-  public Ref<T,I> get(K key) {
+  public Ref<A,V> get(K key) {
     lock().lock();
     try {
       return refs.get(key);
@@ -59,7 +63,7 @@ public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements Re
     }
   }
 
-  public Set<Map.Entry<K, Ref<T,I>>> entries() {
+  public Set<Map.Entry<K, Ref<A,V>>> entries() {
     lock().lock();
     try {
       return refs.entrySet();
@@ -77,20 +81,12 @@ public class RefMapImpl<K,T,I> extends RefImpl<Map<K,T>, Map<K,I>> implements Re
     }
   }
 
-  public Collection<Ref<T,I>> values() {
+  public Collection<Ref<A,V>> values() {
     lock().lock();
     try {
       return refs.values();
     } finally {
       lock().unlock();
     }
-  }
-
-  @Override
-  protected Map<K,T> bindImpl(Map<K,I> ignored1, Map<String, ?> ignored2) {
-    /*
-     * FIX Process the input map and the properties okay?
-     */
-    return Collections.unmodifiableMap(proxies);
   }
 }
