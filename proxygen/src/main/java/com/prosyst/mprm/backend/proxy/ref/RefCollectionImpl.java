@@ -3,7 +3,6 @@ package com.prosyst.mprm.backend.proxy.ref;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
@@ -12,36 +11,39 @@ import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
  * @author Todor Boev
  * @version $Revision$
  */
-public class RefCollectionImpl<J, K> extends RefImpl<Collection<J>, Collection<K>> implements
-    RefCollection<J, K> {
+public class RefCollectionImpl<A, V> extends RefImpl<Void, Collection<V>> implements
+    RefCollection<A, V> {
   
+  private final Class<V> valType;
   private final ProxyFactory fact;
   
-  private final Collection<Ref<J, K>> refs;
-  private final Collection<J> proxies;
+  private final Collection<Ref<A, V>> refs;
+  private final Collection<V> proxies;
   
   /**
-   * @param elemType
+   * @param fact
    */
-  public RefCollectionImpl(ProxyFactory fact) {
-    super(Collection.class);
-    
+  public RefCollectionImpl(Class<V> valType, ProxyFactory fact) {
     this.fact = fact;
-    this.refs = new ConcurrentLinkedQueue<Ref<J, K>>();
-    this.proxies = new ConcurrentLinkedQueue<J>();
+    this.valType = valType;
+    
+    this.refs = new ConcurrentLinkedQueue<Ref<A, V>>();
+    this.proxies = new ConcurrentLinkedQueue<V>();
+    
+    setup(ObjectFactories.<Void, Collection<V>>constant(Collections.unmodifiableCollection(proxies)));
   }
-
-  public final void add(Ref<J, K> ref) {
+  
+  public final void add(Ref<A, V> ref) {
     lock().lock();
     try {
       refs.add(ref);
-      proxies.add(fact.proxy(ref));
+      proxies.add(fact.proxy(valType, ref));
     } finally {
       lock().unlock();
     }
   }
   
-  public final boolean remove(Ref<J, K> ref) {
+  public final boolean remove(Ref<A, V> ref) {
     lock().lock();
     try {
       if (!refs.remove(ref)) {
@@ -52,8 +54,8 @@ public class RefCollectionImpl<J, K> extends RefImpl<Collection<J>, Collection<K
        * Must compare proxy.equals(delegate) in order to get true. The normal
        * remove() method compares delegate.equals(proxy) and fails
        */
-      for (Iterator<J> iter = proxies.iterator(); iter.hasNext();) {
-        if (iter.next().equals(ref.delegate())) {
+      for (Iterator<V> iter = proxies.iterator(); iter.hasNext();) {
+        if (iter.next().equals(ref.val())) {
           iter.remove();
           ref.unbind();
           return true;
@@ -69,15 +71,7 @@ public class RefCollectionImpl<J, K> extends RefImpl<Collection<J>, Collection<K
   /**
    * Weakly consistent Iterator over all existing proxies.
    */
-  public final Iterator<Ref<J, K>> iterator() {
+  public final Iterator<Ref<A, V>> iterator() {
     return refs.iterator(); 
-  }
-  
-  /**
-   * @see com.prosyst.mprm.backend.proxy.ref.RefImpl#bindImpl(java.lang.Object, java.util.Map)
-   */
-  @Override
-  protected Collection<J> bindImpl(Collection<K> ignored1, Map<String, ?> ignored2) {
-    return Collections.unmodifiableCollection(proxies);
   }
 }
