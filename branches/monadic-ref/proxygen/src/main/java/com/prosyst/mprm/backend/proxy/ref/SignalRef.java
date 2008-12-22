@@ -85,7 +85,8 @@ public abstract class SignalRef extends RefImpl<Void, Void> {
    * While this Ref is in state BOUND this method is called every time the state
    * of some of the dependencies changes to determine if the dependency match
    * was lost and this Ref must move to state UNBOUND. By default returns
-   * <code>!mustBind()</code>
+   * <code>!mustBind()</code>. Override this method if you want the ref to
+   * remain BOUND for some set of acceptable changes to the dependencies.
    * 
    * @return
    */

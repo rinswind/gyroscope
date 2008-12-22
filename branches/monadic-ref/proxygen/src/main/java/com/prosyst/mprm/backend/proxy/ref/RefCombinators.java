@@ -102,10 +102,19 @@ public class RefCombinators {
   }
   
   /**
+   * Can be used by the user to raise a signal directly.
    * @return
    */
   public Ref<Void, Void> signal() {
-    return new RefImpl<Void, Void>(ObjectFactories.nothing());
+    return new SignalRef() {
+      /*
+       * This method is actually never called because this ref depends on nothing.
+       */
+      @Override
+      protected boolean mustBind() {
+        return true;
+      }
+    };
   }
   
   /**
