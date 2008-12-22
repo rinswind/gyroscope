@@ -115,7 +115,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
   private final Collection<RefListener<A, V>> listeners = new ConcurrentLinkedQueue<RefListener<A, V>>();
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
   
-  private ObjectFactory<A, V> factory;
+  private final ObjectFactory<A, V> factory;
 
   private Map<String, Object> props;
   private A arg;
@@ -124,22 +124,9 @@ public class RefImpl<A, V> implements Ref<A, V> {
   private StateHandler state = StateHandler.UNBOUND;
   
   /**
-   * 
-   */
-  public RefImpl() {
-  }
-  
-  /**
    * @param factory
    */
   public RefImpl(ObjectFactory<A, V> factory) {
-    this.factory = factory;
-  }
-  
-  /**
-   * @param factory
-   */
-  protected void setup(ObjectFactory<A, V> factory) {
     this.factory = factory;
   }
   

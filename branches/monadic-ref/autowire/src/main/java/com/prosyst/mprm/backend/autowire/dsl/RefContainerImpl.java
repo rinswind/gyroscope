@@ -76,29 +76,6 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
         + " instances required");
   }
   
-  public Ref signal() {
-    return new RefImpl(Object.class);
-  }
-  
-  public Ref and(Object left, Object right) {
-    AndRef res = new AndRef();
-    res.dependsOn(left);
-    res.dependsOn(right);
-    return res;
-  }
-
-  public Ref or(Object left, Object right) {
-    OrRef res = new OrRef();
-    res.dependsOn(left);
-    res.dependsOn(right);
-    return res;
-  }
-  
-  public Ref not(Object inverted) {
-    NotRef res = new NotRef(inverted);
-    return res;
-  }
-
   public final void start(BundleContext bc) throws Exception {
     try {
       configure();
