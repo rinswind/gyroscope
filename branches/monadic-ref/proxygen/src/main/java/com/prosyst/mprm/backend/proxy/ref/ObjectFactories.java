@@ -7,11 +7,11 @@ import java.util.Map;
  * @version $Revision$
  */
 public class ObjectFactories {
-  public static <T> ObjectFactory<?, T> key(final String prop) {
-    return new ObjectFactory.Adapter<Object, T>() {
+  public static <V> ObjectFactory<?, V> key(final String prop) {
+    return new ObjectFactory.Adapter<Object, V>() {
       @SuppressWarnings("unchecked")
-      public T create(Object delegate, Map<String, ?> props) {
-        return (T) props.get(prop);
+      public V create(Object delegate, Map<String, Object> props) {
+        return (V) props.get(prop);
       }
     };
   }
@@ -22,7 +22,7 @@ public class ObjectFactories {
   
   private static final ObjectFactory<Void, Void> NOTHING = 
     new ObjectFactory.Adapter<Void, Void>() {
-      public Void create(Void arg, Map<String, ?> props) {
+      public Void create(Void arg, Map<String, Object> props) {
         return null;
       }
     };
@@ -34,14 +34,14 @@ public class ObjectFactories {
   
   private static final ObjectFactory<Object, Object> IDENTITY = 
     new ObjectFactory.Adapter<Object, Object>() {
-      public Object create(Object arg, Map<String, ?> props) {
+      public Object create(Object arg, Map<String, Object> props) {
         return arg;
       }
     }; 
   
   public static <A, V> ObjectFactory<A, V> constant(final V c) { 
     return new ObjectFactory.Adapter<A, V>() {
-      public V create(A input, Map<String, ?> props){
+      public V create(A input, Map<String, Object> props){
         return c;
       }
     };

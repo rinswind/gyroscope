@@ -221,7 +221,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
    */
-  public final void bind(A arg, Map<String, ?> props) {
+  public final void bind(A arg, Map<String, Object> props) {
     toState(StateHandler.BINDING);
     
     try {
@@ -244,7 +244,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#update(java.lang.Object, java.util.Map)
    */
-  public final void update(A arg, Map<String, ?> props) {
+  public final void update(A arg, Map<String, Object> props) {
     if (arg == null && props == null) {
       throw new RefException(this + ": Must update something");
     }

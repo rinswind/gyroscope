@@ -1,51 +1,35 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import static com.prosyst.mprm.backend.proxy.ref.RefCombinators.ref;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
-import com.prosyst.mprm.backend.autowire.OsgiExporterRef;
-import com.prosyst.mprm.backend.proxy.gen.Proxy;
+import com.prosyst.mprm.backend.autowire.ServiceExport;
+import com.prosyst.mprm.backend.autowire.ServiceFactoryExport;
+import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.RefListener;
+
 
 /**
  * @author Todor Boev
  * @version $Revision$
  */
-public class ExporterBuilderImpl implements ExporterBuilder {
+public class ExporterBuilderImpl<A> implements ExportBuilder<A> {
+  private final Class<A> iface;
   private final BundleContext bc;
-
-  private Class<?> iface;
-//  private boolean superifaces;
-
-  public ExporterBuilderImpl(BundleContext bc) {
+  
+  public ExporterBuilderImpl(Class<A> iface, BundleContext bc) {
     this.bc = bc;
+    this.iface = iface;
   }
 
-  public ExporterBuilder of(Class iface) {
-  	this.iface = iface;
-    return this;
+  public Ref<A, ServiceRegistration> asSingleton() {
+    return ref(new ServiceExport<A>(iface, bc));
   }
 
-//  public ExporterBuilder withSuperinterfaces() {
-//    superifaces = true;
-//    return this;
-//  }
-
-  public Ref asSingleton() {
-    return ref();
-  }
-
-  public Ref asFactory() {
-    return ref();
-  }
-
-  private Ref ref() {
-//    buildIfaceList();
-    return new OsgiExporterRef(iface, bc);
+  public Ref<ObjectFactory<Bundle, A>, ServiceRegistration> asFactory() {
+    return ref(new ServiceFactoryExport<A>(iface, bc));
   }
 }  
-

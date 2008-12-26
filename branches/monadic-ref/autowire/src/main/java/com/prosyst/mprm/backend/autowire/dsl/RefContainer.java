@@ -1,23 +1,14 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
-import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 /**
  * @author Todor Boev
  * @version $Revision$
  */
 public interface RefContainer { 
-  ImporterBuilder importer();
+  <A> ImportBuilder use(Class<A> iface);
   
-  ExporterBuilder exporter();
+  <A> ExportBuilder<A> provide(Class<A> impl);
   
   LinkBuilder from(Object proxy);
-  
-  Ref signal();
-  
-  Ref and(Object left, Object right);
-  
-  Ref or(Object left, Object right);
-  
-  Ref not(Object inverted);
 }

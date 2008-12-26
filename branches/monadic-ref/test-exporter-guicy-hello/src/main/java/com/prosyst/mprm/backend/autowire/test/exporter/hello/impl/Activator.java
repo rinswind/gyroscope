@@ -5,6 +5,7 @@ import static com.google.inject.matcher.Matchers.*;
 import static com.google.inject.name.Names.named;
 
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -13,6 +14,8 @@ import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
+
+import static com.prosyst.mprm.backend.proxy.ref.RefCombinators.*;
 
 /**
  * @author Todor Boev
@@ -27,8 +30,8 @@ public class Activator extends RefContainerImpl {
       @Override
       protected void configure() {
         /* Define the service imports - they are effectively singletons */
-        bind(Format.class).toInstance((Format) importer().of(Format.class).asSingleton().proxy());
-        bind(Date.class).toInstance((Date) importer().of(Date.class).asSingleton().proxy());
+        bind(Format.class).toInstance(use(Format.class).proxy());
+        bind(Date.class).toInstance(use(Date.class).proxy());
         
         /* Define the service impl we will export */
         bind(Hello.class).to(HelloImpl.class);
@@ -44,19 +47,19 @@ public class Activator extends RefContainerImpl {
      * Guice to get the service proxies. Since they are singletons we know we
      * will define the signal over the appropriate instances.
      */
-    final Ref required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
+    final Ref<Void, Void> required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
     
     for (int i = 0; i < NO; i++) {
       /* Use guice to create the export */
       Hello hello = injector.getInstance(Hello.class);
       
-      Ref export = exporter().of(Hello.class).asSingleton();
+      Ref<Hello, ServiceRegistration> export = provide(Hello.class).asSingleton();
       
-      from(required)
-      .bind(export)
-      .to(Hello.PROP, Integer.valueOf(i))
-      .to(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))
-      .to(hello);
+      from(required).notify(
+          binder(export)
+          .withProp(Hello.PROP, Integer.valueOf(i))
+          .withProp(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))
+          .to(hello));
       
       /* Use guice to create the listener */
       from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(i));

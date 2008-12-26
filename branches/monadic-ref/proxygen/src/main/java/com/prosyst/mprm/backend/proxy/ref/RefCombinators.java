@@ -3,33 +3,20 @@ package com.prosyst.mprm.backend.proxy.ref;
 import java.util.Map;
 
 /**
- * Ref monad for ObectFactory functional objects.
+ * Ref is a monad-like thing that adds state tracking to ObectFactory objects.
  * 
  * @author Todor Boev
  */
 public class RefCombinators {
   /**
-   * Start a piping sequence. You might think of this as a variant of the monadic
-   * unit function.
-   * 
-   * @param <A>
-   * @param <B>
-   * @param fact
-   * @return
-   */
-  public static <A, B> RefPipe<A, B> pipe(ObjectFactory<A, B> fact) {
-    return new RefPipeImpl<A, B>(ref(fact));
-  }
-  
-  /**
-   * The unit function to lift an ObjectFactory into the Ref monad.
+   * A function to lift an ObjectFactory into the Ref monad.
    */
   public static <A, B> Ref<A, B> ref(ObjectFactory<A, B> fact) {
     return new RefImpl<A, B>(fact);
   }
   
   /**
-   * The bind function to sequence a Ref monad with an ObjectFactory.
+   * A function to sequence a Ref with an ObjectFactory.
    * 
    * @param <A>
    * @param <B>
@@ -40,12 +27,12 @@ public class RefCombinators {
    */
   public static <A, B, C> Ref<A, C> pipe(final Ref<A, B> ref, final ObjectFactory<B, C> fact) {
     return new RefImpl<A, C>(new ObjectFactory<A, C>() {
-      public C create(A arg, Map<String, ?> props) {
+      public C create(A arg, Map<String, Object> props) {
         ref.bind(arg, props);
         return fact.create(ref.val(), props);
       }
 
-      public void destroy(C val, A arg, Map<String, ?> props) {
+      public void destroy(C val, A arg, Map<String, Object> props) {
         fact.destroy(val, ref.val(), props);
         ref.unbind();
       }
@@ -116,69 +103,78 @@ public class RefCombinators {
       }
     };
   }
-  
-  /**
-   * Provides infix notation for piping refs
-   */
-  public interface RefPipe<A, B> {
-    <C> RefPipe<A, C> to(ObjectFactory<B, C> fact);
-    
-    Ref<A, B> ref();
-  }
-  
-  private static class RefPipeImpl<A, B> implements RefPipe<A, B> {
-    private final Ref<A, B> ref;
-    
-    public RefPipeImpl(Ref<A, B> ref) {
-      this.ref = ref;
-    }
-    
-    public <C> RefPipe<A, C> to(ObjectFactory<B, C> fact) {
-      return new RefPipeImpl<A, C>(pipe(ref, fact)); 
-    }
-    
-    public Ref<A, B> ref() {
-      return ref;
-    }
-  }
-  
+
+//  /**
+//   * Start a piping sequence. You might think of this as a variant of the
+//   * monadic unit function.
+//   * 
+//   * @param <A>
+//   * @param <B>
+//   * @param fact
+//   * @return
+//   */
+//  public static <A, B> RefPipe<A, B> pipe(ObjectFactory<A, B> fact) {
+//    return new RefPipeImpl<A, B>(ref(fact));
+//  }
+//
+//  /**
+//   * Provides infix notation for piping refs
+//   */
+//  public interface RefPipe<A, B> {
+//    <C> RefPipe<A, C> to(ObjectFactory<B, C> fact);
+//
+//    Ref<A, B> ref();
+//  }
+//
+//  private static class RefPipeImpl<A, B> implements RefPipe<A, B> {
+//    private final Ref<A, B> ref;
+//
+//    public RefPipeImpl(Ref<A, B> ref) {
+//      this.ref = ref;
+//    }
+//
+//    public <C> RefPipe<A, C> to(ObjectFactory<B, C> fact) {
+//      return new RefPipeImpl<A, C>(pipe(ref, fact));
+//    }
+//
+//    public Ref<A, B> ref() {
+//      return ref;
+//    }
+//  }
+//
 //  public static void main(String[] args) {
-//    Ref<String, String> pipe = 
-//    pipe(new ObjectFactory<String, Integer>() {
-//      public Integer create(String arg, Map<String, ?> props) {
+//    Ref<String, String> pipe = pipe(new ObjectFactory<String, Integer>() {
+//      public Integer create(String arg, Map<String, Object> props) {
 //        int val = arg.length();
 //        System.out.println(arg + "->" + val);
 //        return val;
 //      }
 //
-//      public void destroy(Integer val, String arg, Map<String, ?> props) {
+//      public void destroy(Integer val, String arg, Map<String, Object> props) {
 //        System.out.println(val + "->" + arg);
 //      }
-//    })
-//    .to(new ObjectFactory<Integer, Integer>() {
-//      public Integer create(Integer arg, Map<String, ?> props) {
-//        int val = arg*2;
+//    }).to(new ObjectFactory<Integer, Integer>() {
+//      public Integer create(Integer arg, Map<String, Object> props) {
+//        int val = arg * 2;
 //        System.out.println(arg + "->" + val);
 //        return val;
 //      }
 //
-//      public void destroy(Integer val, Integer arg, Map<String, ?> props) {
+//      public void destroy(Integer val, Integer arg, Map<String, Object> props) {
 //        System.out.println(val + "->" + arg);
 //      }
-//    })
-//    .to(new ObjectFactory<Integer, String>() {
-//      public String create(Integer arg, Map<String, ?> props) {
+//    }).to(new ObjectFactory<Integer, String>() {
+//      public String create(Integer arg, Map<String, Object> props) {
 //        String val = "This is the integer " + arg;
 //        System.out.println(arg + "->" + val);
 //        return val;
 //      }
 //
-//      public void destroy(String val, Integer arg, Map<String, ?> props) {
+//      public void destroy(String val, Integer arg, Map<String, Object> props) {
 //        System.out.println(val + "->" + arg);
 //      }
-//    })
-//    .ref();
-//    
+//    }).ref();
+//
 //    pipe.bind("This is short string!", null);
 //    pipe.unbind();
 //  }

@@ -12,14 +12,14 @@ import java.util.Map;
  * @param <V>
  */
 public interface ObjectFactory<A, V> {
-  V create(A arg, Map<String, ?> props);
+  V create(A arg, Map<String, Object> props);
 
-  void destroy(V val, A arg, Map<String, ?> props);
+  void destroy(V val, A arg, Map<String, Object> props);
 
   public static abstract class Adapter<A, V> implements ObjectFactory<A, V> {
-    public abstract V create(A arg, Map<String, ?> props);
+    public abstract V create(A arg, Map<String, Object> props);
 
-    public void destroy(V val, A arg, Map<String, ?> props) {
+    public void destroy(V val, A arg, Map<String, Object> props) {
       /* User code comes here */
     }
   }

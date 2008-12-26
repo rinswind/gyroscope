@@ -56,13 +56,30 @@ public interface Ref<A, V> {
    */
   Lock lock();
   
-  void bind(A arg, Map<String, ?> props);
+  /**
+   * @param arg
+   * @param props a heterogeneous collection of named objects.
+   */
+  void bind(A arg, Map<String, Object> props);
   
-  void update(A arg, Map<String, ?> props);
+  /**
+   * @param arg
+   * @param props
+   */
+  void update(A arg, Map<String, Object> props);
   
+  /**
+   * 
+   */
   void unbind();
 
+  /**
+   * @param l
+   */
   void addListener(RefListener<A, V> l);
   
+  /**
+   * @param l
+   */
   void removeListener(RefListener<A, V> l);
 }

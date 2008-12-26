@@ -1,9 +1,7 @@
 package com.prosyst.mprm.backend.autowire;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -81,6 +79,8 @@ public abstract class OsgiTracker {
    * 
    */
   public void open() {
+    openning();
+      
     try {
       synchronized (refs) {
         ServiceReference[] srefs = bc.getServiceReferences(null, filter);
@@ -94,8 +94,6 @@ public abstract class OsgiTracker {
       }
     
       bc.addServiceListener(tracker, filter.toString());
-      
-      opened();
     } catch (InvalidSyntaxException e) {
       throw new RefException("Bad filter syntax: \"" + filter + "\"", e);
     }
@@ -107,23 +105,21 @@ public abstract class OsgiTracker {
   public void close() {
     bc.removeServiceListener(tracker);
     
-    try {
-      closing();
-    } finally {
-      synchronized (refs) {
-        for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
-          ServiceReference ref = (ServiceReference) iter.next();
-          iter.remove();
-          removed(ref);
-        }
+    synchronized (refs) {
+      for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
+        ServiceReference ref = (ServiceReference) iter.next();
+        iter.remove();
+        removed(ref);
       }
     }
+    
+    closed();
   }
   
   /**
    * 
    */
-  protected abstract void opened();
+  protected abstract void openning();
   
   /**
    * @param ref
@@ -143,7 +139,7 @@ public abstract class OsgiTracker {
   /**
    * 
    */
-  protected abstract void closing();
+  protected abstract void closed();
   
   /**
    * @return
@@ -152,22 +148,6 @@ public abstract class OsgiTracker {
     synchronized (refs) {
       return refs.isEmpty() ? null : (ServiceReference) refs.first();
     }
-  }
-  
-  /**
-   * @param ref
-   * @return
-   */
-  public static Map<String, ?> props(ServiceReference ref) {
-    Map<String, Object> props = new HashMap<String, Object>();
-    
-    String[] keys = ref.getPropertyKeys();
-    for (int i = 0; i < keys.length; i++) {
-      String k = keys[i];
-      props.put(k, ref.getProperty(k));
-    }
-    
-    return props;
   }
   
   /**

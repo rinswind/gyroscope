@@ -7,15 +7,17 @@ import org.osgi.framework.ServiceReference;
 
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
+import static com.prosyst.mprm.backend.autowire.Properties.*;
+
 /**
  * @author Todor Boev
  * @version $Revision$
  */
-public class OsgiImporterSingleton<V> extends OsgiTracker {
+public class ImporterOsgiTracker<V> extends OsgiTracker {
   private final Ref<ServiceReference, V> ref;
   private final boolean hotswap;
   
-  public OsgiImporterSingleton(Ref<ServiceReference, V> ref, BundleContext bc, String filter,
+  public ImporterOsgiTracker(Ref<ServiceReference, V> ref, BundleContext bc, String filter,
       Comparator<ServiceReference> comp, boolean hotswap) {
 
     super(bc, filter, comp);
@@ -25,20 +27,20 @@ public class OsgiImporterSingleton<V> extends OsgiTracker {
   }
 
   @Override
-  protected void opened() {
+  protected void openning() {
     /* Nothing to do */
   }
 
   @Override
   protected void added(ServiceReference sref) {
     if (Ref.State.UNBOUND == ref.state()) {
-      ref.bind(sref, props(sref));
+      ref.bind(sref, toAutowireProps(sref));
     } 
     else if (hotswap) {
       ServiceReference best = getBest();
 
       if (!ref.arg().equals(best)) {
-        ref.update(best, props(best));
+        ref.update(best, toAutowireProps(best));
       }
     }
   }
@@ -46,7 +48,7 @@ public class OsgiImporterSingleton<V> extends OsgiTracker {
   @Override
   protected void modified(ServiceReference sref) {
     if (ref.arg().equals(sref)) {
-      ref.update(null, props(sref));
+      ref.update(null, toAutowireProps(sref));
     }
   }
 
@@ -62,16 +64,16 @@ public class OsgiImporterSingleton<V> extends OsgiTracker {
       ref.unbind();
     } 
     else if (hotswap) {
-      ref.update(best, props(best));
+      ref.update(best, toAutowireProps(best));
     } 
     else {
       ref.unbind();
-      ref.bind(best, props(best));
+      ref.bind(best, toAutowireProps(best));
     }
   }
   
   @Override
-  protected void closing() {
+  protected void closed() {
     /* Nothing to do */
   }
 }

@@ -13,15 +13,15 @@ import com.prosyst.mprm.backend.proxy.ref.RefException;
  *
  * @param <V>
  */
-public class ServiceImportFactory<V> implements ObjectFactory<ServiceReference, V> {
+public class ServiceImport<V> implements ObjectFactory<ServiceReference, V> {
   private final BundleContext bc;
   
-  public ServiceImportFactory(BundleContext bc) {
+  public ServiceImport(BundleContext bc) {
     this.bc = bc;
   }
   
   @SuppressWarnings("unchecked")
-  public V create(ServiceReference arg, Map<String, ?> props) {
+  public V create(ServiceReference arg, Map<String, Object> props) {
     V val = (V) bc.getService(arg);
     
     if (val == null) {
@@ -31,7 +31,7 @@ public class ServiceImportFactory<V> implements ObjectFactory<ServiceReference, 
     return val;
   }
 
-  public void destroy(V val, ServiceReference arg, Map<String, ?> props) {
+  public void destroy(V val, ServiceReference arg, Map<String, Object> props) {
     bc.ungetService(arg);
   }
 }
