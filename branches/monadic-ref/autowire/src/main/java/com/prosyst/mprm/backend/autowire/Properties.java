@@ -17,7 +17,7 @@ public class Properties {
    * @param props
    * @return
    */
-  public static <V> Dictionary<String, V> toOsgiProps(Map<String, V> props) {
+  public static <V> Dictionary<String, V> toDictionaryProps(Map<String, V> props) {
     Hashtable<String, V> hash = new Hashtable<String, V>();
     hash.putAll(props);
     return hash;
@@ -27,7 +27,7 @@ public class Properties {
    * @param ref
    * @return
    */
-  public static Map<String, Object> toAutowireProps(ServiceReference ref) {
+  public static Map<String, Object> toMapProps(ServiceReference ref) {
     Map<String, Object> props = new HashMap<String, Object>();
     
     String[] keys = ref.getPropertyKeys();

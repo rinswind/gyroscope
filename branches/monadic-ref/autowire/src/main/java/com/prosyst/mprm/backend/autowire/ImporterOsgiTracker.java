@@ -34,13 +34,13 @@ public class ImporterOsgiTracker<V> extends OsgiTracker {
   @Override
   protected void added(ServiceReference sref) {
     if (Ref.State.UNBOUND == ref.state()) {
-      ref.bind(sref, toAutowireProps(sref));
+      ref.bind(sref, toMapProps(sref));
     } 
     else if (hotswap) {
       ServiceReference best = getBest();
 
       if (!ref.arg().equals(best)) {
-        ref.update(best, toAutowireProps(best));
+        ref.update(best, toMapProps(best));
       }
     }
   }
@@ -48,7 +48,7 @@ public class ImporterOsgiTracker<V> extends OsgiTracker {
   @Override
   protected void modified(ServiceReference sref) {
     if (ref.arg().equals(sref)) {
-      ref.update(null, toAutowireProps(sref));
+      ref.update(null, toMapProps(sref));
     }
   }
 
@@ -64,11 +64,11 @@ public class ImporterOsgiTracker<V> extends OsgiTracker {
       ref.unbind();
     } 
     else if (hotswap) {
-      ref.update(best, toAutowireProps(best));
+      ref.update(best, toMapProps(best));
     } 
     else {
       ref.unbind();
-      ref.bind(best, toAutowireProps(best));
+      ref.bind(best, toMapProps(best));
     }
   }
   

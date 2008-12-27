@@ -1,4 +1,5 @@
 package com.prosyst.mprm.backend.proxy.impl;
+import static com.prosyst.mprm.backend.proxy.ref.Interfaces.interfaces;
 
 /**
  * 
@@ -58,28 +59,15 @@ public class ProxyClassLoader extends ClassLoader {
    * @throws ClassFormatError
    */
   private <T> Class<?> defineProxyClass(Class<T> type, String pname) throws ClassFormatError {
-    Class<?> res;
     /* Build the name of the new proxy class */
     ProxyClassBuilder gen = new ProxyClassBuilder(pname, this);
 
-    /*
-     * Create the new class. Proxy the class itself and all of the interface it
-     * inherits from it's subclasses.
-     * 
-     * FIX Ain't it better to flatten the entire hierarchy? Or have a parameter
-     * that describes the policy?
-     */
-    gen.add(type.getName());
-    
-    for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
-      for (Class<?> iface : cl.getInterfaces()) {
-        gen.add(iface.getName());
-      }
+    for (String ifname : interfaces(type)) {
+      gen.add(ifname);
     }
 
     byte[] raw = gen.generate();
-    res = defineClass(pname, raw, 0, raw.length);
-    return res;
+    return defineClass(pname, raw, 0, raw.length);
   }
 
   /**

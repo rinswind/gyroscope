@@ -1,7 +1,7 @@
 package com.prosyst.mprm.backend.autowire;
 
-import static com.prosyst.mprm.backend.autowire.Interfaces.interfaces;
-import static com.prosyst.mprm.backend.autowire.Properties.toOsgiProps;
+import static com.prosyst.mprm.backend.proxy.ref.Interfaces.*;
+import static com.prosyst.mprm.backend.autowire.Properties.toDictionaryProps;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class ServiceExport<A> implements ObjectFactory<A, ServiceRegistration> {
   }
   
   public ServiceRegistration create(A arg, Map<String, Object> props) {
-    return bc.registerService(iface, arg, toOsgiProps(props));
+    return bc.registerService(iface, arg, toDictionaryProps(props));
   }
 
   public void destroy(ServiceRegistration val, A arg, Map<String, Object> props) {

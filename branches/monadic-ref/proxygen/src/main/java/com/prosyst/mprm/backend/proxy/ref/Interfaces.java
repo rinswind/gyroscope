@@ -1,8 +1,12 @@
-package com.prosyst.mprm.backend.autowire;
+package com.prosyst.mprm.backend.proxy.ref;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Todor Boev
+ *
+ */
 public class Interfaces {
   /**
    * FIX Add more parameters to guide the mode in which interfaces are extracted
