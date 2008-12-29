@@ -10,7 +10,9 @@ import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 
-import static com.prosyst.mprm.backend.proxy.ref.RefCombinators.*;
+import static com.prosyst.mprm.backend.autowire.Attributes.entry;
+import static com.prosyst.mprm.backend.autowire.Attributes.map;
+import static com.prosyst.mprm.backend.proxy.ref.Refs.*;
 
 /**
  * @author Todor Boev
@@ -21,8 +23,8 @@ public class Activator extends RefContainerImpl {
   
   @Override
   public void configure() throws Exception {
-    final Format format = use(Format.class).proxy();
-    final Date date = use(Date.class).proxy();
+    final Format format = require(Format.class).singleton();
+    final Date date = require(Date.class).singleton();
     
     final Ref<?, ?> deps = and(format, date);
     
@@ -34,12 +36,13 @@ public class Activator extends RefContainerImpl {
         }
       };
       
-      Ref<Hello, ServiceRegistration> export = provide(Hello.class).asSingleton();
+      Ref<Hello, ServiceRegistration> export = provide(Hello.class).singleton();
       
       from(deps).notify(
           binder(export)
-          .withProp(Hello.PROP, Integer.valueOf(no))
-          .withProp(Constants.SERVICE_RANKING, Integer.valueOf(NO - no))
+          .attributes(map(
+              entry(Hello.PROP, Integer.valueOf(i)), 
+              entry(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))))
           .to(hello));
       
       from(export).notify(new RefListener.Adapter() {

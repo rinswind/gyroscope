@@ -6,48 +6,31 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
+import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.ref.RefException;
+import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
 /**
  * @author Todor Boev
  *
  */
 public abstract class OsgiTracker {
-  private final BundleContext bc;
+  private final BundleContext root;
   private final String filter;
   private final ServiceListener tracker;
   private final SortedSet<ServiceReference> refs;
   
   /**
-   * @param bc
-   * @param iface
+   * @param root 
    * @param filter
    */
-  public OsgiTracker(BundleContext bc, Class<?> iface, Comparator<ServiceReference> comp) {
-    this (bc, filter(bc, iface, null), comp);
-  }
-  
-  /**
-   * @param bc
-   * @param iface
-   * @param filter
-   */
-  public OsgiTracker(BundleContext bc, Class<?> iface, String filter, Comparator<ServiceReference> comp) {
-    this (bc, filter(bc, iface, filter), comp);
-  }
-  
-  /**
-   * @param bc 
-   * @param filter
-   */
-  public OsgiTracker(BundleContext bc, String filter, Comparator<ServiceReference> comp) {
-    this.bc = bc;
+  public OsgiTracker(BundleContext root, String filter, Comparator<ServiceReference> comp) {
+    this.root = root;
     this.filter = filter;
     this.refs = new TreeSet<ServiceReference>(comp != null ? comp : ServiceComparators.standard());
     
@@ -73,47 +56,17 @@ public abstract class OsgiTracker {
         }
       }
     };
-  }
-  
-  /**
-   * 
-   */
-  public void open() {
-    openning();
-      
-    try {
-      synchronized (refs) {
-        ServiceReference[] srefs = bc.getServiceReferences(null, filter);
-        for (int i = 0; srefs != null && i < srefs.length; i++) {
-          refs.add(srefs[i]);
-        }
-      
-        for (ServiceReference ref : refs) {
-          added(ref);
-        }
+    
+    /* Start tracking as soon as the BundleContext proxy is valid */
+    ((Proxy<?, ?>) root).proxyControl().addListener(new RefListener.Adapter() {
+      public void bound() {
+        open();
       }
-    
-      bc.addServiceListener(tracker, filter.toString());
-    } catch (InvalidSyntaxException e) {
-      throw new RefException("Bad filter syntax: \"" + filter + "\"", e);
-    }
-  }
-
-  /**
-   * 
-   */
-  public void close() {
-    bc.removeServiceListener(tracker);
-    
-    synchronized (refs) {
-      for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
-        ServiceReference ref = (ServiceReference) iter.next();
-        iter.remove();
-        removed(ref);
+      
+      public void unbinding() {
+        close();
       }
-    }
-    
-    closed();
+    });
   }
   
   /**
@@ -151,17 +104,57 @@ public abstract class OsgiTracker {
   }
   
   /**
-   * @param bc
-   * @param iface
-   * @param filter
-   * @return
+   * 
    */
-  private static String filter(BundleContext bc, Class<?> iface, String filter) {
-    if (iface == null) {
-      throw new RefException("Interface not specified");
+  private void open() {
+    openning();
+      
+    try {
+      synchronized (refs) {
+        ServiceReference[] srefs = root.getServiceReferences(null, filter);
+        for (int i = 0; srefs != null && i < srefs.length; i++) {
+          refs.add(srefs[i]);
+        }
+      
+        for (ServiceReference ref : refs) {
+          added(ref);
+        }
+      }
+    
+      root.addServiceListener(tracker, filter.toString());
+    } catch (InvalidSyntaxException e) {
+      throw new RefException("Bad filter syntax: \"" + filter + "\"", e);
+    }
+  }
+
+  /**
+   * 
+   */
+  private void close() {
+    root.removeServiceListener(tracker);
+    
+    synchronized (refs) {
+      for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
+        ServiceReference ref = (ServiceReference) iter.next();
+        iter.remove();
+        removed(ref);
+      }
     }
     
-    String ocFilter = '(' + Constants.OBJECTCLASS + '=' + iface.getName() + ')';
-    return (filter != null) ? "(&" + ocFilter + filter + ')' : ocFilter;
+    closed();
   }
+  
+//  /**
+//   * @param iface
+//   * @param filter
+//   * @return
+//   */
+//  private static String filter(Class<?> iface, String filter) {
+//    if (iface == null) {
+//      throw new RefException("Interface not specified");
+//    }
+//    
+//    String ocFilter = '(' + Constants.OBJECTCLASS + '=' + iface.getName() + ')';
+//    return (filter != null) ? "(&" + ocFilter + filter + ')' : ocFilter;
+//  }
 }

@@ -13,14 +13,14 @@ import static com.prosyst.mprm.backend.autowire.Properties.*;
  * @author Todor Boev
  * @version $Revision$
  */
-public class ImporterOsgiTracker<V> extends OsgiTracker {
+public class SingletonImportOsgiTracker<V> extends OsgiTracker {
   private final Ref<ServiceReference, V> ref;
   private final boolean hotswap;
   
-  public ImporterOsgiTracker(Ref<ServiceReference, V> ref, BundleContext bc, String filter,
+  public SingletonImportOsgiTracker(Ref<ServiceReference, V> ref, BundleContext root, String filter,
       Comparator<ServiceReference> comp, boolean hotswap) {
 
-    super(bc, filter, comp);
+    super(root, filter, comp);
     
     this.ref = ref;
     this.hotswap = hotswap;

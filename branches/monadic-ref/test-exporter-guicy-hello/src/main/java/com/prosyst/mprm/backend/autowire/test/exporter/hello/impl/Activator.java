@@ -15,7 +15,8 @@ import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
-import static com.prosyst.mprm.backend.proxy.ref.RefCombinators.*;
+import static com.prosyst.mprm.backend.autowire.Attributes.*;
+import static com.prosyst.mprm.backend.proxy.ref.Refs.*;
 
 /**
  * @author Todor Boev
@@ -30,8 +31,8 @@ public class Activator extends RefContainerImpl {
       @Override
       protected void configure() {
         /* Define the service imports - they are effectively singletons */
-        bind(Format.class).toInstance(use(Format.class).proxy());
-        bind(Date.class).toInstance(use(Date.class).proxy());
+        bind(Format.class).toInstance(require(Format.class).singleton());
+        bind(Date.class).toInstance(require(Date.class).singleton());
         
         /* Define the service impl we will export */
         bind(Hello.class).to(HelloImpl.class);
@@ -53,12 +54,14 @@ public class Activator extends RefContainerImpl {
       /* Use guice to create the export */
       Hello hello = injector.getInstance(Hello.class);
       
-      Ref<Hello, ServiceRegistration> export = provide(Hello.class).asSingleton();
+      Ref<Hello, ServiceRegistration> export = provide(Hello.class).singleton();
       
-      from(required).notify(
+      from(required)
+      .notify(
           binder(export)
-          .withProp(Hello.PROP, Integer.valueOf(i))
-          .withProp(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))
+          .attributes(map(
+             entry(Hello.PROP, Integer.valueOf(i)), 
+             entry(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))))
           .to(hello));
       
       /* Use guice to create the listener */

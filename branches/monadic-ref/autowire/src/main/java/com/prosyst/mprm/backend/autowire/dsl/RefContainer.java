@@ -1,14 +1,19 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
+import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 /**
  * @author Todor Boev
  * @version $Revision$
  */
-public interface RefContainer { 
-  <A> ImportBuilder use(Class<A> iface);
+public interface RefContainer {
+  <T> Import.Builder<T, T> require(Class<T> iface);
   
-  <A> ExportBuilder<A> provide(Class<A> impl);
+  <T> Export.Builder<T, T> provide(Class<T> impl);
   
-  LinkBuilder from(Object proxy);
+  <V> Link.Linker from(V proxy);
+  
+  Link.Linker from(Ref<?, ?> ref);
+  
+  <A> Link.Binder<A> binder(Ref<A, ?> ref); 
 }

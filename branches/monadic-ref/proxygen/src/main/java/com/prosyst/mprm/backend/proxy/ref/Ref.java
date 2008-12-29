@@ -43,7 +43,7 @@ public interface Ref<A, V> {
    * @return a random set of properties that applications may associate with the
    *         delegate.
    */
-  Map<String, ?> props();
+  Map<String, ?> attributes();
   
   /**
    * @return current state of this reference.
@@ -58,15 +58,15 @@ public interface Ref<A, V> {
   
   /**
    * @param arg
-   * @param props a heterogeneous collection of named objects.
+   * @param attrs a heterogeneous collection of named objects.
    */
-  void bind(A arg, Map<String, Object> props);
+  void bind(A arg, Map<String, Object> attrs);
   
   /**
    * @param arg
-   * @param props
+   * @param attrs
    */
-  void update(A arg, Map<String, Object> props);
+  void update(A arg, Map<String, Object> attrs);
   
   /**
    * 
@@ -76,10 +76,10 @@ public interface Ref<A, V> {
   /**
    * @param l
    */
-  void addListener(RefListener<A, V> l);
+  void addListener(RefListener l);
   
   /**
    * @param l
    */
-  void removeListener(RefListener<A, V> l);
+  void removeListener(RefListener l);
 }

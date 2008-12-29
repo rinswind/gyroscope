@@ -25,6 +25,14 @@ public class ProxyFactoryImpl implements ProxyFactory {
    */
   @SuppressWarnings("unchecked")
   public <V> V proxy(Class<V> type, Ref<?, V> ref) {
+    if (type == null) {
+      throw new NullPointerException();
+    }
+    
+    if (ref == null) {
+      throw new NullPointerException();
+    }
+    
     try {
       Class<? extends V> pclass = loader.loadProxyClass(type);
       

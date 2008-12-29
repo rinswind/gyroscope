@@ -2,6 +2,7 @@ package com.prosyst.mrpm.backen.proxy;
 
 import junit.framework.TestCase;
 
+import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
@@ -60,7 +61,19 @@ public class ProxyPerfTest extends TestCase {
     }
   }
   
-  public void test() {
+  /**
+   * 
+   */
+  public void testProxyControl() {
+    Sum dynamic = dynamic();
+    
+    assertNotNull(((Proxy<?, ?>) dynamic).proxyControl());
+  }
+  
+  /**
+   * 
+   */
+  public void testPerformance() {
     int reps = 10000000;
     int warmup = reps;
     

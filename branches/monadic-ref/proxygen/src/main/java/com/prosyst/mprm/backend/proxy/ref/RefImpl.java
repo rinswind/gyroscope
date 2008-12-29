@@ -19,21 +19,21 @@ public class RefImpl<A, V> implements Ref<A, V> {
     UNBOUND(State.UNBOUND),
     BINDING(State.BINDING) {
       @Override
-      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
-        ll.bound(lc);
+      protected void dispatchOnExit(RefListener l) {
+        l.bound();
       }
     },
     UNBINDING(State.UNBINDING) {
       @Override
-      protected <T, I> void dispatchOnEntry(Ref<T, I> lc, RefListener<T, I> ll) {
-        ll.unbinding(lc);
+      protected void dispatchOnEntry(RefListener l) {
+        l.unbinding();
       }
     },
     BOUND(State.BOUND),
     UPDATING(State.UPDATED) {
       @Override
-      protected <T, I> void dispatchOnExit(Ref<T, I> lc, RefListener<T, I> ll) {
-        ll.updated(lc);
+      protected void dispatchOnExit(RefListener l) {
+        l.updated();
       }
     };
     
@@ -83,36 +83,36 @@ public class RefImpl<A, V> implements Ref<A, V> {
       return rollback;
     }
     
-    public <I, O> void dispatchOnEntry(Ref<I, O> ref, Collection<RefListener<I, O>> listeners) {
-      for (RefListener<I, O> l : listeners) {
+    public void dispatchOnEntry(Collection<RefListener> listeners) {
+      for (RefListener l : listeners) {
         try {
-          dispatchOnEntry(ref, l);
+          dispatchOnEntry(l);
         } catch (Throwable thr) {
           thr.printStackTrace();
         }
       }
     }
     
-    public <I, O> void dispatchOnExit(Ref<I, O> ref, Collection<RefListener<I, O>> listeners) {
-      for (RefListener<I, O> l : listeners) {
+    public void dispatchOnExit(Collection<RefListener> listeners) {
+      for (RefListener l : listeners) {
         try {
-          dispatchOnExit(ref, l);
+          dispatchOnExit(l);
         } catch (Throwable thr) {
           thr.printStackTrace();
         }
       }
     }
     
-    protected <I, O> void dispatchOnEntry(Ref<I, O> lc, RefListener<I, O> ll) {
+    protected void dispatchOnEntry(RefListener ll) {
       /* By default do not call the listener */
     }
     
-    protected <I, O> void dispatchOnExit(Ref<I, O> lc, RefListener<I, O> ll) {
+    protected void dispatchOnExit(RefListener ll) {
       /* By default do not call the listener */
     }
   }
   
-  private final Collection<RefListener<A, V>> listeners = new ConcurrentLinkedQueue<RefListener<A, V>>();
+  private final Collection<RefListener> listeners = new ConcurrentLinkedQueue<RefListener>();
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
   
   private final ObjectFactory<A, V> factory;
@@ -151,11 +151,14 @@ public class RefImpl<A, V> implements Ref<A, V> {
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#val()
    */
   public final A arg() {
-    if (State.BOUND != state.state) {
+    switch (state.state) {
+    case BOUND:
+    case UNBINDING:
+      return arg;
+      
+    default:
       throw new RefUnboundException(this);
     }
-    
-    return arg;
   }
   
   /**
@@ -166,17 +169,20 @@ public class RefImpl<A, V> implements Ref<A, V> {
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#val()
    */
   public final V val() {
-    if (State.BOUND != state.state) {
+    switch (state.state) {
+    case BOUND:
+    case UNBINDING:
+      return val;
+      
+    default:
       throw new RefUnboundException(this);
     }
-    
-    return val;
   }
   
   /**
-   * @see com.prosyst.mprm.backend.proxy.ref.Ref#props()
+   * @see com.prosyst.mprm.backend.proxy.ref.Ref#attributes()
    */
-  public final Map<String, ?> props() {
+  public final Map<String, ?> attributes() {
     lock.readLock().lock();
     try {
       return Collections.unmodifiableMap(props);
@@ -188,14 +194,14 @@ public class RefImpl<A, V> implements Ref<A, V> {
   /**
    * @see com.prosyst.mprm.backend.proxy.gen.Proxy#addListener(com.prosyst.mprm.backend.autowire.ServiceProxyListener)
    */
-  public final void addListener(RefListener<A, V> listener) {
+  public final void addListener(RefListener listener) {
     listeners.add(listener);
   }
   
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#removeListener(com.prosyst.mprm.backend.proxy.ref.RefListener)
    */
-  public final void removeListener(RefListener<A, V> listener) {
+  public final void removeListener(RefListener listener) {
     listeners.remove(listener);
   }
 
@@ -340,8 +346,8 @@ public class RefImpl<A, V> implements Ref<A, V> {
       lock.writeLock().unlock();
     }
     
-    prev.dispatchOnExit(this, listeners);
-    state.dispatchOnEntry(this, listeners);
+    prev.dispatchOnExit(listeners);
+    state.dispatchOnEntry(listeners);
     return true;
   }
 }
