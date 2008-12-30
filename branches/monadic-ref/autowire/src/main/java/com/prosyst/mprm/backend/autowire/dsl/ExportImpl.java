@@ -23,7 +23,9 @@ public class ExportImpl<A, V> implements Builder<A, V> {
   
   private final BundleContext root;
   
-  public ExportImpl(Class<A> argType, Class<V> valType, RefFactoryCombinator<A, V> combinator, BundleContext root) {
+  public ExportImpl(Class<A> argType, Class<V> valType, RefFactoryCombinator<A, V> combinator,
+      BundleContext root) {
+    
     this.argType = argType;
     this.valType = valType;
     this.combinator = combinator;
@@ -39,6 +41,10 @@ public class ExportImpl<A, V> implements Builder<A, V> {
     return new ExportImpl<N, V>(newArgType, valType, combinator.from(fact), root);
   }
 
+  public <N> Builder<A, N> as(Class<N> newValType, ObjectFactory<V, N> fact) {
+    return new ExportImpl<A, N>(argType, newValType, combinator.to(fact), root);
+  }
+  
   public Ref<A, ServiceRegistration> singleton() {
     return combinator.to(new ServiceExport<V>(valType, root)).factory().ref();
   }

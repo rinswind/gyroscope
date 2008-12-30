@@ -54,6 +54,10 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     return new ImportImpl<N, V>(newArgType, valType, combinator.from(fact), attrs, root, proxies);
   }
 
+  public <N> Builder<A, N> as(Class<N> newValType, ObjectFactory<V, N> fact) {
+    return new ImportImpl<A, N>(argType, newValType, combinator.to(fact), attrs, root, proxies);
+  }
+  
   public V singleton() {
     if (BundleContext.class == valType) {
       return (V) root;

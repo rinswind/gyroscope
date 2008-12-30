@@ -13,6 +13,8 @@ public class Import {
   public interface Builder<A, V> extends ModeSelector<V> {
     <N> Builder<N, V> from(Class<N> type, ObjectFactory<N, A> fact);
     
+    <N> Builder<A, N> as(Class<N> type, ObjectFactory<V, N> fact);
+    
     Builder<A, V> attributes(Map<String, Object> attrs);
   }
   
