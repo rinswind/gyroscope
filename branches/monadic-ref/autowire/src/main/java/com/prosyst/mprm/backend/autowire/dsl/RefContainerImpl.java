@@ -1,5 +1,8 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
+import static com.prosyst.mprm.backend.proxy.ref.Refs.combinator;
+import static com.prosyst.mprm.backend.proxy.ref.Refs.ref;
+
 import java.util.HashMap;
 
 import org.osgi.framework.BundleActivator;
@@ -11,7 +14,6 @@ import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactories;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.Refs;
 
 /**
  * 
@@ -19,18 +21,12 @@ import com.prosyst.mprm.backend.proxy.ref.Refs;
  * @version $Revision$
  */
 public abstract class RefContainerImpl implements RefContainer, BundleActivator {
-  /**
-   * The proxy class loader will delegate to the class space of the client
-   * bundle. This happens because this is an abstract class, therefore the user
-   * must extend it and load the extension from his bundle's class loader.
-   * Finally getClass() returns the extension class - not RefContainerImpl.class
-   */
   private ProxyFactory fact;
   /** We treat this as the first external service received */
   private Ref<BundleContext, BundleContext> bcRef;
   /**
    * The BundleContext is proxied just like any other external service. This is
-   * the first proxy and all other tarckers and proxies are stronly referenced
+   * the first proxy and all other trackers and proxies are strongly referenced
    * from bcRef as RefListeners.
    */
   private BundleContext bc;
@@ -39,7 +35,8 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#use(java.lang.Class)
    */
   public <T> Import.Builder<T, T> require(Class<T> iface) {
-    return new ImportImpl<T, T>(iface, iface, Refs.ref(ObjectFactories.<T>identity()), new HashMap<String, Object>(), bc, fact);
+    return new ImportImpl<T, T>(iface, iface, combinator(ObjectFactories.<T> identity()),
+        new HashMap<String, Object>(), bc, fact);
   }
 
   /**
@@ -81,9 +78,19 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    */
   public final void start(BundleContext bc) throws Exception {
     /* Create the root supporting objects */
+    
+    /*
+     * The proxy class loader will delegate to the class space of the client
+     * bundle. We can get the class loader of the client bundle because this is
+     * an abstract class that is extended by a class from the client bundle. In
+     * this setup getClass() returns the client subclass - not
+     * RefContainerImpl.class. Generally getClass() always returns the true
+     * runtime type of the object - not the type of the class file in which the
+     * code calling getClass() resides.
+     */
     this.fact = new ProxyFactoryImpl(new ProxyClassLoader(getClass().getClassLoader()));
     
-    this.bcRef = Refs.ref(ObjectFactories.<BundleContext>identity());
+    this.bcRef = ref(ObjectFactories.<BundleContext>identity());
     this.bc = fact.proxy(BundleContext.class, bcRef);
     
     /* Configure the user content - it is based on the bcRef */
@@ -99,7 +106,12 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
   public final void stop(BundleContext bc) {
     bcRef.unbind();
     
-    /* Give the bundle content to the garbage collector. */
+    /*
+     * Give the bundle content to the garbage collector.
+     * 
+     * FIX How will we make the user drop anything he might have created in
+     * configure() and stored in fields of the class extending RefContainerImpl?
+     */
     bcRef = null;
     bc = null;
   }

@@ -16,6 +16,8 @@ import com.prosyst.mprm.backend.autowire.dsl.Import.Builder;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
+import com.prosyst.mprm.backend.proxy.ref.RefFactory;
+import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
 import com.prosyst.mprm.backend.proxy.ref.Refs;
 
 /**
@@ -26,18 +28,18 @@ import com.prosyst.mprm.backend.proxy.ref.Refs;
 public class ImportImpl<A, V> implements Builder<A, V> {
   private final Class<A> argType;
   private final Class<V> valType;
-  private final Ref<A, V> ref;
+  private final RefFactoryCombinator<A, V> combinator;
   
   private final ProxyFactory proxies;
   private final BundleContext root;
   private Map<String, Object> attrs;
   
-  public ImportImpl(Class<A> argType, Class<V> valType, Ref<A, V> ref, 
+  public ImportImpl(Class<A> argType, Class<V> valType, RefFactoryCombinator<A, V> combinator, 
       Map<String, Object> attrs, BundleContext root, ProxyFactory proxies) {
     
     this.argType = argType;
     this.valType = valType;
-    this.ref = ref;
+    this.combinator = combinator;
     
     this.attrs = attrs;
     
@@ -51,7 +53,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
   }
   
   public <N> Builder<N, V> from(Class<N> newArgType, ObjectFactory<N, A> fact) {
-    return new ImportImpl<N, V>(newArgType, valType, Refs.from(fact, ref), attrs, root, proxies);
+    return new ImportImpl<N, V>(newArgType, valType, combinator.from(fact), attrs, root, proxies);
   }
 
   public V singleton() {
@@ -60,7 +62,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     }
     
     /* Finish the chain with a ref that can actually import from OSGi */
-    Ref<ServiceReference, V> importer = Refs.from(new ServiceImport<A>(root), ref);
+    Ref<ServiceReference, V> importer = combinator.from(new ServiceImport<A>(root)).factory().ref();
      
     /*
      * Set the type we're looking for. This will override any any user supplied

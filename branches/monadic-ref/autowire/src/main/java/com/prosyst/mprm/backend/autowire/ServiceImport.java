@@ -13,7 +13,7 @@ import com.prosyst.mprm.backend.proxy.ref.RefException;
  *
  * @param <V>
  */
-public class ServiceImport<V> implements ObjectFactory<ServiceReference, V> {
+public class ServiceImport<V> implements ObjectFactory<ServiceReference/*<V>*/, V> {
   private final BundleContext bc;
   
   public ServiceImport(BundleContext bc) {
