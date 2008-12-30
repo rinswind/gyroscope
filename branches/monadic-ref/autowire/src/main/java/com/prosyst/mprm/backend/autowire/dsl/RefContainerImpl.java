@@ -35,7 +35,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#use(java.lang.Class)
    */
   public <T> Import.Builder<T, T> require(Class<T> iface) {
-    return new ImportImpl<T, T>(iface, iface, combinator(ObjectFactories.<T> identity()),
+    return new ImportImpl<T, T>(iface, iface, combinator(ObjectFactories.<T>identity()),
         new HashMap<String, Object>(), bc, fact);
   }
 
@@ -43,7 +43,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#provide(java.lang.Class)
    */
   public <T> Export.Builder<T, T> provide(Class<T> impl) {
-    return new ExportImpl<T, T>(impl, impl, null, bc);
+    return new ExportImpl<T, T>(impl, impl, combinator(ObjectFactories.<T>identity()), bc);
   }
   
   /**

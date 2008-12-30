@@ -8,7 +8,7 @@ import com.prosyst.mprm.backend.autowire.ServiceExport;
 import com.prosyst.mprm.backend.autowire.dsl.Export.Builder;
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.Refs;
+import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
 
 /**
  * @author Todor Boev
@@ -19,13 +19,14 @@ import com.prosyst.mprm.backend.proxy.ref.Refs;
 public class ExportImpl<A, V> implements Builder<A, V> {
   private final Class<A> argType;
   private final Class<V> valType;
-  private final Ref<A, V> ref;
+  private final RefFactoryCombinator<A, V> combinator;
+  
   private final BundleContext root;
   
-  public ExportImpl(Class<A> argType, Class<V> valType, Ref<A, V> ref, BundleContext root) {
+  public ExportImpl(Class<A> argType, Class<V> valType, RefFactoryCombinator<A, V> combinator, BundleContext root) {
     this.argType = argType;
     this.valType = valType;
-    this.ref = ref;
+    this.combinator = combinator;
     this.root = root;
   }
   
@@ -35,13 +36,11 @@ public class ExportImpl<A, V> implements Builder<A, V> {
 //  }
 
   public <N> Builder<N, V> from(Class<N> newArgType, ObjectFactory<N, A> fact) {
-    return new ExportImpl<N, V>(newArgType, valType, Refs.from(fact, ref), root);
+    return new ExportImpl<N, V>(newArgType, valType, combinator.from(fact), root);
   }
 
   public Ref<A, ServiceRegistration> singleton() {
-    return ref != null 
-      ? Refs.to(ref, new ServiceExport<V>(valType, root)) 
-      : Refs.ref(new ServiceExport<A>(argType, root));
+    return combinator.to(new ServiceExport<V>(valType, root)).factory().ref();
   }
   
   public Ref<ObjectFactory<Bundle, A>, ServiceRegistration> factory() {

@@ -16,9 +16,7 @@ import com.prosyst.mprm.backend.autowire.dsl.Import.Builder;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.RefFactory;
 import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
-import com.prosyst.mprm.backend.proxy.ref.Refs;
 
 /**
  * @author Todor Boev
@@ -29,10 +27,10 @@ public class ImportImpl<A, V> implements Builder<A, V> {
   private final Class<A> argType;
   private final Class<V> valType;
   private final RefFactoryCombinator<A, V> combinator;
+  private final Map<String, Object> attrs;
   
   private final ProxyFactory proxies;
   private final BundleContext root;
-  private Map<String, Object> attrs;
   
   public ImportImpl(Class<A> argType, Class<V> valType, RefFactoryCombinator<A, V> combinator, 
       Map<String, Object> attrs, BundleContext root, ProxyFactory proxies) {
