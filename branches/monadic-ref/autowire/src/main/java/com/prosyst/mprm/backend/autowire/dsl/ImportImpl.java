@@ -60,9 +60,6 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     }
     
     /* Finish the chain with a ref that can actually import from OSGi */
-//    Ref<ServiceReference, V> importer = ref != null 
-//     ? Refs.from(new ServiceImport<A>(root), ref)
-//     : Refs.ref(new ServiceImport<V>(root));
     Ref<ServiceReference, V> importer = Refs.from(new ServiceImport<A>(root), ref);
      
     /*
