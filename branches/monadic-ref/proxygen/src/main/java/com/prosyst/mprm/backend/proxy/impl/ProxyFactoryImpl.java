@@ -24,7 +24,7 @@ public class ProxyFactoryImpl implements ProxyFactory {
    * @see com.prosyst.mprm.backend.proxy.gen.ProxyFactory#proxy(com.prosyst.mprm.backend.proxy.ref.Ref)
    */
   @SuppressWarnings("unchecked")
-  public <V> V proxy(Class<V> type, Ref<?, V> ref) {
+  public <V> V proxy(Class<?> type, Ref<?, V> ref) {
     if (type == null) {
       throw new NullPointerException();
     }
@@ -34,13 +34,13 @@ public class ProxyFactoryImpl implements ProxyFactory {
     }
     
     try {
-      Class<? extends V> pclass = loader.loadProxyClass(type);
+      Class<?> pclass = loader.loadProxyClass(type);
       
       /*
        * The proxy class will have only one constructor that takes N Ref
        * arguments. Each argument corresponds to a proxied interface.
        */
-      Constructor<? extends V> constr = (Constructor<? extends V>) pclass.getConstructors()[0];
+      Constructor<?> constr = (Constructor<?>) pclass.getConstructors()[0];
       
       int len = constr.getParameterTypes().length;
       
@@ -49,7 +49,7 @@ public class ProxyFactoryImpl implements ProxyFactory {
         vals[i] = ref;
       }
       
-      return constr.newInstance(vals);
+      return (V) constr.newInstance(vals);
     } catch (Throwable thr) {
       throw new ProxyException(thr);
     }

@@ -14,10 +14,15 @@ public interface Ref<A, V> {
    * Lifecycle of a dynamic reference.
    */
   public enum State {
+    /** The val(),arg(),attributes() are NOT available */
     UNBOUND,
+    /** The val(),arg(),attributes() are NOT available */
     BINDING,
+    /** The val(),arg(),attributes() are still available but soon won't be */
     UNBINDING,
+    /** The val(),arg(),attributes() are available */
     BOUND,
+    /** The val(),arg(),attributes() are available and some of the could have changed */
     UPDATED;
   }
 
@@ -40,10 +45,10 @@ public interface Ref<A, V> {
   V val();
   
   /**
-   * @return a random set of properties that applications may associate with the
+   * @return a random set of metadata that applications may associate with this Ref
    *         delegate.
    */
-  Map<String, ?> attributes();
+  Map<String, Object> attributes();
   
   /**
    * @return current state of this reference.

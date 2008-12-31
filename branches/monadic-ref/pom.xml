@@ -12,19 +12,18 @@
   <packaging>pom</packaging>
 
   <modules>
+<!--    <module>test-importer-map</module>-->
     <module>proxygen</module>
     <module>asm</module>
     <module>autowire</module>
+    <module>guice-wrapped</module>
+    <module>aopalliance-wrapped</module>
     <module>test-exporter-hello</module>
     <module>test-exporter-format</module>
     <module>test-exporter-date</module>
     <module>test-exporter-worker</module>
     <module>test-importer-ref</module>
-<!--    <module>test-importer-collection</module>-->
-<!--    <module>test-importer-map</module>-->
     <module>test-exporter-guicy-hello</module>
-<!--    <module>test-importer-guicy-collection</module>-->
-    <module>guice-wrapped</module>
-    <module>aopalliance-wrapped</module>
+    <module>test-importer-guicy-collection</module>
   </modules>
 </project>

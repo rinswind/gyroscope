@@ -36,8 +36,7 @@ public class ProxyClassLoader extends ClassLoader {
    * @param refs
    * @return
    */
-  @SuppressWarnings("unchecked")
-  public <T> Class<? extends T> loadProxyClass(Class<T> type) {
+  public <T> Class<?> loadProxyClass(Class<?> type) {
     String pname = PREFIX + "." + type.getName();
 
     /* Check if we have an appropriate proxy class created already */
@@ -48,17 +47,10 @@ public class ProxyClassLoader extends ClassLoader {
       res = defineProxyClass(type, pname);
     }
     
-    return (Class<? extends T>) res;
+    return res;
   }
 
-  /**
-   * @param <T>
-   * @param type
-   * @param pname
-   * @return
-   * @throws ClassFormatError
-   */
-  private <T> Class<?> defineProxyClass(Class<T> type, String pname) throws ClassFormatError {
+  private Class<?> defineProxyClass(Class<?> type, String pname) throws ClassFormatError {
     /* Build the name of the new proxy class */
     ProxyClassBuilder gen = new ProxyClassBuilder(pname, this);
 

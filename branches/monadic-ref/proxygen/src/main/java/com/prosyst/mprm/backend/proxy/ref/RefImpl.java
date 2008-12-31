@@ -182,7 +182,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
   /**
    * @see com.prosyst.mprm.backend.proxy.ref.Ref#attributes()
    */
-  public final Map<String, ?> attributes() {
+  public final Map<String, Object> attributes() {
     lock.readLock().lock();
     try {
       return Collections.unmodifiableMap(props);
