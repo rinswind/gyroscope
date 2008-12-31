@@ -1,0 +1,50 @@
+package com.prosyst.mprm.backend.autowire;
+
+import static com.prosyst.mprm.backend.autowire.Properties.toDictionaryProps;
+import static com.prosyst.mprm.backend.proxy.ref.Interfaces.interfaces;
+
+import java.util.Collections;
+import java.util.Map;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceRegistration;
+
+import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
+
+/**
+ * @author Todor Boev
+ *
+ * @param <A>
+ */
+public class FactoryExportObjectFactory<A> implements ObjectFactory<ObjectFactory<Bundle, A>, ServiceRegistration> {
+  private final BundleContext bc;
+  private final String[] iface;
+  
+  public FactoryExportObjectFactory(Class<A> iface, BundleContext bc) {
+    this.iface = interfaces(iface);
+    this.bc = bc;
+  }
+  
+  public ServiceRegistration create(final ObjectFactory<Bundle, A> arg, Map<String, Object> props) {
+    return bc.registerService(
+        iface, 
+        /* FIX Are there any properties we can pass in? */
+        new ServiceFactory() {
+          public Object getService(Bundle bundle, ServiceRegistration registration) {
+            return arg.create(bundle, Collections.<String, Object>emptyMap());
+          }
+
+          @SuppressWarnings("unchecked")
+          public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+            arg.destroy((A) service, bundle, Collections.<String, Object>emptyMap());
+          }
+        }, 
+        toDictionaryProps(props));
+  }
+
+  public void destroy(ServiceRegistration val, ObjectFactory<Bundle, A> arg, Map<String, Object> props) {
+    val.unregister();
+  }
+}
