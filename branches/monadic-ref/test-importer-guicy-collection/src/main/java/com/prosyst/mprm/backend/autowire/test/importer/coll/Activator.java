@@ -1,17 +1,16 @@
 package com.prosyst.mprm.backend.autowire.test.importer.coll;
 
 import static com.google.inject.Guice.createInjector;
-import static com.google.inject.Key.get;
 import static com.google.inject.Scopes.SINGLETON;
 import static com.google.inject.name.Names.named;
+import static com.google.inject.util.Types.newParameterizedType;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
@@ -29,8 +28,7 @@ public class Activator extends RefContainerImpl {
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(get(collectionOf(RichHello.class)))
-        .toInstance( 
+        bind(collectionOf(RichHello.class)).toInstance( 
           require(RichHello.class)
           /*
            * The Autowire DSL requires an ObjectFactory instance at this spot. For
@@ -88,7 +86,7 @@ public class Activator extends RefContainerImpl {
      * annotations on the linked classes.
      * 
      */
-    from(injector.getInstance(get(collectionOf(RichHello.class))))
+    from(injector.getInstance(Key.get(collectionOf(RichHello.class))))
     .notify(injector.getInstance(Printer.class));
   }
   
@@ -103,18 +101,6 @@ public class Activator extends RefContainerImpl {
    */
   @SuppressWarnings("unchecked")
   private static <V> TypeLiteral<Collection<V>> collectionOf(final Class<V> typeParam) {
-    return (TypeLiteral<Collection<V>>) TypeLiteral.get(new ParameterizedType() {
-      public Type[] getActualTypeArguments() {
-        return new Type[] {typeParam};
-      }
-
-      public Type getRawType() {
-        return Collection.class;
-      }
-      
-      public Type getOwnerType() {
-        return null;
-      }
-    });
+    return (TypeLiteral<Collection<V>>) TypeLiteral.get(newParameterizedType(Collection.class, typeParam));
   }
 }
