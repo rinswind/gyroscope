@@ -5,6 +5,8 @@ import static com.google.inject.Key.get;
 import static com.google.inject.Scopes.SINGLETON;
 import static com.google.inject.name.Names.named;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class Activator extends RefContainerImpl {
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(get(new TypeLiteral<Collection<RichHello>>(){}))
+        bind(get(collectionOf(RichHello.class)))
         .toInstance( 
           require(RichHello.class)
           /*
@@ -82,14 +84,37 @@ public class Activator extends RefContainerImpl {
      * bootstrapped our bundle a this spot. Now the two objects are strongly
      * referenced by Autowire and will automatically be started/stopped when the
      * appropriate conditions are met. In future versions of Autowire these
-     * linkages must be must happen automatically and be guided by special
-     * Autowire annotations on the linked classes.
+     * linkages must happen automatically and be guided by special Autowire
+     * annotations on the linked classes.
      * 
-     * Going around Java 5's dreaded erasure in order to get type safety of
-     * generified collections requires the crufly TypeLiteral - alas it can't be
-     * made shorter.
      */
-    from(injector.getInstance(get(new TypeLiteral<Collection<RichHello>>(){})))
+    from(injector.getInstance(get(collectionOf(RichHello.class))))
     .notify(injector.getInstance(Printer.class));
+  }
+  
+  /**
+   * Going around Java 5's dreaded erasure in order to get type safety of
+   * generified collections requires the crufly TypeLiteral - alas it can't be
+   * made shorter.
+   * 
+   * @param <V>
+   * @param typeParam
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  private static <V> TypeLiteral<Collection<V>> collectionOf(final Class<V> typeParam) {
+    return (TypeLiteral<Collection<V>>) TypeLiteral.get(new ParameterizedType() {
+      public Type[] getActualTypeArguments() {
+        return new Type[] {typeParam};
+      }
+
+      public Type getRawType() {
+        return Collection.class;
+      }
+      
+      public Type getOwnerType() {
+        return null;
+      }
+    });
   }
 }
