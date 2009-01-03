@@ -2,6 +2,7 @@ package com.prosyst.mprm.backend.autowire;
 
 import static com.prosyst.mprm.backend.autowire.Properties.toMapProps;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,10 +29,15 @@ public class MultipleImport<V> implements ServiceTrackerListener {
   
   private ServiceTracker tracker;
   
+  /**
+   * @param valType
+   * @param refs
+   * @param proxies
+   */
   public MultipleImport(final Class<V> valType, final RefFactory<ServiceReference, V> refs,
       final ProxyFactory proxies) {
     
-    this.cache = new HashMap<ServiceReference, V>();
+    this.cache = Collections.synchronizedMap(new HashMap<ServiceReference, V>());
     
     this.iterable = Refs.ref(new ObjectFactory.Adapter<Void, Iterable<V>>() {
       public Iterable<V> create(Void arg, Map<String, Object> props) {
@@ -47,16 +53,20 @@ public class MultipleImport<V> implements ServiceTrackerListener {
               public V next() {
                 ServiceReference sref = iter.next();
                 
-                V proxy = cache.get(sref);
+                Ref<ServiceReference, V> ref = null;
+                V proxy = null;
                 
-                if (proxy == null) {
-                  Ref<ServiceReference, V> ref = refs.ref();
-                  ref.bind(sref, toMapProps(sref));
-                  
-                  proxy = proxies.proxy(valType, ref);
-                  cache.put(sref, proxy);
+                synchronized (cache) {
+                  proxy = cache.get(sref);
+
+                  if (proxy == null) {
+                    ref = refs.ref();
+                    proxy = proxies.proxy(valType, ref);
+                    cache.put(sref, proxy);
+                  }
                 }
                 
+                ref.bind(sref, toMapProps(sref));
                 return proxy;
               }
 
@@ -95,7 +105,7 @@ public class MultipleImport<V> implements ServiceTrackerListener {
   }
 
   public void removed(ServiceTracker tracker, ServiceReference sref) {
-    /* If we have a cached entry for this ServiceReference inbind it. */
+    /* If we have a cached entry for this ServiceReference unbind it. */
     Object proxy = cache.remove(sref);
     
     if (proxy != null) {
