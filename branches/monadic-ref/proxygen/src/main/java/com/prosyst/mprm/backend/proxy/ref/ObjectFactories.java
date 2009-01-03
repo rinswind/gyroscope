@@ -4,14 +4,12 @@ import java.util.Map;
 
 /**
  * @author Todor Boev
- * @version $Revision$
  */
 public class ObjectFactories {
-  public static <V> ObjectFactory<?, V> key(final String prop) {
-    return new ObjectFactory.Adapter<Object, V>() {
-      @SuppressWarnings("unchecked")
-      public V create(Object delegate, Map<String, Object> props) {
-        return (V) props.get(prop);
+  public static <A, V> ObjectFactory<A, V> constant(final V c) { 
+    return new ObjectFactory.Adapter<A, V>() {
+      public V create(A input, Map<String, Object> props){
+        return c;
       }
     };
   }
@@ -38,12 +36,4 @@ public class ObjectFactories {
         return arg;
       }
     }; 
-  
-  public static <A, V> ObjectFactory<A, V> constant(final V c) { 
-    return new ObjectFactory.Adapter<A, V>() {
-      public V create(A input, Map<String, Object> props){
-        return c;
-      }
-    };
-  }
 }

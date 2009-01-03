@@ -2,10 +2,9 @@ package com.prosyst.mprm.backend.autowire;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -91,10 +90,48 @@ public class ServiceTracker {
   /**
    * @return
    */
-  public Set<ServiceReference> all() {
-    synchronized (refs) {
-      return new HashSet<ServiceReference>(refs);
-    }
+  public Iterable<ServiceReference> all() {
+    return new Iterable<ServiceReference>() {
+      public Iterator<ServiceReference> iterator() {
+        return new Iterator<ServiceReference>() {
+          private final Iterator<ServiceReference> iter = refs.iterator(); 
+          private ServiceReference current;
+          
+          /**
+           * We guarantee that if hasNext() returns true next() will always
+           * return a value. It is possible that that value has since become
+           * invalid and will toss RefUnboundException.
+           */
+          public boolean hasNext() {
+            synchronized (refs) {
+              if (current == null) {
+                if (iter.hasNext()) {
+                  current = iter.next();
+                }
+              }
+              
+              return current != null;
+            }
+          }
+
+          public ServiceReference next() {
+            synchronized (refs) {
+              if (current == null) {
+                throw new NoSuchElementException();
+              }
+              
+              ServiceReference res = current;
+              current = null;
+              return res;
+            }
+          }
+
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+    };
   }
 
   /**

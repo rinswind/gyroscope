@@ -5,7 +5,6 @@ import static com.google.inject.Scopes.SINGLETON;
 import static com.google.inject.name.Names.named;
 import static com.google.inject.util.Types.newParameterizedType;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.google.inject.AbstractModule;
@@ -27,7 +26,7 @@ public class Activator extends RefContainerImpl {
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(collectionOf(RichHello.class)).toInstance( 
+        bind(iterableOf(RichHello.class)).toInstance( 
           require(RichHello.class)
           /*
            * The Autowire DSL requires an ObjectFactory instance at this spot. For
@@ -36,10 +35,20 @@ public class Activator extends RefContainerImpl {
            * get it's dependencies injected.
            */
           .from(Hello.class, new ObjectFactory.Adapter<Hello, RichHello>() {
-            public RichHello create(final Hello delegate, Map<String, Object> props) {
+            public RichHello create(final Hello delegate, final Map<String, Object> attrs) {
               return new RichHello() {
                 public void hello(String title, String name) {
-                  delegate.hello(title + " " + name);
+                  /*
+                   * We can access the service properties at this point. It is a
+                   * good practice to do so in wrapper classes like this one in
+                   * order to limit the dependencies to the proxy API into this
+                   * dynamic transformations layer.
+                   * 
+                   * FIX If the attrs get updated this will not be seen by this
+                   * factory because the attrs are not mutated - they are replaced
+                   * with a new attrs map.
+                   */
+                  delegate.hello(title + " " + name + " (" + attrs.get(Hello.PROP) + ")");
                 }
               };
             }
@@ -84,21 +93,25 @@ public class Activator extends RefContainerImpl {
      * linkages must happen automatically and be guided by special Autowire
      * annotations on the linked classes.
      */
-    from(injector.getInstance(collectionOf(RichHello.class)))
+    from(injector.getInstance(iterableOf(RichHello.class)))
     .notify(injector.getInstance(Printer.class));
   }
   
   /**
    * Going around Java 5's dreaded erasure in order to get type safety of
-   * generified collections requires the crufly TypeLiteral - alas it can't be
-   * made shorter.
+   * generified collections requires the crufly TypeLiteral - alas this is the
+   * shortest this can ever get. Such little helper methods will become
+   * commonplace when using Guice. Probably with time these will be grouped in
+   * all-static utility classes. The alternative to this helper is to use the
+   * "new TypeLiteral<T>{}" idiom. So iterableOf(RichHello.class) can be
+   * replaced with "new TypeLiteral<Iterable<RichHello>>{}"
    * 
    * @param <V>
    * @param typeParam
    * @return
    */
   @SuppressWarnings("unchecked")
-  private static <V> TypeLiteral<Collection<V>> collectionOf(final Class<V> typeParam) {
-    return (TypeLiteral<Collection<V>>) TypeLiteral.get(newParameterizedType(Collection.class, typeParam));
+  private static <V> TypeLiteral<Iterable<V>> iterableOf(final Class<V> typeParam) {
+    return (TypeLiteral<Iterable<V>>) TypeLiteral.get(newParameterizedType(Iterable.class, typeParam));
   }
 }

@@ -17,8 +17,8 @@ public class SingleImport<V> implements ServiceTrackerListener {
   private final Ref<ServiceReference, V> ref;
   private final boolean hotswap;
   
-  public SingleImport(Class<V> type, RefFactory<ServiceReference, V> fact,
-      ProxyFactory proxies, final boolean hotswap) {
+  public SingleImport(Class<V> type, RefFactory<ServiceReference, V> fact, ProxyFactory proxies,
+      final boolean hotswap) {
 
     this.ref = fact.ref();
     this.proxy = proxies.proxy(type, this.ref);
