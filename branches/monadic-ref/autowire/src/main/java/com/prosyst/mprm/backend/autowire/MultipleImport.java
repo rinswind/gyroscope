@@ -1,6 +1,5 @@
 package com.prosyst.mprm.backend.autowire;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.osgi.framework.ServiceReference;
@@ -16,17 +15,17 @@ import com.prosyst.mprm.backend.proxy.ref.RefFactory;
  *
  */
 public class MultipleImport<V> implements ServiceTrackerListener {
-  private final Collection<V> proxy;
+  private final Iterable<V> proxy;
   private final RefFactory<ServiceReference, V> refs;
   private final RefCollection<ServiceReference, V> collection;
   
   public MultipleImport(Class<V> valType, RefFactory<ServiceReference, V> refs, ProxyFactory proxies) {
     this.collection = new RefCollectionImpl<ServiceReference, V>(valType, proxies);
     this.refs = refs;
-    this.proxy = proxies.proxy(Collection.class, collection);
+    this.proxy = proxies.proxy(Iterable.class, collection);
   }
   
-  public Collection<V> proxy() {
+  public Iterable<V> proxy() {
     return proxy;
   }
   

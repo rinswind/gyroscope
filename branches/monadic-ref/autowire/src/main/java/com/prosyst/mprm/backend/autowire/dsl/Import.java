@@ -1,6 +1,5 @@
 package com.prosyst.mprm.backend.autowire.dsl;
 
-import java.util.Collection;
 import java.util.Map;
 
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
@@ -21,6 +20,6 @@ public class Import {
   public interface ModeSelector<T> {
     T single();
     
-    Collection<T> multiple();
+    Iterable<T> multiple();
   }
 }

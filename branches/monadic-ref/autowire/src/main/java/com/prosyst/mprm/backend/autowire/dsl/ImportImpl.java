@@ -2,15 +2,14 @@ package com.prosyst.mprm.backend.autowire.dsl;
 
 import static com.prosyst.mprm.backend.autowire.Attributes.filter;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-import com.prosyst.mprm.backend.autowire.MultipleImport;
 import com.prosyst.mprm.backend.autowire.ImportObjectFactory;
+import com.prosyst.mprm.backend.autowire.MultipleImport;
 import com.prosyst.mprm.backend.autowire.ServiceComparators;
 import com.prosyst.mprm.backend.autowire.ServiceTracker;
 import com.prosyst.mprm.backend.autowire.SingleImport;
@@ -98,7 +97,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     return assembly.proxy();
   }
   
-  public Collection<V> multiple() {
+  public Iterable<V> multiple() {
     if (BundleContext.class == valType) {
       throw new UnsupportedOperationException();
     }
