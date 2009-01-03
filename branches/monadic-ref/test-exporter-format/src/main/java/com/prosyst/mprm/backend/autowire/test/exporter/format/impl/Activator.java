@@ -15,8 +15,8 @@ public class Activator extends RefContainerImpl {
       }
     };
     
-    BundleContext root = require(BundleContext.class).singleton();
-    Ref<Format, ServiceRegistration> export = provide(Format.class).singleton();
+    BundleContext root = require(BundleContext.class).single();
+    Ref<Format, ServiceRegistration> export = provide(Format.class).single();
     from(root).notify(binder(export).to(service));
   }
 }

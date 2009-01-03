@@ -31,8 +31,8 @@ public class Activator extends RefContainerImpl {
       @Override
       protected void configure() {
         /* Define the service imports - they are effectively singletons */
-        bind(Format.class).toInstance(require(Format.class).singleton());
-        bind(Date.class).toInstance(require(Date.class).singleton());
+        bind(Format.class).toInstance(require(Format.class).single());
+        bind(Date.class).toInstance(require(Date.class).single());
         
         /* Define the service impl we will export */
         bind(Hello.class).to(HelloImpl.class);
@@ -54,7 +54,7 @@ public class Activator extends RefContainerImpl {
       /* Use guice to create the export */
       Hello hello = injector.getInstance(Hello.class);
       
-      Ref<Hello, ServiceRegistration> export = provide(Hello.class).singleton();
+      Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
       from(required)
       .notify(

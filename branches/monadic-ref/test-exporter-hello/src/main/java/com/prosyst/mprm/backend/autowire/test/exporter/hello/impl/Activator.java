@@ -23,8 +23,8 @@ public class Activator extends RefContainerImpl {
   
   @Override
   public void configure() throws Exception {
-    final Format format = require(Format.class).singleton();
-    final Date date = require(Date.class).singleton();
+    final Format format = require(Format.class).single();
+    final Date date = require(Date.class).single();
     
     final Ref<?, ?> deps = and(format, date);
     
@@ -36,7 +36,7 @@ public class Activator extends RefContainerImpl {
         }
       };
       
-      Ref<Hello, ServiceRegistration> export = provide(Hello.class).singleton();
+      Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
       from(deps).notify(
           binder(export)

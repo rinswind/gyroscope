@@ -49,8 +49,8 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
   /**
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#from(java.lang.Object)
    */
-  public <V> Link.Linker from(V proxy) {
-    return from(((Proxy<?, V>) proxy).proxyControl());
+  public Link.Linker from(Object proxy) {
+    return from(((Proxy<?, ?>) proxy).proxyControl());
   }
   
   /**

@@ -4,11 +4,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.prosyst.mprm.backend.autowire.ExportObjectFactory;
+import com.prosyst.mprm.backend.autowire.SingleExportObjectFactory;
+import com.prosyst.mprm.backend.autowire.MultipleExportObjectFactory;
 import com.prosyst.mprm.backend.autowire.dsl.Export.Builder;
 import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
+import com.prosyst.mprm.backend.proxy.ref.Refs;
 
 /**
  * @author Todor Boev
@@ -45,11 +47,11 @@ public class ExportImpl<A, V> implements Builder<A, V> {
     return new ExportImpl<A, N>(argType, newValType, combinator.to(fact), root);
   }
   
-  public Ref<A, ServiceRegistration> singleton() {
-    return combinator.to(new ExportObjectFactory<V>(valType, root)).factory().ref();
+  public Ref<A, ServiceRegistration> single() {
+    return combinator.to(new SingleExportObjectFactory<V, V>(valType, root)).factory().ref();
   }
   
-  public Ref<ObjectFactory<Bundle, A>, ServiceRegistration> factory() {
-    throw new UnsupportedOperationException();
+  public Ref<ObjectFactory<Bundle, A>, ServiceRegistration> multiple() {
+    return Refs.ref(new MultipleExportObjectFactory<A, V>(valType, combinator, root));
   }
 }

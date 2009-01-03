@@ -20,8 +20,8 @@ public class Export {
   }
   
   public interface ModeSelector<T> {
-    Ref<T, ServiceRegistration/*<T>*/> singleton();
+    Ref<T, ServiceRegistration/*<T>*/> single();
     
-    Ref<ObjectFactory<Bundle, T>, ServiceRegistration/*<T>*/> factory();
+    Ref<ObjectFactory<Bundle, T>, ServiceRegistration/*<T>*/> multiple();
   }
 }

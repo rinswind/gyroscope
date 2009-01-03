@@ -11,11 +11,8 @@ public class ServiceComparators {
    */
   private static final Comparator<ServiceReference> STANDARD = new Comparator<ServiceReference>() {
     public int compare(ServiceReference fst, ServiceReference sec) {
-      ServiceReference sfst = (ServiceReference) fst;
-      ServiceReference ssec = (ServiceReference) sec;
-      
-      int rsgn = (int) Math.signum(rank(ssec) - rank(sfst));
-      return (rsgn != 0) ? rsgn : (int) Math.signum(id(sfst) - id(ssec));
+      int rsgn = (int) Math.signum(rank(fst) - rank(sec));
+      return (rsgn != 0) ? rsgn : (int) Math.signum(id(fst) - id(sec));
     }
     
     private int rank(ServiceReference ref) {

@@ -45,7 +45,7 @@ public class Refs {
       throw new NullPointerException();
     }
 
-    return new RefImpl<A, C>(new ObjectFactory<A, C>() {
+    return ref(new ObjectFactory<A, C>() {
       public C create(A arg, Map<String, Object> props) {
         ref.bind(arg, props);
         return fact.create(ref.val(), props);
@@ -77,7 +77,7 @@ public class Refs {
       throw new NullPointerException();
     }
 
-    return new RefImpl<C, A>(new ObjectFactory<C, A>() {
+    return ref(new ObjectFactory<C, A>() {
       public A create(C arg, Map<String, Object> props) {
         ref.bind(fact.create(arg, props), props);
         return ref.val();

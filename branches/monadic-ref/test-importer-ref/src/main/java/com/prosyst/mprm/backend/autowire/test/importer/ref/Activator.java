@@ -43,7 +43,7 @@ public class Activator extends RefContainerImpl {
           };
         }
       })
-      .singleton();
+      .single();
     
     from(service).notify(new RefListener.Adapter() {
       public void bound() {

@@ -10,7 +10,6 @@ import java.util.Map;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
@@ -40,12 +39,12 @@ public class Activator extends RefContainerImpl {
             public RichHello create(final Hello delegate, Map<String, Object> props) {
               return new RichHello() {
                 public void hello(String title, String name) {
-                  ((Hello) delegate).hello(title + " " + name);
+                  delegate.hello(title + " " + name);
                 }
               };
             }
           })
-          .collection()
+          .multiple()
         );
             
         /*
@@ -71,7 +70,7 @@ public class Activator extends RefContainerImpl {
         return new Worker(name, task);
       }
     });
-
+    
     /*
      * Declare that the printer will start working as soon as the collection of
      * services becomes available. A collection becomes available (and empty) as
@@ -84,9 +83,8 @@ public class Activator extends RefContainerImpl {
      * appropriate conditions are met. In future versions of Autowire these
      * linkages must happen automatically and be guided by special Autowire
      * annotations on the linked classes.
-     * 
      */
-    from(injector.getInstance(Key.get(collectionOf(RichHello.class))))
+    from(injector.getInstance(collectionOf(RichHello.class)))
     .notify(injector.getInstance(Printer.class));
   }
   

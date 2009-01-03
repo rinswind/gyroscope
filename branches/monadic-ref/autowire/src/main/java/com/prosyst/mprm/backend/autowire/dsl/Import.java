@@ -19,10 +19,8 @@ public class Import {
   }
   
   public interface ModeSelector<T> {
-    T singleton();
+    T single();
     
-    Collection<T> collection();
-    
-    <K> Map<K, T> map(ObjectFactory<T, K> key);
+    Collection<T> multiple();
   }
 }

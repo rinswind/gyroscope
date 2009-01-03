@@ -9,11 +9,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-import com.prosyst.mprm.backend.autowire.CollectionImport;
+import com.prosyst.mprm.backend.autowire.MultipleImport;
 import com.prosyst.mprm.backend.autowire.ImportObjectFactory;
 import com.prosyst.mprm.backend.autowire.ServiceComparators;
 import com.prosyst.mprm.backend.autowire.ServiceTracker;
-import com.prosyst.mprm.backend.autowire.SingletonImport;
+import com.prosyst.mprm.backend.autowire.SingleImport;
 import com.prosyst.mprm.backend.autowire.dsl.Import.Builder;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
@@ -62,7 +62,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     return new ImportImpl<A, N>(argType, newValType, combinator.to(fact), attrs, root, proxies);
   }
   
-  public V singleton() {
+  public V single() {
     if (BundleContext.class == valType) {
       return (V) root;
     }
@@ -70,7 +70,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     /* Finish the chain with a ref that can actually import from OSGi */
     RefFactory<ServiceReference, V> importer = combinator.from(new ImportObjectFactory<A>(root)).factory();
      
-    SingletonImport<V> assembly = new SingletonImport<V>(valType, importer, proxies, false);
+    SingleImport<V> assembly = new SingleImport<V>(valType, importer, proxies, false);
     
     /*
      * Set the type we're looking for. This will override any any user supplied
@@ -98,7 +98,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     return assembly.proxy();
   }
   
-  public Collection<V> collection() {
+  public Collection<V> multiple() {
     if (BundleContext.class == valType) {
       throw new UnsupportedOperationException();
     }
@@ -106,7 +106,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     /* Finish the chain with a ref that can actually import from OSGi */
     RefFactory<ServiceReference, V> importer = combinator.from(new ImportObjectFactory<A>(root)).factory();
      
-    CollectionImport<V> assembly = new CollectionImport<V>(valType, importer, proxies);
+    MultipleImport<V> assembly = new MultipleImport<V>(valType, importer, proxies);
     
     /*
      * Set the type we're looking for. This will override any any user supplied
@@ -132,13 +132,5 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     
     /* Create a proxy to represent the front end of the import */
     return assembly.proxy();
-  }
-
-  public <K> Map<K, V> map(ObjectFactory<V, K> key) {
-    if (BundleContext.class == valType) {
-      throw new UnsupportedOperationException();
-    }
-    
-    throw new UnsupportedOperationException();
   }
 }

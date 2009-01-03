@@ -152,7 +152,7 @@ public class ServiceTracker {
     
     synchronized (refs) {
       for (Iterator<ServiceReference> iter = refs.iterator(); iter.hasNext();) {
-        ServiceReference ref = (ServiceReference) iter.next();
+        ServiceReference ref = iter.next();
         iter.remove();
         fireRemoved(ref);
       }
