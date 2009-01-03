@@ -40,7 +40,7 @@ public class ProxyFactoryImpl implements ProxyFactory {
        * The proxy class will have only one constructor that takes N Ref
        * arguments. Each argument corresponds to a proxied interface.
        */
-      Constructor<?> constr = (Constructor<?>) pclass.getConstructors()[0];
+      Constructor<?> constr = pclass.getConstructors()[0];
       
       int len = constr.getParameterTypes().length;
       

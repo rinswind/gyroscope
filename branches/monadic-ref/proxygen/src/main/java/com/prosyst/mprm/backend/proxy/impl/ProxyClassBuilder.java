@@ -351,7 +351,7 @@ public class ProxyClassBuilder implements Opcodes {
    
     /* Write the class header */
     cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER, implName, null, "java/lang/Object", 
-        (String[]) classSig.toArray(new String[classSig.size()]));
+        classSig.toArray(new String[classSig.size()]));
     
     /* Start the constructor */
     MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, "<init>", constrSig, null, null);
@@ -364,7 +364,7 @@ public class ProxyClassBuilder implements Opcodes {
      * methods that use that field for delegation
      */
     for (int no = 0; no < mixins.size(); no++) {
-      MixinGenerator e = (MixinGenerator) mixins.get(no);
+      MixinGenerator e = mixins.get(no);
       
       /*
        * First mixin our overrides of object methods so that this is remembered
