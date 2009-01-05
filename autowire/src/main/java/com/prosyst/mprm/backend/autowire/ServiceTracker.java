@@ -100,7 +100,8 @@ public class ServiceTracker {
           /**
            * We guarantee that if hasNext() returns true next() will always
            * return a value. It is possible that that value has since become
-           * invalid and will toss an exception on attempt to getService().
+           * invalid and will return null when used with
+           * BundleContext.getService().
            */
           public boolean hasNext() {
             synchronized (refs) {
