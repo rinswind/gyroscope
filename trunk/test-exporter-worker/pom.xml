@@ -16,7 +16,7 @@
   <packaging>bundle</packaging>
   
   <properties>
-    <Export-Package>com.prosyst.mprm.backend.autowire.test.exporter.worker</Export-Package>
+    <Export-Package>edu.unseen.autowire.test.exporter.worker</Export-Package>
   </properties>
   
   <dependencies>

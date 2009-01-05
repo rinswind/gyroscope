@@ -19,7 +19,7 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <Export-Package>com.prosyst.mprm.backend.autowire.*</Export-Package>
+    <Export-Package>edu.unseen.autowire.*</Export-Package>
   </properties>
 
   <dependencies>

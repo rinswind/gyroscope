@@ -15,8 +15,8 @@
   <packaging>bundle</packaging>
   
   <properties>
-    <Private-Package>com.prosyst.mprm.backend.autowire.test.importer.coll</Private-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.coll.Activator</Bundle-Activator>
+    <Private-Package>edu.unseen.autowire.test.importer.coll</Private-Package>
+    <Bundle-Activator>edu.unseen.autowire.test.importer.coll.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>
