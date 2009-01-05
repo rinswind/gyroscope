@@ -57,6 +57,7 @@ public class Activator extends RefContainerImpl {
       
       Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
+      /* When both imports are available export the service object with certain properties */
       from(required)
       .notify(
           binder(export)
@@ -65,7 +66,11 @@ public class Activator extends RefContainerImpl {
              entry(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))))
           .to(hello));
       
-      /* Use guice to create the listener */
+      /*
+       * Also as soon as the export is bound notify a listener that dumps what
+       * is happening on the console. Use Guice to create the listener. This
+       * shows how multiple events can be hooked to the same source.
+       */
       from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(i));
     }
   }
