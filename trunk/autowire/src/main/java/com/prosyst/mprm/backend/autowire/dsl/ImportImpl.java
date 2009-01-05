@@ -22,9 +22,15 @@ import com.prosyst.mprm.backend.proxy.ref.RefFactory;
 import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
 
 /**
+ * FIX Refactor the repeated code in single() and multiple(). Must extract this
+ * code out of the DSL. The DSL code must be lean and contain no significant
+ * logic - only configuration.
+ * 
+ * 
  * @author Todor Boev
- *
- * @param <T>
+ * 
+ * @param <A> Argument
+ * @param <V> Value
  */
 public class ImportImpl<A, V> implements Builder<A, V> {
   private final Class<A> argType;
