@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>edu.unseen</groupId>
+    <artifactId>pom-bundle</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom-bundle.xml</relativePath>
+  </parent>
+
+  <groupId>edu.unseen</groupId>
+  <artifactId>guice-wrapped</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+  
+  <name>Guice Dependency Injection Framework</name>
+  
+  <packaging>bundle</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/guice-snapshot.jar</systemPath>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <Export-Package>
+      com.google.inject; version=${pom.version},
+      com.google.inject.binder; version=${pom.version},
+      com.google.inject.matcher; version=${pom.version},
+      com.google.inject.name; version=${pom.version},
+      com.google.inject.spi; version=${pom.version},
+      com.google.inject.util; version=${pom.version}
+    </Export-Package>
+    <Private-Package>com.google.inject.internal.*</Private-Package>
+    <Import-Package>
+      !com.google.common.base,
+      !com.google.inject.internal.asm.util,
+      !javax.management,
+      !javax.naming,
+      *
+    </Import-Package>
+  </properties>
+</project>
