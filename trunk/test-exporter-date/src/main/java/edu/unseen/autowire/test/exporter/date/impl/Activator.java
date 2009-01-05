@@ -1,12 +1,9 @@
 package edu.unseen.autowire.test.exporter.date.impl;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
 
 import edu.unseen.autowire.dsl.RefContainerImpl;
 import edu.unseen.autowire.test.exporter.date.Date;
-import edu.unseen.proxy.ref.Ref;
 
 public class Activator extends RefContainerImpl {
   private final java.text.DateFormat FORMAT = java.text.DateFormat.getDateTimeInstance();
@@ -18,8 +15,11 @@ public class Activator extends RefContainerImpl {
       }
     };
     
-    BundleContext root = require(BundleContext.class).single();
-    Ref<Date, ServiceRegistration> export = provide(Date.class).single();
-    from(root).notify(binder(export).to(service));
+    /*
+     * When the BundleContext "service" becomes available bind the provider of
+     * Date.class to the service object.
+     */
+    from(require(BundleContext.class).single())
+    .notify(binder(provide(Date.class).single()).to(service));
   }
 }
