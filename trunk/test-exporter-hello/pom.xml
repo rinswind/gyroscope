@@ -17,7 +17,8 @@
   
   <properties>
     <Export-Package>com.prosyst.mprm.backend.autowire.test.exporter.hello</Export-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.hello.HelloExporter</Bundle-Activator>
+    <Export-Package>com.prosyst.mprm.backend.autowire.test.exporter.hello.impl</Export-Package>
+    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.hello.impl.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>

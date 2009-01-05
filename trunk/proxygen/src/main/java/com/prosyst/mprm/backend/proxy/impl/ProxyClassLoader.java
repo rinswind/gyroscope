@@ -1,4 +1,5 @@
 package com.prosyst.mprm.backend.proxy.impl;
+import static com.prosyst.mprm.backend.proxy.ref.Interfaces.interfaces;
 
 /**
  * 
@@ -35,8 +36,7 @@ public class ProxyClassLoader extends ClassLoader {
    * @param refs
    * @return
    */
-  @SuppressWarnings("unchecked")
-  public <T> Class<? extends T> loadProxyClass(Class<T> type) {
+  public <T> Class<?> loadProxyClass(Class<?> type) {
     String pname = PREFIX + "." + type.getName();
 
     /* Check if we have an appropriate proxy class created already */
@@ -47,39 +47,19 @@ public class ProxyClassLoader extends ClassLoader {
       res = defineProxyClass(type, pname);
     }
     
-    return (Class<? extends T>) res;
+    return res;
   }
 
-  /**
-   * @param <T>
-   * @param type
-   * @param pname
-   * @return
-   * @throws ClassFormatError
-   */
-  private <T> Class<?> defineProxyClass(Class<T> type, String pname) throws ClassFormatError {
-    Class<?> res;
+  private Class<?> defineProxyClass(Class<?> type, String pname) throws ClassFormatError {
     /* Build the name of the new proxy class */
     ProxyClassBuilder gen = new ProxyClassBuilder(pname, this);
 
-    /*
-     * Create the new class. Proxy the class itself and all of the interface it
-     * inherits from it's subclasses.
-     * 
-     * FIX Ain't it better to flatten the entire hierarchy? Or have a parameter
-     * that describes the policy?
-     */
-    gen.add(type.getName());
-    
-    for (Class<?> cl = type; cl != null; cl = cl.getSuperclass()) {
-      for (Class<?> iface : cl.getInterfaces()) {
-        gen.add(iface.getName());
-      }
+    for (String ifname : interfaces(type)) {
+      gen.add(ifname);
     }
 
     byte[] raw = gen.generate();
-    res = defineClass(pname, raw, 0, raw.length);
-    return res;
+    return defineClass(pname, raw, 0, raw.length);
   }
 
   /**

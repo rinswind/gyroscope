@@ -14,10 +14,15 @@ public interface Ref<A, V> {
    * Lifecycle of a dynamic reference.
    */
   public enum State {
+    /** The val(),arg(),attributes() are NOT available */
     UNBOUND,
+    /** The val(),arg(),attributes() are NOT available */
     BINDING,
+    /** The val(),arg(),attributes() are still available but soon won't be */
     UNBINDING,
+    /** The val(),arg(),attributes() are available */
     BOUND,
+    /** The val(),arg(),attributes() are available and some of the could have changed */
     UPDATED;
   }
 
@@ -40,10 +45,10 @@ public interface Ref<A, V> {
   V val();
   
   /**
-   * @return a random set of properties that applications may associate with the
+   * @return a random set of metadata that applications may associate with this Ref
    *         delegate.
    */
-  Map<String, ?> props();
+  Map<String, Object> attributes();
   
   /**
    * @return current state of this reference.
@@ -56,13 +61,30 @@ public interface Ref<A, V> {
    */
   Lock lock();
   
-  void bind(A arg, Map<String, ?> props);
+  /**
+   * @param arg
+   * @param attrs a heterogeneous collection of named objects.
+   */
+  void bind(A arg, Map<String, Object> attrs);
   
-  void update(A arg, Map<String, ?> props);
+  /**
+   * @param arg
+   * @param attrs
+   */
+  void update(A arg, Map<String, Object> attrs);
   
+  /**
+   * 
+   */
   void unbind();
 
-  void addListener(RefListener<A, V> l);
+  /**
+   * @param l
+   */
+  void addListener(RefListener l);
   
-  void removeListener(RefListener<A, V> l);
+  /**
+   * @param l
+   */
+  void removeListener(RefListener l);
 }
