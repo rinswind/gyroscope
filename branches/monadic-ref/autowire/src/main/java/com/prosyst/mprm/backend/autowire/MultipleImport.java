@@ -11,7 +11,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
+import com.prosyst.mprm.backend.proxy.ref.TransformerAdapter;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefFactory;
 import com.prosyst.mprm.backend.proxy.ref.Refs;
@@ -39,7 +39,7 @@ public class MultipleImport<V> implements ServiceTrackerListener {
     
     this.cache = Collections.synchronizedMap(new HashMap<ServiceReference, V>());
     
-    this.iterable = Refs.ref(new ObjectFactory.Adapter<Void, Iterable<V>>() {
+    this.iterable = Refs.ref(new TransformerAdapter<Void, Iterable<V>>() {
       public Iterable<V> create(Void arg, Map<String, Object> props) {
         return new Iterable<V>() {
           public Iterator<V> iterator() {
@@ -66,7 +66,10 @@ public class MultipleImport<V> implements ServiceTrackerListener {
                   }
                 }
                 
-                ref.bind(sref, toMapProps(sref));
+                if (ref != null) {
+                  ref.bind(sref, toMapProps(sref));
+                }
+                
                 return proxy;
               }
 

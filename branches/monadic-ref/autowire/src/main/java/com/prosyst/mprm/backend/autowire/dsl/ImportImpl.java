@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-import com.prosyst.mprm.backend.autowire.ImportObjectFactory;
+import com.prosyst.mprm.backend.autowire.ImportTransformer;
 import com.prosyst.mprm.backend.autowire.MultipleImport;
 import com.prosyst.mprm.backend.autowire.ServiceComparators;
 import com.prosyst.mprm.backend.autowire.ServiceTracker;
@@ -16,10 +16,10 @@ import com.prosyst.mprm.backend.autowire.SingleImport;
 import com.prosyst.mprm.backend.autowire.dsl.Import.Builder;
 import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
+import com.prosyst.mprm.backend.proxy.ref.RefListenerAdapter;
+import com.prosyst.mprm.backend.proxy.ref.Transformer;
 import com.prosyst.mprm.backend.proxy.ref.RefFactory;
 import com.prosyst.mprm.backend.proxy.ref.RefFactoryCombinator;
-import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
 /**
  * @author Todor Boev
@@ -53,11 +53,11 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     return this;
   }
   
-  public <N> Builder<N, V> from(Class<N> newArgType, ObjectFactory<N, A> fact) {
+  public <N> Builder<N, V> from(Class<N> newArgType, Transformer<N, A> fact) {
     return new ImportImpl<N, V>(newArgType, valType, combinator.from(fact), attrs, root, proxies);
   }
 
-  public <N> Builder<A, N> as(Class<N> newValType, ObjectFactory<V, N> fact) {
+  public <N> Builder<A, N> as(Class<N> newValType, Transformer<V, N> fact) {
     return new ImportImpl<A, N>(argType, newValType, combinator.to(fact), attrs, root, proxies);
   }
   
@@ -67,7 +67,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     }
     
     /* Finish the chain with a ref that can actually import from OSGi */
-    RefFactory<ServiceReference, V> importer = combinator.from(new ImportObjectFactory<A>(root)).factory();
+    RefFactory<ServiceReference, V> importer = combinator.from(new ImportTransformer<A>(root)).factory();
      
     SingleImport<V> assembly = new SingleImport<V>(valType, importer, proxies, false);
     
@@ -81,7 +81,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     final ServiceTracker tracker = new ServiceTracker(root, filter(attrs), ServiceComparators.standard()); 
       
     /* Start tracking as soon as the BundleContext proxy is valid */
-    ((Proxy<?, ?>) root).proxyControl().addListener(new RefListener.Adapter() {
+    ((Proxy<?, ?>) root).proxyControl().addListener(new RefListenerAdapter() {
       public void bound() {
         tracker.open();
       }
@@ -103,7 +103,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     }
     
     /* Finish the chain with a ref that can actually import from OSGi */
-    RefFactory<ServiceReference, V> importer = combinator.from(new ImportObjectFactory<A>(root)).factory();
+    RefFactory<ServiceReference, V> importer = combinator.from(new ImportTransformer<A>(root)).factory();
      
     MultipleImport<V> assembly = new MultipleImport<V>(valType, importer, proxies);
     
@@ -117,7 +117,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     final ServiceTracker tracker = new ServiceTracker(root, filter(attrs), ServiceComparators.standard()); 
       
     /* Start tracking as soon as the BundleContext proxy is valid */
-    ((Proxy<?, ?>) root).proxyControl().addListener(new RefListener.Adapter() {
+    ((Proxy<?, ?>) root).proxyControl().addListener(new RefListenerAdapter() {
       public void bound() {
         tracker.open();
       }

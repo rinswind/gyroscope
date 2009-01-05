@@ -100,7 +100,7 @@ public class ServiceTracker {
           /**
            * We guarantee that if hasNext() returns true next() will always
            * return a value. It is possible that that value has since become
-           * invalid and will toss RefUnboundException.
+           * invalid and will toss an exception on attempt to getService().
            */
           public boolean hasNext() {
             synchronized (refs) {

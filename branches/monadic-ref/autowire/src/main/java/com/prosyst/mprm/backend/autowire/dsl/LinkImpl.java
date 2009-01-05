@@ -3,6 +3,7 @@ package com.prosyst.mprm.backend.autowire.dsl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.prosyst.mprm.backend.proxy.ref.RefListenerAdapter;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefListener;
 
@@ -45,7 +46,7 @@ public class LinkImpl {
     }
 
     public RefListener to(final A arg) {
-      return new RefListener.Adapter() {
+      return new RefListenerAdapter() {
         private final Ref<A, ?> target = BinderImpl.this.target;
         private final Map<String, Object> props = BinderImpl.this.attrs;
         private final A a = arg;

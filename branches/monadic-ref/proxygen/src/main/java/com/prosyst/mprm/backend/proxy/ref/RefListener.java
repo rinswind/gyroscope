@@ -10,18 +10,4 @@ public interface RefListener {
   void unbinding();
   
   void updated();
-  
-  public static class Adapter implements RefListener {
-    public void bound() {
-      /* User code comes here */
-    }
-
-    public void unbinding() {
-      /* User code comes here */
-    }
-
-    public void updated() {
-      /* User code comes here */
-    }
-  }
 }

@@ -12,7 +12,7 @@ public class Refs {
   /**
    * A function to lift an ObjectFactory into the Ref monad.
    */
-  public static <A, B> Ref<A, B> ref(ObjectFactory<A, B> fact) {
+  public static <A, B> Ref<A, B> ref(Transformer<A, B> fact) {
     return new RefImpl<A, B>(fact);
   }
 
@@ -22,7 +22,7 @@ public class Refs {
    * @param seed
    * @return
    */
-  public static <A, B> RefFactoryCombinator<A, B> combinator(ObjectFactory<A, B> seed) {
+  public static <A, B> RefFactoryCombinator<A, B> combinator(Transformer<A, B> seed) {
     return new RefFactoryCombinatorImpl<A, B>(seed);
   }
 
@@ -36,7 +36,7 @@ public class Refs {
    * @param fact
    * @return
    */
-  public static <A, B, C> Ref<A, C> to(final Ref<A, B> ref, final ObjectFactory<B, C> fact) {
+  public static <A, B, C> Ref<A, C> to(final Ref<A, B> ref, final Transformer<B, C> fact) {
     if (ref == null) {
       throw new NullPointerException();
     }
@@ -45,7 +45,7 @@ public class Refs {
       throw new NullPointerException();
     }
 
-    return ref(new ObjectFactory<A, C>() {
+    return ref(new Transformer<A, C>() {
       public C create(A arg, Map<String, Object> props) {
         ref.bind(arg, props);
         return fact.create(ref.val(), props);
@@ -68,7 +68,7 @@ public class Refs {
    * @param fact
    * @return
    */
-  public static <A, B, C> Ref<C, A> from(final ObjectFactory<C, B> fact, final Ref<B, A> ref) {
+  public static <A, B, C> Ref<C, A> from(final Transformer<C, B> fact, final Ref<B, A> ref) {
     if (ref == null) {
       throw new NullPointerException();
     }
@@ -77,7 +77,7 @@ public class Refs {
       throw new NullPointerException();
     }
 
-    return ref(new ObjectFactory<C, A>() {
+    return ref(new Transformer<C, A>() {
       public A create(C arg, Map<String, Object> props) {
         ref.bind(fact.create(arg, props), props);
         return ref.val();

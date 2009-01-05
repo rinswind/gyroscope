@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
+import com.prosyst.mprm.backend.proxy.ref.Transformer;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefFactory;
 import com.prosyst.mprm.backend.proxy.ref.Refs;
@@ -15,7 +15,7 @@ import com.prosyst.mprm.backend.proxy.ref.Refs;
  * FIX Convert this code into real unit tests, which do assert oracles hold true.
  */
 public class RefCombinatorsTest {
-  private static final ObjectFactory<String, Integer> A = new ObjectFactory<String, Integer>() {
+  private static final Transformer<String, Integer> A = new Transformer<String, Integer>() {
     @Override
     public String toString() {
       return "A";
@@ -32,7 +32,7 @@ public class RefCombinatorsTest {
     }
   };
 
-  private static final ObjectFactory<Integer, Integer> B = new ObjectFactory<Integer, Integer>() {
+  private static final Transformer<Integer, Integer> B = new Transformer<Integer, Integer>() {
     @Override
     public String toString() {
       return "B";
@@ -49,7 +49,7 @@ public class RefCombinatorsTest {
     }
   };
 
-  private static final ObjectFactory<Integer, String> C = new ObjectFactory<Integer, String>() {
+  private static final Transformer<Integer, String> C = new Transformer<Integer, String>() {
     @Override
     public String toString() {
       return "C";

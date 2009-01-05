@@ -7,9 +7,9 @@ package com.prosyst.mprm.backend.proxy.ref;
  * @param <V>
  */
 public interface RefFactoryCombinator<A, V> {
-  <N> RefFactoryCombinator<N, V> from(ObjectFactory<N, A> prev);
+  <N> RefFactoryCombinator<N, V> from(Transformer<N, A> prev);
 
-  <N> RefFactoryCombinator<A, N> to(ObjectFactory<V, N> next);
+  <N> RefFactoryCombinator<A, N> to(Transformer<V, N> next);
 
   RefFactory<A, V> factory();
 }

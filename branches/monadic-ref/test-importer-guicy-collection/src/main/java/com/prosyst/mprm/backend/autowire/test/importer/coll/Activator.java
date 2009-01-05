@@ -15,7 +15,7 @@ import com.google.inject.name.Named;
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
 import com.prosyst.mprm.backend.autowire.test.exporter.worker.Worker;
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactory;
+import com.prosyst.mprm.backend.proxy.ref.TransformerAdapter;
 
 /**
  * @version $Revision$
@@ -34,7 +34,7 @@ public class Activator extends RefContainerImpl {
            * will allow the ObjectFactory instance to also be created by Guice and
            * get it's dependencies injected.
            */
-          .from(Hello.class, new ObjectFactory.Adapter<Hello, RichHello>() {
+          .from(Hello.class, new TransformerAdapter<Hello, RichHello>() {
             public RichHello create(final Hello delegate, final Map<String, Object> attrs) {
               return new RichHello() {
                 public void hello(String title, String name) {

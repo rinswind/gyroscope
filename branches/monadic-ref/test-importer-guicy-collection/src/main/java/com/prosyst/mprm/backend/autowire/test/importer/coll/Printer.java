@@ -2,14 +2,14 @@ package com.prosyst.mprm.backend.autowire.test.importer.coll;
 
 import com.google.inject.Inject;
 import com.prosyst.mprm.backend.autowire.test.exporter.worker.Worker;
-import com.prosyst.mprm.backend.proxy.ref.RefListener;
+import com.prosyst.mprm.backend.proxy.ref.RefListenerAdapter;
 import com.prosyst.mprm.backend.proxy.ref.RefUnboundException;
 
 /**
  * @author Todor Boev
  *
  */
-public class Printer extends RefListener.Adapter implements Runnable {
+public class Printer extends RefListenerAdapter implements Runnable {
   private final Worker worker;
   private final Iterable<RichHello> services;
   

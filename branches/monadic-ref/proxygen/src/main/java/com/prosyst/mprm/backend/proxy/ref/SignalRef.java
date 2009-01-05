@@ -34,10 +34,10 @@ public abstract class SignalRef extends RefImpl<Void, Void> {
   }
   
   public SignalRef() {
-    super(ObjectFactories.nothing());
+    super(Transformers.nothing());
     
     this.deps = new ArrayList<Ref<?,?>>();
-    this.listener = new RefListener.Adapter() {
+    this.listener = new RefListenerAdapter() {
       @Override
       public void bound() {
         update();

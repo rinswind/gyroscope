@@ -6,7 +6,7 @@ import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactories;
+import com.prosyst.mprm.backend.proxy.ref.Transformers;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefImpl;
 
@@ -116,7 +116,7 @@ public class ProxyPerfTest extends TestCase {
   }
   
   private static Sum dynamic() {
-    Ref<Sum, Sum> ref = new RefImpl<Sum,Sum>(ObjectFactories.<Sum>identity());
+    Ref<Sum, Sum> ref = new RefImpl<Sum,Sum>(Transformers.<Sum>identity());
     
     ref.bind(new SumImpl(), null);
     

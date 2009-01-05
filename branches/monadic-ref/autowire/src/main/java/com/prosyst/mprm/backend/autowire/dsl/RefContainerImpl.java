@@ -12,7 +12,7 @@ import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
-import com.prosyst.mprm.backend.proxy.ref.ObjectFactories;
+import com.prosyst.mprm.backend.proxy.ref.Transformers;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 
 /**
@@ -35,7 +35,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#use(java.lang.Class)
    */
   public <T> Import.Builder<T, T> require(Class<T> iface) {
-    return new ImportImpl<T, T>(iface, iface, combinator(ObjectFactories.<T>identity()),
+    return new ImportImpl<T, T>(iface, iface, combinator(Transformers.<T>identity()),
         new HashMap<String, Object>(), bc, fact);
   }
 
@@ -43,7 +43,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see com.prosyst.mprm.backend.autowire.dsl.RefContainer#provide(java.lang.Class)
    */
   public <T> Export.Builder<T, T> provide(Class<T> impl) {
-    return new ExportImpl<T, T>(impl, impl, combinator(ObjectFactories.<T>identity()), bc);
+    return new ExportImpl<T, T>(impl, impl, combinator(Transformers.<T>identity()), bc);
   }
   
   /**
@@ -90,7 +90,7 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
      */
     this.fact = new ProxyFactoryImpl(new ProxyClassLoader(getClass().getClassLoader()));
     
-    this.bcRef = ref(ObjectFactories.<BundleContext>identity());
+    this.bcRef = ref(Transformers.<BundleContext>identity());
     this.bc = fact.proxy(BundleContext.class, bcRef);
     
     /* Configure the user content - it is based on the bcRef */

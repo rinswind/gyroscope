@@ -4,8 +4,8 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 import com.prosyst.mprm.backend.autowire.dsl.RefContainerImpl;
+import com.prosyst.mprm.backend.proxy.ref.RefListenerAdapter;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
-import com.prosyst.mprm.backend.proxy.ref.RefListener;
 import com.prosyst.mprm.backend.autowire.test.exporter.date.Date;
 import com.prosyst.mprm.backend.autowire.test.exporter.format.Format;
 import com.prosyst.mprm.backend.autowire.test.exporter.hello.Hello;
@@ -45,7 +45,7 @@ public class Activator extends RefContainerImpl {
               entry(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))))
           .to(hello));
       
-      from(export).notify(new RefListener.Adapter() {
+      from(export).notify(new RefListenerAdapter() {
         @Override
         public void bound() {
           System.out.println("Bound " + no);
