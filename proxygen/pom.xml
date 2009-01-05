@@ -31,8 +31,7 @@
   </dependencies>
 
   <properties>
-    <Export-Package>com.prosyst.mprm.backend.proxy.*</Export-Package>
-    <!-- <Private-Package>org.foo.myproject.*</Private-Package> -->
-    <Bundle-Activator>com.prosyst.mprm.backend.proxy.impl.Activator</Bundle-Activator>
+    <Export-Package>edu.unseen.proxy.*</Export-Package>
+    <Bundle-Activator>edu.unseen.proxy.impl.Activator</Bundle-Activator>
   </properties>
 </project>
