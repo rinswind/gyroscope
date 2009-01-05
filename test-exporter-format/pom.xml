@@ -16,7 +16,8 @@
 
   <properties>
     <Export-Package>com.prosyst.mprm.backend.autowire.test.exporter.format</Export-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.format.FormatExporter</Bundle-Activator>
+    <Private-Package>com.prosyst.mprm.backend.autowire.test.exporter.format.impl</Private-Package>
+    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.format.impl.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>

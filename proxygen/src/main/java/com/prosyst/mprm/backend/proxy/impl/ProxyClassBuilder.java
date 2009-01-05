@@ -27,8 +27,8 @@ public class ProxyClassBuilder implements Opcodes {
   private static final String REF_IFACE;
   private static final String REF_LOCK;
   private static final String REF_LOCK_DESC;
-  private static final String REF_DELEGATE;
-  private static final String REF_DELEGATE_DESC;
+  private static final String REF_VAL;
+  private static final String REF_VAL_DESC;
   
   static {
     try {
@@ -44,8 +44,8 @@ public class ProxyClassBuilder implements Opcodes {
       REF_LOCK = Ref.class.getMethod("lock", new Class[0]).getName();
       REF_LOCK_DESC = "()L" + toInternalName(Lock.class) + ";";
       
-      REF_DELEGATE = Ref.class.getMethod("delegate", new Class[0]).getName();
-      REF_DELEGATE_DESC = "()L" + toInternalName(Object.class) + ";";
+      REF_VAL = Ref.class.getMethod("val", new Class[0]).getName();
+      REF_VAL_DESC = "()L" + toInternalName(Object.class) + ";";
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -130,7 +130,7 @@ public class ProxyClassBuilder implements Opcodes {
       mv.visitLabel(l0);
       mv.visitVarInsn(ALOAD, 0);
       mv.visitFieldInsn(GETFIELD, implName, fieldName, FIELD_DESC);
-      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_DELEGATE, REF_DELEGATE_DESC);
+      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_VAL, REF_VAL_DESC);
       mv.visitVarInsn(ASTORE, 2);
       Label l4 = new Label();
       mv.visitJumpInsn(GOTO, l4);
@@ -160,7 +160,7 @@ public class ProxyClassBuilder implements Opcodes {
       mv.visitMethodInsn(INVOKEINTERFACE, "java/util/concurrent/locks/Lock", "lock", "()V");
       mv.visitLabel(l2);
       mv.visitVarInsn(ALOAD, 3);
-      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_DELEGATE, REF_DELEGATE_DESC);
+      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_VAL, REF_VAL_DESC);
       mv.visitVarInsn(ASTORE, 1);
       Label l6 = new Label();
       mv.visitJumpInsn(GOTO, l6);
@@ -259,7 +259,7 @@ public class ProxyClassBuilder implements Opcodes {
       /* Dereference */
       mv.visitVarInsn(ALOAD, 0);
       mv.visitFieldInsn(GETFIELD, implName, fieldName, FIELD_DESC);
-      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_DELEGATE, REF_DELEGATE_DESC);
+      mv.visitMethodInsn(INVOKEINTERFACE, REF_IFACE, REF_VAL, REF_VAL_DESC);
       mv.visitTypeInsn(CHECKCAST, ifName);
       
       /* Invoke */
@@ -351,7 +351,7 @@ public class ProxyClassBuilder implements Opcodes {
    
     /* Write the class header */
     cv.visit(V1_5, ACC_PUBLIC + ACC_SUPER, implName, null, "java/lang/Object", 
-        (String[]) classSig.toArray(new String[classSig.size()]));
+        classSig.toArray(new String[classSig.size()]));
     
     /* Start the constructor */
     MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, "<init>", constrSig, null, null);
@@ -364,7 +364,7 @@ public class ProxyClassBuilder implements Opcodes {
      * methods that use that field for delegation
      */
     for (int no = 0; no < mixins.size(); no++) {
-      MixinGenerator e = (MixinGenerator) mixins.get(no);
+      MixinGenerator e = mixins.get(no);
       
       /*
        * First mixin our overrides of object methods so that this is remembered

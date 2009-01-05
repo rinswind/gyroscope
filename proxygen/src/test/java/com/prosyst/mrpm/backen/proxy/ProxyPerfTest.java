@@ -2,9 +2,11 @@ package com.prosyst.mrpm.backen.proxy;
 
 import junit.framework.TestCase;
 
+import com.prosyst.mprm.backend.proxy.gen.Proxy;
 import com.prosyst.mprm.backend.proxy.gen.ProxyFactory;
 import com.prosyst.mprm.backend.proxy.impl.ProxyClassLoader;
 import com.prosyst.mprm.backend.proxy.impl.ProxyFactoryImpl;
+import com.prosyst.mprm.backend.proxy.ref.Transformers;
 import com.prosyst.mprm.backend.proxy.ref.Ref;
 import com.prosyst.mprm.backend.proxy.ref.RefImpl;
 
@@ -59,7 +61,19 @@ public class ProxyPerfTest extends TestCase {
     }
   }
   
-  public void test() {
+  /**
+   * 
+   */
+  public void testProxyControl() {
+    Sum dynamic = dynamic();
+    
+    assertNotNull(((Proxy<?, ?>) dynamic).proxyControl());
+  }
+  
+  /**
+   * 
+   */
+  public void testPerformance() {
     int reps = 10000000;
     int warmup = reps;
     
@@ -102,13 +116,14 @@ public class ProxyPerfTest extends TestCase {
   }
   
   private static Sum dynamic() {
-    Ref<Sum, Sum> ref = new RefImpl<Sum,Sum>(Sum.class);
+    Ref<Sum, Sum> ref = new RefImpl<Sum,Sum>(Transformers.<Sum>identity());
+    
     ref.bind(new SumImpl(), null);
     
     ProxyClassLoader loader = new ProxyClassLoader(ProxyPerfTest.class.getClassLoader());
     ProxyFactory fact = new ProxyFactoryImpl(loader);
     
-    return fact.proxy(ref);
+    return fact.proxy(Sum.class, ref);
   }
   
   /**

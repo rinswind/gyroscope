@@ -18,7 +18,8 @@
   
   <properties>
     <Export-Package>com.prosyst.mprm.backend.autowire.test.exporter.date</Export-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.date.DateExporter</Bundle-Activator>
+    <Private-Package>com.prosyst.mprm.backend.autowire.test.exporter.date.impl</Private-Package>
+    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.exporter.date.impl.Activator</Bundle-Activator>
   </properties>
 
   <dependencies>

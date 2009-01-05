@@ -16,7 +16,7 @@
   
   <properties>
     <Private-Package>com.prosyst.mprm.backend.autowire.test.importer.ref</Private-Package>
-    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.ref.RefImporter</Bundle-Activator>
+    <Bundle-Activator>com.prosyst.mprm.backend.autowire.test.importer.ref.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>

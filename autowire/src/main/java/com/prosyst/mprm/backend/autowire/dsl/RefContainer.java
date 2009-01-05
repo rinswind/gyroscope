@@ -6,18 +6,14 @@ import com.prosyst.mprm.backend.proxy.ref.Ref;
  * @author Todor Boev
  * @version $Revision$
  */
-public interface RefContainer { 
-  ImporterBuilder importer();
+public interface RefContainer {
+  <T> Import.Builder<T, T> require(Class<T> iface);
   
-  ExporterBuilder exporter();
+  <T> Export.Builder<T, T> provide(Class<T> impl);
   
-  LinkBuilder from(Object proxy);
+  <V> Link.Linker from(V proxy);
   
-  Ref signal();
+  Link.Linker from(Ref<?, ?> ref);
   
-  Ref and(Object left, Object right);
-  
-  Ref or(Object left, Object right);
-  
-  Ref not(Object inverted);
+  <A> Link.Binder<A> binder(Ref<A, ?> ref); 
 }
