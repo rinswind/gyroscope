@@ -29,10 +29,9 @@ public class Activator extends RefContainerImpl {
         bind(iterableOf(RichHello.class)).toInstance( 
           require(RichHello.class)
           /*
-           * The Autowire DSL requires an ObjectFactory instance at this spot. For
+           * The Autowire DSL requires a Transformer instance at this spot. For
            * good Guice support here a Guice key() must be supplied instead. This
-           * will allow the ObjectFactory instance to also be created by Guice and
-           * get it's dependencies injected.
+           * will let the Transformer into the Guice club.
            */
           .from(Hello.class, new TransformerAdapter<Hello, RichHello>() {
             public RichHello create(final Hello delegate, final Map<String, Object> attrs) {
