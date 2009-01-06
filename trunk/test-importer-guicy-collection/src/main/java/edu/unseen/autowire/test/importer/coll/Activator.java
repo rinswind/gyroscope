@@ -19,7 +19,8 @@ import edu.unseen.autowire.test.exporter.worker.Worker;
 import edu.unseen.proxy.ref.TransformerAdapter;
 
 /**
- * @version $Revision$
+ * @author Todor Boev
+ *
  */
 public class Activator extends RefContainerImpl {
   @Override
@@ -27,7 +28,15 @@ public class Activator extends RefContainerImpl {
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(iterableOf(RichHello.class)).toInstance( 
+        bind(iterableOf(RichHello.class)).toInstance(
+          /*
+           * The Autowire DSL creates directly dynamic service proxies. For better
+           * Guice support it should create Provider instances instead. If the
+           * user wants to use Autowire without Guice he will simply have to add
+           * and additional ".get()" call at the end of the chain. However this
+           * will still have the unfortunate consequence of making Autowire 
+           * dependent on Guice - what to do? :( 
+           */
           require(RichHello.class)
           /*
            * The Autowire DSL requires a Transformer instance at this spot. For
@@ -44,9 +53,10 @@ public class Activator extends RefContainerImpl {
                    * order to limit the dependencies to the proxy API into this
                    * dynamic transformations layer.
                    * 
-                   * FIX If the attrs get updated this will not be seen by this
-                   * factory because the attrs are not mutated - they are replaced
-                   * with a new attrs map.
+                   * FIX If the attrs get updated this will not be seen by the
+                   * transformer because the attrs are not mutated - they are replaced
+                   * with a new map. At the same time the transformer currently has
+                   * no method the gets called when just the attributes change. 
                    */
                   delegate.hello(title + " " + name + " (" + attrs.get(Hello.PROP) + ")");
                 }
@@ -70,8 +80,8 @@ public class Activator extends RefContainerImpl {
       }
       
       /*
-       * In case Worker has no @Inject annotated constructor we can annotate a
-       * method to act as the constructor. Cool stuff from Guice 2.0.
+       * In case Worker has no an @Inject annotated constructor we can annotate
+       * a method to act as the constructor. Cool stuff from Guice 2.0.
        */
       @Provides
       @SuppressWarnings("unused")
@@ -91,7 +101,8 @@ public class Activator extends RefContainerImpl {
      * referenced by Autowire and will automatically be started/stopped when the
      * appropriate conditions are met. In future versions of Autowire these
      * linkages must happen automatically and be guided by special Autowire
-     * annotations on the linked classes.
+     * annotations on the user classes. I wish Guice had lifecycle support 
+     * so I can reuse it.
      */
     from(injector.getInstance(iterableOf(RichHello.class)))
     .notify(injector.getInstance(Printer.class));
