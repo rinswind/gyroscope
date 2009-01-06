@@ -3,8 +3,9 @@ package edu.unseen.proxy.ref;
 import java.util.Map;
 
 /**
- * Ref is a monad-like thing that adds state tracking and result storage to
- * ObectFactory instances.
+ * {@link Ref} is a monad-like thing that adds state tracking and result storage
+ * to {@link Transformer} instances. This class houses the functional
+ * combinators that allow the user to crate complex transformation chains.
  * 
  * @author Todor Boev
  */
@@ -46,13 +47,13 @@ public class Refs {
     }
 
     return ref(new Transformer<A, C>() {
-      public C create(A arg, Map<String, Object> props) {
+      public C map(A arg, Map<String, Object> props) {
         ref.bind(arg, props);
-        return fact.create(ref.val(), props);
+        return fact.map(ref.val(), props);
       }
 
-      public void destroy(C val, A arg, Map<String, Object> props) {
-        fact.destroy(val, ref.val(), props);
+      public void unmap(C val, A arg, Map<String, Object> props) {
+        fact.unmap(val, ref.val(), props);
         ref.unbind();
       }
     });
@@ -78,15 +79,15 @@ public class Refs {
     }
 
     return ref(new Transformer<C, A>() {
-      public A create(C arg, Map<String, Object> props) {
-        ref.bind(fact.create(arg, props), props);
+      public A map(C arg, Map<String, Object> props) {
+        ref.bind(fact.map(arg, props), props);
         return ref.val();
       }
 
-      public void destroy(A val, C arg, Map<String, Object> props) {
+      public void unmap(A val, C arg, Map<String, Object> props) {
         B b = ref.arg();
         ref.unbind();
-        fact.destroy(b, arg, props);
+        fact.unmap(b, arg, props);
       }
     });
   }

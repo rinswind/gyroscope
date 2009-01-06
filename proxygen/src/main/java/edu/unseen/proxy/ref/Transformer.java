@@ -4,7 +4,11 @@ import java.util.Map;
 
 /**
  * A two way function used to process objects traveling back and forth in a
- * pipeline.
+ * transformation pipeline. A {@link Transformer} should be a completely
+ * functional object. E.g. the result of {@link #map} must depend only on it's
+ * arguments. A {@link Ref} wraps {@link Transformer} to add storage of it's
+ * argument and value and track if the last method called was {@link #map} (
+ * {@link Ref.State.BOUND}) or {@link #unmap} ({@link Ref.State.UNBOUND}).
  * 
  * @author Todor Boev
  * 
@@ -12,7 +16,7 @@ import java.util.Map;
  * @param <V>
  */
 public interface Transformer<A, V> {
-  V create(A arg, Map<String, Object> props);
+  V map(A arg, Map<String, Object> attrs);
 
-  void destroy(V val, A arg, Map<String, Object> props);
+  void unmap(V val, A arg, Map<String, Object> attrs);
 }

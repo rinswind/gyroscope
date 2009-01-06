@@ -28,6 +28,11 @@ public class Activator extends RefContainerImpl {
     }
   };
   
+  /**
+   * The proxied interface can be anything that is visible in the class space of
+   * the client. Even a protected. Private is out of the question due to the
+   * fundamental limitations of the JVM.
+   */
   protected interface RichHello {
     void hello(String title, String name);
   }
@@ -36,7 +41,7 @@ public class Activator extends RefContainerImpl {
     this.service =
       require(RichHello.class)
       .from(Hello.class, new TransformerAdapter<Hello, RichHello>() {
-        public RichHello create(final Hello arg, Map<String, Object> props) {
+        public RichHello map(final Hello arg, Map<String, Object> props) {
           return new RichHello() {
             public void hello(String title, String name) {
               arg.hello(title + " " + name);

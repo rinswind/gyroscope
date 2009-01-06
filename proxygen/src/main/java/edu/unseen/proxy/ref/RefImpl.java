@@ -232,7 +232,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
     
     try {
       this.arg = arg;
-      this.val = factory.create(arg, props);
+      this.val = factory.map(arg, props);
       
       if (props != null) {
         /* Defensive copy of the props */
@@ -265,10 +265,10 @@ public class RefImpl<A, V> implements Ref<A, V> {
     
     if (arg != null) {
       try {
-        factory.destroy(val, this.arg, props);
+        factory.unmap(val, this.arg, props);
         this.arg = arg;
         
-        this.val = factory.create(arg, props);
+        this.val = factory.map(arg, props);
       } catch (Exception exc) {
         failover();
         throw new RefException(this + ": Update failed", exc);
@@ -287,7 +287,7 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
     
     try {
-      factory.destroy(val, arg, props);
+      factory.unmap(val, arg, props);
     } finally {
       this.val = null;
       this.arg = null;
