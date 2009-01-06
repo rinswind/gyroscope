@@ -7,15 +7,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * A simple unoptimized sorted container. The main characteristic it has is a
- * weakly consistent iterator that returns the content in order.
+ * A simple thread-safe sorted container. It has is a weakly consistent iterator
+ * that returns the content in the order determined by the passed Comparator
+ * object. This allows an iteration to be in progress at the same time when
+ * modifications are made.
  * 
  * FIX Is it worth optimizing this until it becomes like the TreeSet? Probably
  * not since the addition/removal of service is after all a rare operation. The
- * fast iteration it more important that the add/remove here - for that I use an
- * ArrayList that gives me O(1) random access. Should I replace the internal
- * ArrayList with ConcurrentLinkedList. It seems to have the same weakly
- * consistent iterator. Than I can remove all synchronization?
+ * fast iteration is more important that the add/remove. For fast iteration I
+ * use an ArrayList that gives me O(1) random access. Should I replace the
+ * internal ArrayList with ConcurrentLinkedList? It seems to have the same
+ * weakly consistent iterator. Than I can remove all synchronization?
  * 
  * @author Todor Boev
  * 
