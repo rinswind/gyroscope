@@ -35,7 +35,7 @@ public class Activator extends RefContainerImpl {
            * will let the Transformer into the Guice club.
            */
           .from(Hello.class, new TransformerAdapter<Hello, RichHello>() {
-            public RichHello create(final Hello delegate, final Map<String, Object> attrs) {
+            public RichHello map(final Hello delegate, final Map<String, Object> attrs) {
               return new RichHello() {
                 public void hello(String title, String name) {
                   /*

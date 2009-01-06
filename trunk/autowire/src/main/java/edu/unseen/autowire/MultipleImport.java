@@ -40,7 +40,7 @@ public class MultipleImport<V> implements ServiceTrackerListener {
     this.cache = Collections.synchronizedMap(new HashMap<ServiceReference, V>());
     
     this.iterable = Refs.ref(new TransformerAdapter<Void, Iterable<V>>() {
-      public Iterable<V> create(Void arg, Map<String, Object> props) {
+      public Iterable<V> map(Void arg, Map<String, Object> props) {
         return new Iterable<V>() {
           public Iterator<V> iterator() {
             return new Iterator<V>() {

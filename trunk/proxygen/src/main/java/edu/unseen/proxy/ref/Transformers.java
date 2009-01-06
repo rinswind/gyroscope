@@ -8,7 +8,7 @@ import java.util.Map;
 public class Transformers {
   public static <A, V> Transformer<A, V> constant(final V c) { 
     return new TransformerAdapter<A, V>() {
-      public V create(A input, Map<String, Object> props){
+      public V map(A input, Map<String, Object> props){
         return c;
       }
     };
@@ -20,7 +20,7 @@ public class Transformers {
   
   private static final Transformer<Void, Void> NOTHING = 
     new TransformerAdapter<Void, Void>() {
-      public Void create(Void arg, Map<String, Object> props) {
+      public Void map(Void arg, Map<String, Object> props) {
         return null;
       }
     };
@@ -32,7 +32,7 @@ public class Transformers {
   
   private static final Transformer<Object, Object> IDENTITY = 
     new TransformerAdapter<Object, Object>() {
-      public Object create(Object arg, Map<String, Object> props) {
+      public Object map(Object arg, Map<String, Object> props) {
         return arg;
       }
     }; 

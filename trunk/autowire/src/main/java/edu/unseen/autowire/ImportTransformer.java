@@ -21,7 +21,7 @@ public class ImportTransformer<V> implements Transformer<ServiceReference/*<V>*/
   }
   
   @SuppressWarnings("unchecked")
-  public V create(ServiceReference arg, Map<String, Object> props) {
+  public V map(ServiceReference arg, Map<String, Object> props) {
     V val = (V) bc.getService(arg);
     
     if (val == null) {
@@ -31,7 +31,7 @@ public class ImportTransformer<V> implements Transformer<ServiceReference/*<V>*/
     return val;
   }
 
-  public void destroy(V val, ServiceReference arg, Map<String, Object> props) {
+  public void unmap(V val, ServiceReference arg, Map<String, Object> props) {
     bc.ungetService(arg);
   }
 }

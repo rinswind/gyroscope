@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -24,7 +21,7 @@ public class ServiceTracker {
   private final BundleContext bc;
   private final String filter;
   private final ServiceListener tracker;
-  private final SortedSet<ServiceReference> refs;
+  private final ConcurrentSortedSet<ServiceReference> refs;
   private final List<ServiceTrackerListener> listeners;
   
   private boolean open;
@@ -37,7 +34,7 @@ public class ServiceTracker {
   public ServiceTracker(BundleContext bc, String filter, Comparator<ServiceReference> comp) {
     this.bc = bc;
     this.filter = filter;
-    this.refs = new TreeSet<ServiceReference>(comp);
+    this.refs = new ConcurrentSortedSet<ServiceReference>(comp);
     this.listeners = new ArrayList<ServiceTrackerListener>();
     
     this.tracker = new ServiceListener() {
@@ -90,58 +87,15 @@ public class ServiceTracker {
   /**
    * @return
    */
-  public Iterable<ServiceReference> all() {
-    return new Iterable<ServiceReference>() {
-      public Iterator<ServiceReference> iterator() {
-        return new Iterator<ServiceReference>() {
-          private final Iterator<ServiceReference> iter = refs.iterator(); 
-          private ServiceReference current;
-          
-          /**
-           * We guarantee that if hasNext() returns true next() will always
-           * return a value. It is possible that that value has since become
-           * invalid and will return null when used with
-           * BundleContext.getService().
-           */
-          public boolean hasNext() {
-            synchronized (refs) {
-              if (current == null) {
-                if (iter.hasNext()) {
-                  current = iter.next();
-                }
-              }
-              
-              return current != null;
-            }
-          }
-
-          public ServiceReference next() {
-            synchronized (refs) {
-              if (current == null) {
-                throw new NoSuchElementException();
-              }
-              
-              ServiceReference res = current;
-              current = null;
-              return res;
-            }
-          }
-
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-    };
+  public ServiceReference best() {
+    return refs.first();
   }
 
   /**
    * @return
    */
-  public ServiceReference best() {
-    synchronized (refs) {
-      return refs.isEmpty() ? null : refs.first();
-    }
+  public Iterable<ServiceReference> all() {
+    return unmodifiableIterable(refs);
   }
 
   /**
@@ -242,5 +196,32 @@ public class ServiceTracker {
     for (ServiceTrackerListener l : listeners) {
       l.closed(this);
     }
+  }
+  
+  /**
+   * @param <T>
+   * @param wrapped
+   * @return
+   */
+  private static <T> Iterable<T> unmodifiableIterable(final Iterable<T> wrapped) {
+    return new Iterable<T>() {
+      public Iterator<T> iterator() {
+        return new Iterator<T>() {
+          private final Iterator<T> iter = wrapped.iterator();
+          
+          public boolean hasNext() {
+            return iter.hasNext();
+          }
+
+          public T next() {
+            return iter.next();
+          }
+
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+    };    
   }
 }

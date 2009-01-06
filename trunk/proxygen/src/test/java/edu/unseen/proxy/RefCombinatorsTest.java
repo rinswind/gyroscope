@@ -21,13 +21,13 @@ public class RefCombinatorsTest {
       return "A";
     }
 
-    public Integer create(String arg, Map<String, Object> props) {
+    public Integer map(String arg, Map<String, Object> props) {
       int val = arg.length();
       System.out.println(arg + "->" + val);
       return val;
     }
 
-    public void destroy(Integer val, String arg, Map<String, Object> props) {
+    public void unmap(Integer val, String arg, Map<String, Object> props) {
       System.out.println(val + "->" + arg);
     }
   };
@@ -38,13 +38,13 @@ public class RefCombinatorsTest {
       return "B";
     }
 
-    public Integer create(Integer arg, Map<String, Object> props) {
+    public Integer map(Integer arg, Map<String, Object> props) {
       int val = arg * 2;
       System.out.println(arg + "->" + val);
       return val;
     }
 
-    public void destroy(Integer val, Integer arg, Map<String, Object> props) {
+    public void unmap(Integer val, Integer arg, Map<String, Object> props) {
       System.out.println(val + "->" + arg);
     }
   };
@@ -55,13 +55,13 @@ public class RefCombinatorsTest {
       return "C";
     }
 
-    public String create(Integer arg, Map<String, Object> props) {
+    public String map(Integer arg, Map<String, Object> props) {
       String val = "This is the integer " + arg;
       System.out.println(arg + "->" + val);
       return val;
     }
 
-    public void destroy(String val, Integer arg, Map<String, Object> props) {
+    public void unmap(String val, Integer arg, Map<String, Object> props) {
       System.out.println(val + "->" + arg);
     }
   };

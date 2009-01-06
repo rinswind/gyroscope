@@ -25,11 +25,11 @@ public class SingleExportTransformer<A, V> implements Transformer<A, ServiceRegi
     this.iface = interfaces(iface);
   }
   
-  public ServiceRegistration create(A arg, Map<String, Object> props) {
+  public ServiceRegistration map(A arg, Map<String, Object> props) {
     return bc.registerService(iface, arg, toDictionaryProps(props));
   }
 
-  public void destroy(ServiceRegistration val, A arg, Map<String, Object> props) {
+  public void unmap(ServiceRegistration val, A arg, Map<String, Object> props) {
     val.unregister();
   }
 }

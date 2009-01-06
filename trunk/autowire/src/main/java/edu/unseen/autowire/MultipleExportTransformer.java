@@ -22,18 +22,22 @@ import edu.unseen.proxy.ref.Transformer;
  *
  * @param <A>
  */
-public class MultipleExportTransformer<A, V> implements Transformer<Transformer<Bundle, A>, ServiceRegistration/*V*/> {
+public class MultipleExportTransformer<A, V> implements
+    Transformer<Transformer<Bundle, A>, ServiceRegistration/* V */> {
+  
   private final RefFactoryCombinator<A, V> combinator;
   private final BundleContext bc;
   private final String[] iface;
   
-  public MultipleExportTransformer(Class<V> iface, RefFactoryCombinator<A, V> combinator, BundleContext bc) {
+  public MultipleExportTransformer(Class<V> iface, RefFactoryCombinator<A, V> combinator,
+      BundleContext bc) {
+    
     this.iface = interfaces(iface);
     this.bc = bc;
     this.combinator = combinator;
   }
   
-  public ServiceRegistration create(final Transformer<Bundle, A> arg, Map<String, Object> props) {
+  public ServiceRegistration map(final Transformer<Bundle, A> arg, Map<String, Object> props) {
     return bc.registerService(
         iface, 
         /* FIX Are there any properties we can pass in? */
@@ -60,7 +64,7 @@ public class MultipleExportTransformer<A, V> implements Transformer<Transformer<
         toDictionaryProps(props));
   }
 
-  public void destroy(ServiceRegistration val, Transformer<Bundle, A> arg, Map<String, Object> props) {
+  public void unmap(ServiceRegistration val, Transformer<Bundle, A> arg, Map<String, Object> props) {
     val.unregister();
   }
 }
