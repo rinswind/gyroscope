@@ -62,8 +62,8 @@ public class Activator extends RefContainerImpl {
       .notify(
           binder(export)
           .attributes(map(
-             entry(Hello.PROP, Integer.valueOf(i)), 
-             entry(Constants.SERVICE_RANKING, Integer.valueOf(NO - i))))
+             entry(Hello.PROP, i), 
+             entry(Constants.SERVICE_RANKING, NO - i)))
           .to(hello));
       
       /*
