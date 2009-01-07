@@ -69,7 +69,7 @@ public class Activator extends RefContainerImpl {
       /*
        * Also as soon as the export is bound notify a listener that dumps what
        * is happening on the console. Use Guice to create the listener. This
-       * shows how multiple events can be hooked to the same source.
+       * shows how multiple declarations can refer to the same DSL created object.
        */
       from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(i));
     }
