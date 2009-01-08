@@ -31,7 +31,7 @@ public class Attributes {
     }
   }
   
-  public static Attr entry(final String name, final Object val) {
+  public static Attr entry(String name, Object val) {
     return new Attr(name, val);
   }
   

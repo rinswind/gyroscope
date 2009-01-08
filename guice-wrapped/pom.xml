@@ -25,6 +25,18 @@
       <scope>system</scope>
       <systemPath>${basedir}/lib/guice-snapshot.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/guice-assistedinject-snapshot.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>edu.unseen</groupId>
+      <artifactId>aopalliance-wrapped</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
 
   <properties>
@@ -34,7 +46,8 @@
       com.google.inject.matcher; version=${pom.version},
       com.google.inject.name; version=${pom.version},
       com.google.inject.spi; version=${pom.version},
-      com.google.inject.util; version=${pom.version}
+      com.google.inject.util; version=${pom.version},
+      com.google.inject.assistedinject; version=${pom.version},
     </Export-Package>
     <Private-Package>com.google.inject.internal.*</Private-Package>
     <Import-Package>
