@@ -43,21 +43,32 @@ public class Activator extends RefContainerImpl {
         bindInterceptor(any(), annotatedWith(named("log")), new Logger());
       }
     });
-    
+
     /*
      * Define a signal that becomes true only if both imports are available. Use
      * Guice to get the service proxies. Since they are singletons we know we
      * will define the signal over the appropriate instances.
+     * 
+     * FIX It should be possible to provide Guice keys rather than instances?
+     * But we must be sure the instances are singletons otherwise it is not
+     * clear what are we tracking?
      */
     final Ref<Void, Void> required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
     
+    /*
+     * Export NO separate instances of the Hello service - just for fun :)
+     */
     for (int i = 0; i < NO; i++) {
       /* Use guice to create the export */
       Hello hello = injector.getInstance(Hello.class);
       
+      /*
+       * Create an unbound export by not using the single(T instance) method. We
+       * will define the conditions of binding later
+       */
       Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
-      /* When both imports are available export the service object with certain properties */
+      /* When both imports are available export the service object with certain attributes */
       from(required)
       .notify(
           binder(export)
@@ -68,8 +79,7 @@ public class Activator extends RefContainerImpl {
       
       /*
        * Also as soon as the export is bound notify a listener that dumps what
-       * is happening on the console. Use Guice to create the listener. This
-       * shows how multiple declarations can refer to the same DSL created object.
+       * is happening on the console. Use Guice to create the listener.
        */
       from(export).notify(injector.getInstance(PrintingRefListenerFactory.class).listener(i));
     }

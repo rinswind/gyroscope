@@ -1,5 +1,8 @@
 package edu.unseen.proxy;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 import junit.framework.TestCase;
 
 import edu.unseen.proxy.gen.Proxy;
@@ -19,7 +22,7 @@ public class ProxyPerfTest extends TestCase {
    * The dynamic proxies can have up to 50% worse performance than a regular
    * synchronized method
    */
-  private final int THRESHOLD = 50;
+  private final int THRESHOLD = 60;
   
   public interface Sum {
     void add(int i);
@@ -74,19 +77,20 @@ public class ProxyPerfTest extends TestCase {
    * 
    */
   public void testPerformance() {
-    int reps = 10000000;
+    int reps = 10000000; // 10 million! :)
     int warmup = reps;
     
-    Sum control = control();
-    Sum syncControl = syncControl();
-    Sum manual = manual();
-    Sum dynamic = dynamic();
+    ProxyPerfDriver control = new ProxyPerfDriver(control(), reps, warmup);
+    ProxyPerfDriver syncControl = new ProxyPerfDriver(syncControl(), reps, warmup);
+    ProxyPerfDriver manual = new ProxyPerfDriver(manual(), reps, warmup);
+    ProxyPerfDriver dynamic = new ProxyPerfDriver(dynamic(), reps, warmup);
+    ProxyPerfDriver reflexive = new ProxyPerfDriver(reflexive(), reps, warmup);
     
-    run("Control",new ProxyPerfDriver(control, reps, warmup));
-    long syncTime = run("SyncControl",new ProxyPerfDriver(syncControl, reps, warmup));
-    
-    run("Manual", new ProxyPerfDriver(manual, reps, warmup));
-    long dynamicTime = run("Dynamic", new ProxyPerfDriver(dynamic, reps, warmup));
+    run("Control", control);
+    long syncTime = run("SyncControl", syncControl);
+    long dynamicTime = run("Dynamic", dynamic);
+    run("Reflexive", reflexive);
+    run("Manual", manual);
     
     long timeDiff = dynamicTime - syncTime;
     float ratio = ((float) timeDiff)/syncTime;
@@ -96,7 +100,6 @@ public class ProxyPerfTest extends TestCase {
     
     assertTrue("Difference between dynamic and syncronized is less than " + THRESHOLD + "%: "
         + perc + "%", perc < THRESHOLD);
-    
   }
   
   private static long run(String name, ProxyPerfDriver test) {
@@ -131,19 +134,35 @@ public class ProxyPerfTest extends TestCase {
    */
   private static Sum manual() {
     return new Sum() {
-      private final Sum del = new SumImpl();
+      private final Sum delegate = new SumImpl();
       
       public void add(int i) {
-        del.add(i);
+        delegate.add(i);
       }
 
       public void sub(int i) {
-        del.sub(i);
+        delegate.sub(i);
       }
       
       public int get() {
-        return del.get();
+        return delegate.get();
       }
     };
+  }
+  
+  /**
+   * @return
+   */
+  private static Sum reflexive() {
+    return (Sum) java.lang.reflect.Proxy.newProxyInstance(
+        ProxyPerfTest.class.getClassLoader(), 
+        new Class<?>[] {Sum.class}, 
+        new InvocationHandler() {
+          private final Sum delegate = new SumImpl();
+          
+          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(delegate, args);
+          }
+        });
   }
 }
