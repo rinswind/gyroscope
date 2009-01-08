@@ -1,6 +1,6 @@
 package edu.unseen.autowire;
 
-import static edu.unseen.autowire.Properties.toDictionaryProps;
+import static edu.unseen.autowire.Attributes.toDictionaryAttrs;
 import static edu.unseen.proxy.ref.Interfaces.interfaces;
 
 import java.util.Collections;
@@ -61,7 +61,7 @@ public class MultipleExportTransformer<A, V> implements
             refs.remove(bundle.getBundleId()).unbind();
           }
         }, 
-        toDictionaryProps(props));
+        toDictionaryAttrs(props));
   }
 
   public void unmap(ServiceRegistration val, Transformer<Bundle, A> arg, Map<String, Object> props) {

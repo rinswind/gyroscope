@@ -1,6 +1,6 @@
 package edu.unseen.autowire;
 
-import static edu.unseen.autowire.Properties.toMapProps;
+import static edu.unseen.autowire.Attributes.toMapAttrs;
 
 import org.osgi.framework.ServiceReference;
 
@@ -35,20 +35,20 @@ public class SingleImport<V> implements ServiceTrackerListener {
   
   public void added(ServiceTracker tracker, ServiceReference sref) {
     if (Ref.State.UNBOUND == ref.state()) {
-      ref.bind(sref, toMapProps(sref));
+      ref.bind(sref, toMapAttrs(sref));
     } 
     else if (hotswap) {
       ServiceReference best = tracker.best();
 
       if (!ref.arg().equals(best)) {
-        ref.update(best, toMapProps(best));
+        ref.update(best, toMapAttrs(best));
       }
     }
   }
 
   public void modified(ServiceTracker tracker, ServiceReference sref) {
     if (ref.arg().equals(sref)) {
-      ref.update(null, toMapProps(sref));
+      ref.update(null, toMapAttrs(sref));
     }
   }
 
@@ -63,11 +63,11 @@ public class SingleImport<V> implements ServiceTrackerListener {
       ref.unbind();
     } 
     else if (hotswap) {
-      ref.update(best, toMapProps(best));
+      ref.update(best, toMapAttrs(best));
     } 
     else {
       ref.unbind();
-      ref.bind(best, toMapProps(best));
+      ref.bind(best, toMapAttrs(best));
     }
   }
 

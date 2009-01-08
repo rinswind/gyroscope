@@ -1,8 +1,12 @@
 package edu.unseen.autowire;
 
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Todor Boev
@@ -52,5 +56,32 @@ public class Attributes {
     }
     buff.append(")");
     return buff.toString();
+  }
+  
+  /**
+   * @param <V>
+   * @param attrs
+   * @return
+   */
+  public static <V> Dictionary<String, V> toDictionaryAttrs(Map<String, V> attrs) {
+    Hashtable<String, V> hash = new Hashtable<String, V>();
+    hash.putAll(attrs);
+    return hash;
+  }
+  
+  /**
+   * @param ref
+   * @return
+   */
+  public static Map<String, Object> toMapAttrs(ServiceReference ref) {
+    Map<String, Object> props = new HashMap<String, Object>();
+    
+    String[] keys = ref.getPropertyKeys();
+    for (int i = 0; i < keys.length; i++) {
+      String k = keys[i];
+      props.put(k, ref.getProperty(k));
+    }
+    
+    return props;
   }
 }
