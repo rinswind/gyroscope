@@ -1,6 +1,6 @@
 package edu.unseen.autowire;
 
-import static edu.unseen.autowire.Properties.toDictionaryProps;
+import static edu.unseen.autowire.Attributes.toDictionaryAttrs;
 import static edu.unseen.proxy.ref.Interfaces.*;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ public class SingleExportTransformer<A, V> implements Transformer<A, ServiceRegi
   }
   
   public ServiceRegistration map(A arg, Map<String, Object> props) {
-    return bc.registerService(iface, arg, toDictionaryProps(props));
+    return bc.registerService(iface, arg, toDictionaryAttrs(props));
   }
 
   public void unmap(ServiceRegistration val, A arg, Map<String, Object> props) {

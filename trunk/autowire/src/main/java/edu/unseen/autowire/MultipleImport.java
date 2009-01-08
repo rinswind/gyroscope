@@ -1,6 +1,6 @@
 package edu.unseen.autowire;
 
-import static edu.unseen.autowire.Properties.toMapProps;
+import static edu.unseen.autowire.Attributes.toMapAttrs;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class MultipleImport<V> implements ServiceTrackerListener {
                 }
                 
                 if (ref != null) {
-                  ref.bind(sref, toMapProps(sref));
+                  ref.bind(sref, toMapAttrs(sref));
                 }
                 
                 return proxy;
@@ -103,7 +103,7 @@ public class MultipleImport<V> implements ServiceTrackerListener {
     Object proxy = cache.get(sref);
     
     if (proxy != null) {
-      ((Proxy<?, ?>) proxy).proxyControl().update(null, Properties.toMapProps(sref));
+      ((Proxy<?, ?>) proxy).proxyControl().update(null, toMapAttrs(sref));
     }
   }
 
