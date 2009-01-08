@@ -24,7 +24,7 @@ import static edu.unseen.proxy.ref.Refs.*;
  * @version $Revision$
  */
 public class Activator extends RefContainerImpl {
-  private static final int NO = 10;
+  private static final int NUM = 10;
   
   @Override
   public void configure() throws Exception {
@@ -56,9 +56,9 @@ public class Activator extends RefContainerImpl {
     final Ref<Void, Void> required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
     
     /*
-     * Export NO separate instances of the Hello service - just for fun :)
+     * Export NUM separate instances of the Hello service - just for fun :)
      */
-    for (int i = 0; i < NO; i++) {
+    for (int i = 0; i < NUM; i++) {
       /* Use guice to create the export */
       Hello hello = injector.getInstance(Hello.class);
       
@@ -74,7 +74,7 @@ public class Activator extends RefContainerImpl {
           binder(export)
           .attributes(map(
              entry(Hello.PROP, i), 
-             entry(Constants.SERVICE_RANKING, NO - i)))
+             entry(Constants.SERVICE_RANKING, NUM - i)))
           .to(hello));
       
       /*
