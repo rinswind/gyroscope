@@ -43,7 +43,8 @@ public abstract class RefContainerImpl implements RefContainer, BundleActivator 
    * @see edu.unseen.autowire.dsl.RefContainer#provide(java.lang.Class)
    */
   public <T> Export.Builder<T, T> provide(Class<T> impl) {
-    return new ExportImpl<T, T>(impl, impl, combinator(Transformers.<T>identity()), bc);
+    return new ExportImpl<T, T>(impl, impl, combinator(Transformers.<T> identity()),
+        new HashMap<String, Object>(), bc);
   }
   
   /**

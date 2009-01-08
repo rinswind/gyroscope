@@ -3,6 +3,7 @@ package edu.unseen.proxy;
 import java.util.Random;
 
 import edu.unseen.proxy.ProxyPerfTest.Sum;
+
 /**
  * @author Todor Boev
  * @version $Revision$
@@ -28,11 +29,18 @@ public class ProxyPerfDriver {
   public long test() {
     Random random = new Random();
     
+    System.gc();
+    System.gc();
+    System.gc();
+    
     act(warmup, random);
+    
+    System.gc();
+    System.gc();
+    System.gc();
     
     long time = System.currentTimeMillis();
     act(repeats, random);
-    
     return System.currentTimeMillis() - time;
   }
   
@@ -48,10 +56,6 @@ public class ProxyPerfDriver {
    * @param random
    */
   private void act(int repeats, Random random) {
-    System.gc();
-    System.gc();
-    System.gc();
-    
     for (int i = 0; i < repeats; i++) {
       int num = random.nextInt();
       
