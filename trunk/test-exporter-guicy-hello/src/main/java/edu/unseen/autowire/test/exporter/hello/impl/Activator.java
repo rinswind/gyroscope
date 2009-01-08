@@ -9,6 +9,8 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.assistedinject.FactoryProvider;
+
 import edu.unseen.autowire.dsl.RefContainerImpl;
 import edu.unseen.proxy.ref.Ref;
 
@@ -28,6 +30,9 @@ public class Activator extends RefContainerImpl {
   
   @Override
   public void configure() throws Exception {
+    /* 
+     * Guice configuration part  - declarative
+     */
     Injector injector = createInjector(new AbstractModule() {
       @Override
       protected void configure() {
@@ -35,8 +40,13 @@ public class Activator extends RefContainerImpl {
         bind(Format.class).toInstance(require(Format.class).single());
         bind(Date.class).toInstance(require(Date.class).single());
         
-        /* Define the service impl we will export */
-        bind(Hello.class).to(HelloImpl.class);
+        /*
+         * Define the service impl we will export. We will be creating many
+         * services with some parameters passed by us and some resolved by
+         * guice. For that we use the Assisted Inject extension
+         */
+        bind(HelloFactory.class).toProvider(FactoryProvider.newFactory(HelloFactory.class, HelloImpl.class));
+        
         bind(PrintingRefListenerFactory.class);
         
         /* Add an interceptor to test Guice's class loading bridges */
@@ -44,6 +54,12 @@ public class Activator extends RefContainerImpl {
       }
     });
 
+    /*
+     * Bootstrap the bundle - contains mixed code: part creates the initial
+     * objects with Guice, parts is declarative lifecycle instructions to
+     * Autowire.
+     */
+    
     /*
      * Define a signal that becomes true only if both imports are available. Use
      * Guice to get the service proxies. Since they are singletons we know we
@@ -58,24 +74,28 @@ public class Activator extends RefContainerImpl {
     /*
      * Export NUM separate instances of the Hello service - just for fun :)
      */
+    
+    /* Use Guice to get the partial injection factory we are going to use */
+    HelloFactory helloFact = injector.getInstance(HelloFactory.class);
     for (int i = 0; i < NUM; i++) {
-      /* Use guice to create the export */
-      Hello hello = injector.getInstance(Hello.class);
-      
       /*
        * Create an unbound export by not using the single(T instance) method. We
        * will define the conditions of binding later
        */
       Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
-      /* When both imports are available export the service object with certain attributes */
+      /*
+       * When both imports are available export a Hello service instance craeted
+       * for the specific "i" and with attributes reflecting the specific "i"
+       */
       from(required)
       .notify(
           binder(export)
-          .attributes(map(
-             entry(Hello.PROP, i), 
-             entry(Constants.SERVICE_RANKING, NUM - i)))
-          .to(hello));
+          .attributes(
+             map(entry(Hello.PROP, i), 
+                 entry(Constants.SERVICE_RANKING, NUM - i)))
+          /* Here we use the Guice-backed factory to spawn a new instance of Hello */
+          .to(helloFact.create(i)));
       
       /*
        * Also as soon as the export is bound notify a listener that dumps what
