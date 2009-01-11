@@ -4,25 +4,25 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>edu.unseen</groupId>
+    <groupId>org.unseen</groupId>
     <artifactId>pom-bundle</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../pom-bundle.xml</relativePath>
   </parent>
 
-  <groupId>edu.unseen</groupId>
+  <groupId>org.unseen</groupId>
   <artifactId>test-exporter-format</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <Export-Package>edu.unseen.autowire.test.exporter.format</Export-Package>
-    <Private-Package>edu.unseen.autowire.test.exporter.format.impl</Private-Package>
-    <Bundle-Activator>edu.unseen.autowire.test.exporter.format.impl.Activator</Bundle-Activator>
+    <Export-Package>org.unseen.autowire.test.exporter.format</Export-Package>
+    <Private-Package>org.unseen.autowire.test.exporter.format.impl</Private-Package>
+    <Bundle-Activator>org.unseen.autowire.test.exporter.format.impl.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>
     <dependency>
-      <groupId>edu.unseen</groupId>
+      <groupId>org.unseen</groupId>
       <artifactId>autowire</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>

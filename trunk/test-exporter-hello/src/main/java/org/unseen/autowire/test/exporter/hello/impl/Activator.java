@@ -15,6 +15,10 @@
  */
 package org.unseen.autowire.test.exporter.hello.impl;
 
+import static org.unseen.autowire.Attributes.entry;
+import static org.unseen.autowire.Attributes.map;
+import static org.unseen.proxy.ref.Refs.and;
+
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.unseen.autowire.dsl.RefContainerImpl;
@@ -23,12 +27,6 @@ import org.unseen.autowire.test.exporter.format.Format;
 import org.unseen.autowire.test.exporter.hello.Hello;
 import org.unseen.proxy.ref.Ref;
 import org.unseen.proxy.ref.RefListenerAdapter;
-
-
-
-import static org.unseen.autowire.Attributes.entry;
-import static org.unseen.autowire.Attributes.map;
-import static org.unseen.proxy.ref.Refs.*;
 
 /**
  * @author Todor Boev
