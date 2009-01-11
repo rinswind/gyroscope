@@ -15,19 +15,17 @@
  */
 package org.unseen.autowire.test.exporter.worker;
 
-import org.unseen.proxy.ref.RefUnboundException;
-
-
 /**
+ * One shot endless repetition worker thread with graceful stop.
+ * 
  * @author Todor Boev
- * @version $Revision$
  */
 public class Worker {
   private final String name;
   private final Runnable task;
   
   private Thread thread;
-  private volatile boolean stopRequest;
+  private boolean stopRequest;
   
   public Worker(String name, Runnable task) {
     this.name = name;
@@ -43,6 +41,10 @@ public class Worker {
    * 
    */
   public synchronized void start() {
+    if (thread != null) {
+      throw new IllegalStateException();
+    }
+    
     thread = new Thread(name) {
       @Override
       public void run() {
@@ -56,14 +58,17 @@ public class Worker {
             
             task.run();
           }
-        } catch (RefUnboundException rue) {
-          if (!stopRequest) {
-            throw rue;
+        } catch (RuntimeException exc) {
+          synchronized (Worker.this) {
+            if (!stopRequest) {
+              throw exc;
+            }
           }
         }
       }
     };
     
+    stopRequest = false;
     thread.start();
   }
   
