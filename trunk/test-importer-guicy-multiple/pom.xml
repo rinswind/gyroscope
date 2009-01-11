@@ -9,7 +9,7 @@
   </parent>
   
   <groupId>org.unseen</groupId>
-  <artifactId>test-importer-guicy-collection</artifactId>
+  <artifactId>test-importer-guicy-multiple</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
   <packaging>bundle</packaging>
