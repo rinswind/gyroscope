@@ -9,7 +9,7 @@
   </parent>
   
   <groupId>org.unseen</groupId>
-  <artifactId>test-importer-ref</artifactId>
+  <artifactId>test-importer-single</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
   <packaging>bundle</packaging>
