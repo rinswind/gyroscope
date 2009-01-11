@@ -15,14 +15,14 @@
     <module>proxygen</module>
     <module>asm</module>
     <module>autowire</module>
-    <module>guice-wrapped</module>
-    <module>aopalliance-wrapped</module>
+    <module>guice</module>
+    <module>aopalliance</module>
     <module>test-exporter-hello</module>
     <module>test-exporter-format</module>
     <module>test-exporter-date</module>
     <module>test-exporter-worker</module>
-    <module>test-importer-ref</module>
+    <module>test-importer-single</module>
     <module>test-exporter-guicy-hello</module>
-    <module>test-importer-guicy-collection</module>
+    <module>test-importer-guicy-multiple</module>
   </modules>
 </project>
