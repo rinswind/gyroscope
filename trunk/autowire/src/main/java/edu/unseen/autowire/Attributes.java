@@ -13,6 +13,9 @@ import org.osgi.framework.ServiceReference;
  *
  */
 public class Attributes {
+  /**
+   * An immutable String to Object pair.
+   */
   public static class Attr implements Map.Entry<String, Object> {
     private final String name;
     private final Object val;
@@ -35,10 +38,19 @@ public class Attributes {
     }
   }
   
+  /**
+   * @param name
+   * @param val
+   * @return
+   */
   public static Attr entry(String name, Object val) {
     return new Attr(name, val);
   }
   
+  /**
+   * @param entries
+   * @return
+   */
   public static Map<String, Object> map(Attr... entries) {
     Map<String, Object> res = new HashMap<String, Object>();
     for (Map.Entry<String, Object> e : entries) {
@@ -47,6 +59,10 @@ public class Attributes {
     return Collections.unmodifiableMap(res); 
   }
   
+  /**
+   * @param attrs
+   * @return
+   */
   public static String filter(Map<String, Object> attrs) {
     StringBuilder buff = new StringBuilder().append("(&");
     for (Map.Entry<String, Object> e : attrs.entrySet()) {

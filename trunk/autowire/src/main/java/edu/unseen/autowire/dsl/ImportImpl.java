@@ -79,7 +79,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     SingleImport<V> assembly = new SingleImport<V>(valType, importer, proxies, false);
     
     /*
-     * Set the type we're looking for. This will override any any user supplied
+     * Set the type we're looking for. This will override any user supplied
      * objectclass - which is a mistake to begin with. Maybe I must rise a
      * warning here.
      */
@@ -115,7 +115,7 @@ public class ImportImpl<A, V> implements Builder<A, V> {
     MultipleImport<V> assembly = new MultipleImport<V>(valType, importer, proxies);
     
     /*
-     * Set the type we're looking for. This will override any any user supplied
+     * Set the type we're looking for. This will override any user supplied
      * objectclass - which is a mistake to begin with. Maybe I must rise a
      * warning here.
      */
