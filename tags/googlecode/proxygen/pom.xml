@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.unseen</groupId>
+    <artifactId>pom-bundle</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom-bundle.xml</relativePath>
+  </parent>
+
+  <groupId>org.unseen</groupId>
+  <artifactId>proxygen</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <name>Proxy Generator</name>
+  
+  <packaging>bundle</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.unseen</groupId>
+      <artifactId>asm-wrapped</artifactId>
+      <version>3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <Export-Package>org.unseen.proxy.*</Export-Package>
+    <Bundle-Activator>org.unseen.proxy.impl.Activator</Bundle-Activator>
+  </properties>
+</project>
