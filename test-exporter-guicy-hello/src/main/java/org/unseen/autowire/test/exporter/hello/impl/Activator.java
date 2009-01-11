@@ -27,14 +27,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.FactoryProvider;
 
-import edu.unseen.autowire.dsl.RefContainerImpl;
-import edu.unseen.proxy.ref.Ref;
+import org.unseen.autowire.dsl.RefContainerImpl;
+import org.unseen.proxy.ref.Ref;
 
-import edu.unseen.autowire.test.exporter.date.Date;
-import edu.unseen.autowire.test.exporter.format.Format;
+import org.unseen.autowire.test.exporter.date.Date;
+import org.unseen.autowire.test.exporter.format.Format;
 
-import static edu.unseen.autowire.Attributes.*;
-import static edu.unseen.proxy.ref.Refs.*;
+import static org.unseen.autowire.Attributes.*;
+import static org.unseen.proxy.ref.Refs.*;
 
 /**
  * @author Todor Boev

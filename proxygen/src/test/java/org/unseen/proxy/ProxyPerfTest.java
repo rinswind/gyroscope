@@ -105,7 +105,7 @@ public class ProxyPerfTest extends TestCase {
     run("Control", control);
     long syncTime = run("SyncControl", syncControl);
     long dynamicTime = run("Dynamic", dynamic);
-    run("Reflexive", reflexive);
+    run("SyncReflexive", reflexive);
     run("Manual", manual);
     
     long timeDiff = dynamicTime - syncTime;
@@ -171,12 +171,12 @@ public class ProxyPerfTest extends TestCase {
    */
   private static Sum reflexive() {
     return (Sum) java.lang.reflect.Proxy.newProxyInstance(
-        ProxyPerfTest.class.getClassLoader(), 
+        ProxyPerfTest.class.getClassLoader(),
         new Class<?>[] {Sum.class}, 
         new InvocationHandler() {
           private final Sum delegate = new SumImpl();
           
-          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+          public synchronized Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             return method.invoke(delegate, args);
           }
         });
