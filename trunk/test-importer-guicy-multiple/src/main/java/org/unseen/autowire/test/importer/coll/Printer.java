@@ -27,23 +27,24 @@ import com.google.inject.Inject;
  *
  */
 public class Printer extends RefListenerAdapter implements Runnable {
-  private final Worker worker;
   private final Iterable<RichHello> services;
+  private Worker worker;
   
   @Inject
-  public Printer(Worker worker, Iterable<RichHello> services) {
-    this.worker = worker;
+  public Printer(Iterable<RichHello> services) {
     this.services = services;
   }
   
   @Override
   public void bound() {
+    worker = new Worker("Greeting printer", this);
     worker.start();
   }
 
   @Override
   public void unbinding() {
     worker.stop();
+    worker = null;
   }
   
   public void run() {
