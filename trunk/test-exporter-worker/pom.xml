@@ -13,18 +13,11 @@
   <artifactId>test-exporter-worker</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
+  <name>Test Exporter Worker</name>  
+  
   <packaging>bundle</packaging>
   
   <properties>
-    <Export-Package>org.unseen.autowire.test.exporter.worker</Export-Package>
+    <Export-Package>test.exporter.worker</Export-Package>
   </properties>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.unseen</groupId>
-      <artifactId>proxygen</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-  
 </project>

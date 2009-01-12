@@ -4,17 +4,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.unseen</groupId>
-  <artifactId>autowire-modules</artifactId>
+  <artifactId>gyroscope-modules</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
-  <name>Autowire: OSGi service layer runtime</name>
+  <name>Gyroscope: OSGi service layer runtime</name>
   
   <packaging>pom</packaging>
 
   <modules>
     <module>proxygen</module>
     <module>asm</module>
-    <module>autowire</module>
+    <module>gyroscope</module>
     <module>guice</module>
     <module>aopalliance</module>
     <module>test-exporter-hello</module>
