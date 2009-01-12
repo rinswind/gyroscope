@@ -13,12 +13,14 @@
   <artifactId>test-exporter-hello</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
+  <name>Test Exporter Hello</name>
+  
   <packaging>bundle</packaging>
   
   <properties>
-    <Export-Package>org.unseen.autowire.test.exporter.hello</Export-Package>
-    <Export-Package>org.unseen.autowire.test.exporter.hello.impl</Export-Package>
-    <Bundle-Activator>org.unseen.autowire.test.exporter.hello.impl.Activator</Bundle-Activator>
+    <Export-Package>test.exporter.hello</Export-Package>
+    <Export-Package>test.exporter.hello.impl</Export-Package>
+    <Bundle-Activator>test.exporter.hello.impl.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>

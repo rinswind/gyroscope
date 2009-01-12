@@ -12,17 +12,19 @@
   <artifactId>test-importer-single</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
+  <name>Test Importer Single</name>
+  
   <packaging>bundle</packaging>
   
   <properties>
-    <Private-Package>org.unseen.autowire.test.importer.ref</Private-Package>
-    <Bundle-Activator>org.unseen.autowire.test.importer.ref.Activator</Bundle-Activator>
+    <Private-Package>test.importer.single</Private-Package>
+    <Bundle-Activator>test.importer.single.Activator</Bundle-Activator>
   </properties>
   
   <dependencies>
     <dependency>
       <groupId>org.unseen</groupId>
-      <artifactId>autowire</artifactId>
+      <artifactId>gyroscope</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>

@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>org.unseen</groupId>
     <artifactId>pom-bundle</artifactId>
@@ -11,23 +11,23 @@
   </parent>
 
   <groupId>org.unseen</groupId>
-  <artifactId>test-exporter-format</artifactId>
+  <artifactId>gyroscope</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>Test Exporter Format</name>
+  <name>Autowire Service Runtime</name>
+
+  <packaging>bundle</packaging>
 
   <properties>
-    <Export-Package>test.exporter.format</Export-Package>
-    <Private-Package>test.exporter.format.impl</Private-Package>
-    <Bundle-Activator>test.exporter.format.impl.Activator</Bundle-Activator>
+    <Export-Package>org.unseen.gyro.*</Export-Package>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.unseen</groupId>
-      <artifactId>gyroscope</artifactId>
+      <artifactId>proxygen</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
-
+  
 </project>
