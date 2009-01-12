@@ -14,7 +14,7 @@
   <artifactId>gyroscope</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>Autowire Service Runtime</name>
+  <name>Gyroscope Service Runtime</name>
 
   <packaging>bundle</packaging>
 
