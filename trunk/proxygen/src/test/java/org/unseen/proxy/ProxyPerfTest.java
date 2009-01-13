@@ -36,7 +36,8 @@ import org.unseen.proxy.ref.Transformers;
  * @version $Revision$
  */
 public class ProxyPerfTest extends TestCase {
-  private double EPSILON = 0.0001;
+  /** Percentage deviation we consider to be equality */
+  private double EPSILON = 5;
   
   /**
    * 
