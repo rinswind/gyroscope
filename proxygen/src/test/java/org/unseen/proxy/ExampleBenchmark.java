@@ -44,10 +44,6 @@ public class ExampleBenchmark {
     }
   }
   
-  /**
-   * @param tested
-   * @param repeats
-   */
   public ExampleBenchmark(String name, Example tested, int repeats, int warmup) {
     this.name = name;
     this.tested = tested;
@@ -55,32 +51,20 @@ public class ExampleBenchmark {
     this.warmup = warmup;
   }
   
-  /**
-   * @param baseline
-   * @return
-   */
   public double benckmark(long baseline) {
     long time = time();
     
-    long diff = time - baseline;
-    double perc = 100*((double) diff)/((double) baseline);
+    double perc = 100*((double)time/baseline - 1);
         
-    System.out.printf("%s (%d ns/call): %8.2f%% diff with baseline\n", name, time, perc);
+    System.out.printf("%10s: %4d ns/call diff from base %4d ns/call is %6.2f%%\n", name, time, baseline, perc);
     return perc;
   }
   
-  /**
-   * @return
-   */
   public long time() {
     act(warmup);
     return act(repeats);
   }
   
-  /**
-   * @param repeats
-   * @param random
-   */
   private long act(int repeats) {
     System.gc();
     System.runFinalization();

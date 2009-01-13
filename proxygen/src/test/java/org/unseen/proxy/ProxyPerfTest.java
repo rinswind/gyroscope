@@ -64,6 +64,8 @@ public class ProxyPerfTest extends TestCase {
     
     long baseTime = base.time();
     
+    base.benckmark(baseTime);
+    
     double manualOverhead = manual.benckmark(baseTime);
     double syncOverhead = sync.benckmark(baseTime);
     double dynamicOverhead = dynamic.benckmark(baseTime);
