@@ -33,12 +33,14 @@ public class ExampleBenchmark {
   public static class ExampleImpl implements Example {
     public double action(double val) {
       return Math.exp(val * Math.cosh(val));
+//      return val * Math.cosh(val);
     }
   }
   
   public static class SyncExampleImpl implements Example {
     public synchronized double action(double val) {
       return Math.exp(val * Math.cosh(val));
+//      return val * Math.cosh(val);
     }
   }
   
@@ -57,14 +59,13 @@ public class ExampleBenchmark {
    * @param baseline
    * @return
    */
-  public int benckmark(long baseline) {
+  public double benckmark(long baseline) {
     long time = time();
     
     long diff = time - baseline;
-    double ratio = ((double) diff)/baseline;
-    int perc = (int) (100*ratio);
+    double perc = 100*((double) diff)/((double) baseline);
         
-    System.out.printf("%s (%8.2f ns/call): %d%% diff with baseline\n", name, (double)time, perc);
+    System.out.printf("%s (%d ns/call): %8.2f%% diff with baseline\n", name, time, perc);
     return perc;
   }
   
@@ -82,13 +83,16 @@ public class ExampleBenchmark {
    */
   private long act(int repeats) {
     System.gc();
+    System.runFinalization();
+    System.gc();
     
     double point = 0;
     double step = 1f/repeats;
     
     long now = System.nanoTime();
+    double dummy = 0;
     for (int i = 0; i < repeats; i++, point +=step) {
-      tested.action(point);
+      dummy += tested.action(point);
     }
     return (System.nanoTime() - now) / repeats;
   }

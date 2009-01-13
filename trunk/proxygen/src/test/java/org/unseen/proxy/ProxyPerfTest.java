@@ -36,6 +36,8 @@ import org.unseen.proxy.ref.Transformers;
  * @version $Revision$
  */
 public class ProxyPerfTest extends TestCase {
+  private double EPSILON = 0.0001;
+  
   /**
    * 
    */
@@ -52,6 +54,8 @@ public class ProxyPerfTest extends TestCase {
     int reps = 1000000; // 1 million! :)
     int warmup = reps;
     
+    System.out.println("Repetitions: " + reps);
+    
     ExampleBenchmark base = new ExampleBenchmark("Base", base(), reps, warmup);
     ExampleBenchmark sync = new ExampleBenchmark("Sync", sync(), reps, warmup);
     ExampleBenchmark manual = new ExampleBenchmark("Manual", manual(), reps, warmup);
@@ -60,14 +64,14 @@ public class ProxyPerfTest extends TestCase {
     
     long baseTime = base.time();
     
-    int manualOverhead = manual.benckmark(baseTime);
-    int syncOverhead = sync.benckmark(baseTime);
-    int dynamicOverhead = dynamic.benckmark(baseTime);
-    int reflexiveOverhead = reflexive.benckmark(baseTime);
+    double manualOverhead = manual.benckmark(baseTime);
+    double syncOverhead = sync.benckmark(baseTime);
+    double dynamicOverhead = dynamic.benckmark(baseTime);
+    double reflexiveOverhead = reflexive.benckmark(baseTime);
     
-    assertTrue(manualOverhead < syncOverhead);
-    assertTrue(syncOverhead < dynamicOverhead);
-    assertTrue(dynamicOverhead < reflexiveOverhead);
+    assertTrue(manualOverhead - syncOverhead < EPSILON);
+    assertTrue(syncOverhead - dynamicOverhead < EPSILON);
+    assertTrue(dynamicOverhead - reflexiveOverhead < EPSILON);
   }
   
   private static Example base() {
