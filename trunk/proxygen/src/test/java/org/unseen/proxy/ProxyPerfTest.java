@@ -28,7 +28,7 @@ import org.unseen.proxy.gen.ProxyFactory;
 import org.unseen.proxy.impl.ProxyClassLoader;
 import org.unseen.proxy.impl.ProxyFactoryImpl;
 import org.unseen.proxy.ref.Ref;
-import org.unseen.proxy.ref.RefImpl;
+import org.unseen.proxy.ref.Refs;
 import org.unseen.proxy.ref.Transformers;
 
 /**
@@ -37,7 +37,7 @@ import org.unseen.proxy.ref.Transformers;
  */
 public class ProxyPerfTest extends TestCase {
   /** Percentage deviation we consider to be equality */
-  private double EPSILON = 5;
+  private double EPSILON = 10;
   
   /**
    * 
@@ -62,6 +62,7 @@ public class ProxyPerfTest extends TestCase {
     ExampleBenchmark manual = new ExampleBenchmark("Manual", manual(), reps, warmup);
     ExampleBenchmark dynamic = new ExampleBenchmark("Dynamic", dynamic(), reps, warmup);
     ExampleBenchmark reflexive = new ExampleBenchmark("Reflexive", reflexive(), reps, warmup);
+    ExampleBenchmark syncreflexive = new ExampleBenchmark("SyncReflexive", syncReflexive(), reps, warmup);
     
     long baseTime = base.time();
     
@@ -71,10 +72,12 @@ public class ProxyPerfTest extends TestCase {
     double syncOverhead = sync.benckmark(baseTime);
     double dynamicOverhead = dynamic.benckmark(baseTime);
     double reflexiveOverhead = reflexive.benckmark(baseTime);
+    double syncreflexiveOverhead = syncreflexive.benckmark(baseTime);
     
     assertTrue(manualOverhead - syncOverhead < EPSILON);
     assertTrue(syncOverhead - dynamicOverhead < EPSILON);
     assertTrue(dynamicOverhead - reflexiveOverhead < EPSILON);
+    assertTrue(reflexiveOverhead - syncreflexiveOverhead  < EPSILON);
   }
   
   private static Example base() {
@@ -96,7 +99,7 @@ public class ProxyPerfTest extends TestCase {
   }
   
   private static Example dynamic() {
-    Ref<Example, Example> ref = new RefImpl<Example, Example>(Transformers.<Example>identity());
+    Ref<Example, Example> ref = Refs.ref(Transformers.<Example>identity());
     
     ref.bind(new ExampleImpl(), null);
     
@@ -115,6 +118,22 @@ public class ProxyPerfTest extends TestCase {
         new Class<?>[] {Example.class}, 
         new InvocationHandler() {
           private final Example delegate = new ExampleImpl();
+          
+          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(delegate, args);
+          }
+        });
+  }
+  
+  /**
+   * @return
+   */
+  private static Example syncReflexive() {
+    return (Example) java.lang.reflect.Proxy.newProxyInstance(
+        ProxyPerfTest.class.getClassLoader(),
+        new Class<?>[] {Example.class}, 
+        new InvocationHandler() {
+          private final Example delegate = new SyncExampleImpl();
           
           public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             return method.invoke(delegate, args);
