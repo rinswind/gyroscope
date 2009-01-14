@@ -33,14 +33,12 @@ public class ExampleBenchmark {
   public static class ExampleImpl implements Example {
     public double action(double val) {
       return Math.exp(val * Math.cosh(val));
-//      return val * Math.cosh(val);
     }
   }
   
   public static class SyncExampleImpl implements Example {
     public synchronized double action(double val) {
       return Math.exp(val * Math.cosh(val));
-//      return val * Math.cosh(val);
     }
   }
   
@@ -56,7 +54,7 @@ public class ExampleBenchmark {
     
     double perc = 100*((double)time/baseline - 1);
         
-    System.out.printf("%10s: %4d ns/call diff from base %4d ns/call is %6.2f%%\n", name, time, baseline, perc);
+    System.out.printf("%15s: %4d ns/call diff from base %4d ns/call is %6.2f%%\n", name, time, baseline, perc);
     return perc;
   }
   
