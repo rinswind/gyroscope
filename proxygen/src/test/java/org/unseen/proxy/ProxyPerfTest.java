@@ -76,8 +76,8 @@ public class ProxyPerfTest extends TestCase {
     
     assertTrue(manualOverhead - syncOverhead < EPSILON);
     assertTrue(syncOverhead - dynamicOverhead < EPSILON);
-    assertTrue(dynamicOverhead - reflexiveOverhead < EPSILON);
     assertTrue(reflexiveOverhead - syncreflexiveOverhead  < EPSILON);
+    assertTrue(dynamicOverhead - syncreflexiveOverhead < EPSILON);
   }
   
   private static Example base() {
