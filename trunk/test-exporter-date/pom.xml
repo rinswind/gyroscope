@@ -19,6 +19,8 @@
   <packaging>bundle</packaging>
   
   <properties>
+    <felix-target-dir>gyro-test</felix-target-dir>
+  
     <Export-Package>test.exporter.date</Export-Package>
     <Private-Package>test.exporter.date.impl</Private-Package>
     <Bundle-Activator>test.exporter.date.impl.Activator</Bundle-Activator>

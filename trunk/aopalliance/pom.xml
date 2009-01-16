@@ -13,11 +13,13 @@
   <artifactId>aopalliance-wrapped</artifactId>
   <version>1.0</version>
 
-  <name>ASM Bytecode Manipulation Framework</name>
+  <name>AOP API</name>
 
   <packaging>bundle</packaging>
 
   <properties>
+    <felix-target-dir>guice</felix-target-dir>
+  
     <Export-Package>org.aopalliance.*;version=${pom.version}</Export-Package>
   </properties>
 

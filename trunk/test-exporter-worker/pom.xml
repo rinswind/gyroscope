@@ -18,6 +18,8 @@
   <packaging>bundle</packaging>
   
   <properties>
+    <felix-target-dir>gyro-test</felix-target-dir>
+  
     <Export-Package>test.exporter.worker</Export-Package>
   </properties>
 </project>
