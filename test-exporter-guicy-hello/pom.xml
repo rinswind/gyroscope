@@ -18,6 +18,8 @@
   <packaging>bundle</packaging>
   
   <properties>
+    <felix-target-dir>gyro-test</felix-target-dir>
+  
     <Export-Package>test.exporter.hello</Export-Package>
     <Private-Package>test.exporter.hello.impl.*</Private-Package>
     <Bundle-Activator>test.exporter.hello.impl.Activator</Bundle-Activator>

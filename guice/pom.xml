@@ -17,6 +17,30 @@
   
   <packaging>bundle</packaging>
 
+  <properties>
+    <felix-target-dir>guice</felix-target-dir>
+    
+    <Export-Package>
+      com.google.inject; version=${pom.version},
+      com.google.inject.binder; version=${pom.version},
+      com.google.inject.matcher; version=${pom.version},
+      com.google.inject.name; version=${pom.version},
+      com.google.inject.spi; version=${pom.version},
+      com.google.inject.util; version=${pom.version},
+      com.google.inject.assistedinject; version=${pom.version},
+      com.google.inject.multibindings; version=${pom.version},
+      com.google.inject.throwingproviders; version=${pom.version},
+    </Export-Package>
+    <Private-Package>com.google.inject.internal.*</Private-Package>
+    <Import-Package>
+      !com.google.common.base,
+      !com.google.inject.internal.asm.util,
+      !javax.management,
+      !javax.naming,
+      *
+    </Import-Package>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.inject</groupId>
@@ -52,26 +76,4 @@
       <version>1.0</version>
     </dependency>
   </dependencies>
-
-  <properties>
-    <Export-Package>
-      com.google.inject; version=${pom.version},
-      com.google.inject.binder; version=${pom.version},
-      com.google.inject.matcher; version=${pom.version},
-      com.google.inject.name; version=${pom.version},
-      com.google.inject.spi; version=${pom.version},
-      com.google.inject.util; version=${pom.version},
-      com.google.inject.assistedinject; version=${pom.version},
-      com.google.inject.multibindings; version=${pom.version},
-      com.google.inject.throwingproviders; version=${pom.version},
-    </Export-Package>
-    <Private-Package>com.google.inject.internal.*</Private-Package>
-    <Import-Package>
-      !com.google.common.base,
-      !com.google.inject.internal.asm.util,
-      !javax.management,
-      !javax.naming,
-      *
-    </Import-Package>
-  </properties>
 </project>

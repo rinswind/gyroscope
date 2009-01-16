@@ -17,6 +17,13 @@
   
   <packaging>bundle</packaging>
 
+  <properties>
+    <felix-target-dir>gyro</felix-target-dir>
+  
+    <Export-Package>org.unseen.proxy.*</Export-Package>
+    <Bundle-Activator>org.unseen.proxy.impl.Activator</Bundle-Activator>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.unseen</groupId>
@@ -29,9 +36,4 @@
       <version>3.1</version>
     </dependency>
   </dependencies>
-
-  <properties>
-    <Export-Package>org.unseen.proxy.*</Export-Package>
-    <Bundle-Activator>org.unseen.proxy.impl.Activator</Bundle-Activator>
-  </properties>
 </project>

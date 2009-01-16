@@ -19,6 +19,8 @@
   <packaging>bundle</packaging>
 
   <properties>
+    <felix-target-dir>gyro</felix-target-dir>
+  
     <Export-Package>org.unseen.gyro.*</Export-Package>
   </properties>
 

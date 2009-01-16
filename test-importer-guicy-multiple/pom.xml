@@ -17,6 +17,8 @@
   <packaging>bundle</packaging>
   
   <properties>
+    <felix-target-dir>gyro-test</felix-target-dir>
+  
     <Private-Package>test.importer.multiple</Private-Package>
     <Bundle-Activator>test.importer.multiple.Activator</Bundle-Activator>
   </properties>

@@ -17,6 +17,8 @@
   <name>Test Exporter Format</name>
 
   <properties>
+    <felix-target-dir>gyro-test</felix-target-dir>
+  
     <Export-Package>test.exporter.format</Export-Package>
     <Private-Package>test.exporter.format.impl</Private-Package>
     <Bundle-Activator>test.exporter.format.impl.Activator</Bundle-Activator>

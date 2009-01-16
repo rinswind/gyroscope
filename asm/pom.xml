@@ -17,6 +17,8 @@
   <packaging>bundle</packaging>
   
   <properties>
+    <felix-target-dir>gyro</felix-target-dir>
+  
     <Export-Package>org.objectweb.asm.*;version=${pom.version}</Export-Package>
   </properties>
   
