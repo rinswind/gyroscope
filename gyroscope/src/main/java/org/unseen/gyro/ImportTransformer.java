@@ -40,7 +40,7 @@ public class ImportTransformer<V> implements Transformer<ServiceReference/*<V>*/
     V val = (V) bc.getService(arg);
     
     if (val == null) {
-      throw new RefException("ServiceReference points to an unregistered service" + arg);
+      throw new RefException("ServiceReference points to an unregistered service " + arg);
     }
     
     return val;

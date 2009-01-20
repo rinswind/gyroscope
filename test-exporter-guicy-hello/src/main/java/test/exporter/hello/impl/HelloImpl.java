@@ -15,7 +15,6 @@
  */
 package test.exporter.hello.impl;
 
-
 import test.exporter.date.Date;
 import test.exporter.format.Format;
 import test.exporter.hello.Hello;
@@ -24,14 +23,13 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 
-
 public class HelloImpl implements Hello {
   private final int no;
   private final Format format;
   private final Date date;
   
   @Inject
-  public HelloImpl(Format format, Date date, @Assisted int no) {
+  public HelloImpl(@Assisted int no, Format format, Date date) {
     this.format = format;
     this.date = date;
     this.no = no;

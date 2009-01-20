@@ -35,8 +35,6 @@ import org.unseen.proxy.ref.RefFactoryCombinator;
 import org.unseen.proxy.ref.RefListenerAdapter;
 import org.unseen.proxy.ref.Transformer;
 
-
-
 /**
  * FIX Refactor the repeated code in single() and multiple(). Must extract this
  * code out of the DSL. The DSL code must be lean and contain no significant

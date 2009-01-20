@@ -200,7 +200,14 @@ public class RefImpl<A, V> implements Ref<A, V> {
   public final Map<String, Object> attributes() {
     lock.readLock().lock();
     try {
-      return Collections.unmodifiableMap(props);
+      switch (state.state) {
+      case BOUND:
+      case UNBINDING:
+        return Collections.unmodifiableMap(props);
+        
+      default:
+        throw new RefUnboundException(this);
+      }
     } finally {
       lock.readLock().unlock();
     }
