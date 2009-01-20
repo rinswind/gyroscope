@@ -27,8 +27,8 @@ import org.unseen.proxy.ref.Transformer;
  * @author Todor Boev
  *
  */
-public class Export {
-  public interface Builder<A, V> extends ModeSelector<A> {
+public interface Export {
+  interface Builder<A, V> extends ModeSelector<A> {
     <N> Builder<N, V> from(Class<N> type, Transformer<N, A> fact);
     
     <N> Builder<A, N> as(Class<N> type, Transformer<V, N> fact);
@@ -36,7 +36,7 @@ public class Export {
     Builder<A, V> attributes(Map<String, Object> attrs);
   }
   
-  public interface ModeSelector<T> {
+  interface ModeSelector<T> {
     Ref<T, ServiceRegistration/*<T>*/> single();
     
     Ref<T, ServiceRegistration/*<T>*/> single(T instance);

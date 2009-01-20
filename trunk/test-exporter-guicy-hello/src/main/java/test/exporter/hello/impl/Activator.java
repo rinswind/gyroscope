@@ -36,6 +36,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.FactoryProvider;
 
+import static com.google.inject.assistedinject.FactoryProvider.*;
+
 /**
  * @author Todor Boev
  * @version $Revision$
@@ -60,7 +62,7 @@ public class Activator extends RefContainerImpl {
          * services with some parameters passed by us and some resolved by
          * guice. For that we use the Assisted Inject extension
          */
-        bind(HelloFactory.class).toProvider(FactoryProvider.newFactory(HelloFactory.class, HelloImpl.class));
+        bind(HelloFactory.class).toProvider(newFactory(HelloFactory.class, HelloImpl.class));
         
         bind(PrintingRefListenerFactory.class);
         
@@ -71,7 +73,7 @@ public class Activator extends RefContainerImpl {
 
     /*
      * Bootstrap the bundle - contains mixed code: part creates the initial
-     * singletons with Guice, parts is declarative lifecycle instructions to
+     * singletons with Guice, part is declarative lifecycle instructions to
      * Autowire.
      */
     
@@ -87,20 +89,21 @@ public class Activator extends RefContainerImpl {
     final Ref<Void, Void> required = and(injector.getInstance(Format.class), injector.getInstance(Date.class));
     
     /*
-     * Export NUM separate instances of the Hello service - just for fun :)
+     * Export NUM separate instances of the Hello service
      */
     
     /* Use Guice to get the partial injection factory we are going to use */
     HelloFactory helloFact = injector.getInstance(HelloFactory.class);
     for (int i = 0; i < NUM; i++) {
       /*
-       * Create an unbound export by not using the single(T instance) method. We
-       * will define the conditions of binding later
+       * Create an unbound export by not using the single() method rather than
+       * single(T instance) method. We will define the conditions of binding
+       * later
        */
       Ref<Hello, ServiceRegistration> export = provide(Hello.class).single();
       
       /*
-       * When both imports are available export a Hello service instance craeted
+       * When both imports are available export a Hello service instance created
        * for the specific "i" and with attributes reflecting the specific "i"
        */
       from(required)
