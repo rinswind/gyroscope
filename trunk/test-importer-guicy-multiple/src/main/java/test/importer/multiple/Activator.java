@@ -47,16 +47,26 @@ public class Activator extends RefContainerImpl {
       protected void configure() {
         bind(iterableOf(RichHello.class)).toInstance(
           /*
-           * The Autowire DSL creates directly dynamic service proxies. For better
+           * The Gyro DSL creates directly dynamic service proxies. For better
            * Guice support it should create Provider instances instead. If the
-           * user wants to use Autowire without Guice he will simply have to add
+           * user wants to use Gyro without Guice he will simply have to add
            * and additional ".get()" call at the end of the chain. However this
-           * will still have the unfortunate consequence of making Autowire 
+           * will still have the unfortunate consequence of making Gyro 
            * dependent on Guice - what to do? :( 
            */
           require(RichHello.class)
           /*
-           * The Autowire DSL requires a Transformer instance at this spot. For
+           * Transform Hello services into our internal RichHello as they
+           * are pulled into our bundle. We can build an arbitrary chain of
+           * transformations and build a random object structure
+           * around any imported service. Than we cap this structure with
+           * a proxy and present it to the rest of the bundle. So a bundle
+           * can have a pre-proxy/dynamic/adapter part what prepares
+           * the services for use by the post-proxy/static/business part.
+           * The static part can not distinguish a service imported directly
+           * from OSGi from an internally built one. 
+           *  
+           * The Gyro DSL requires a Transformer instance at this spot. For
            * good Guice support here a Guice key() must be supplied instead. This
            * will let the Transformer into the Guice club.
            */
