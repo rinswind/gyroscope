@@ -15,7 +15,11 @@
  */
 package test.exporter.format.impl;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.unseen.gyro.dsl.RefContainerImpl;
+import org.unseen.proxy.ref.Ref;
+import org.unseen.proxy.ref.RefListener;
 
 import test.exporter.format.Format;
 
@@ -28,29 +32,35 @@ public class Activator extends RefContainerImpl {
       }
     };
 
+    /* Get a proxy to the root "service" to which everyone are linked */
+    BundleContext bc = require(BundleContext.class).single();
+    
     /*
-     * Create a service export and specify the concrete object to get exported
-     * in one step. The export will become available as soon as the bundle starts.
-     * This is exactly equivalent to:
-     * 
-     * from(require(BundleContext.class).single())
-     * .notify(binder(provide(Format.class).single()).to(service))
-     * 
-     * In the above declaration we take two separate steps. First we create an
-     * unbound export by using the noarg single() method:
-     * 
-     * provide(Format.class).single() 
-     * 
-     * and than we specify that as soon as the BundleContext
-     * "service" becomes available 
-     * 
-     * from(require(BundleContext.class).single())
-     * 
-     * that export must get bound to the 'service'
-     * object.
-     * 
-     * .notify(binder(provide(Format.class).single()).to(service))
+     * Create an unbound export. Someone who transforms a service object to a
+     * ServiceRegistration. This has the side effect of exporting the service.
      */
-    provide(Format.class).single(service);
+    Ref<Format, ServiceRegistration> export = provide(Format.class).single();
+    
+    /*
+     * Create a listener that will bind the export to a concrete instance when
+     * notified.
+     */
+    RefListener binder = binder(export).to(service);
+    
+    /*
+     * Tell Gyro to notify the listener as soon as the BundleContext is
+     * available. E.g. as soon as the bundle starts.
+     */
+    from(bc).notify(binder);
+    
+    /*
+     * We can do all of the above with one line:
+     * 
+     * provide(Format.class).single(service);
+     * 
+     * Here we don't have to refer to BundleContext or any of Gyros classes. The
+     * complicated way used above is intended when we need complex eventing
+     * links between exports and imports.
+     */
   }
 }
