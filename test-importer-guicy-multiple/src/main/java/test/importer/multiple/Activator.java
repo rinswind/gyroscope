@@ -125,9 +125,9 @@ public class Activator extends RefContainerImpl {
      * Notice that to make this link we had to ask Guice to create the
      * Collection<RichHello> and the Printer objects. So we have effectively
      * bootstrapped our bundle a this spot. Now the two objects are strongly
-     * referenced by Autowire and will automatically be started/stopped when the
-     * appropriate conditions are met. In future versions of Autowire these
-     * linkages must happen automatically and be guided by special Autowire
+     * referenced by Gyro and will automatically be started/stopped when the
+     * appropriate conditions are met. In future versions of Gyro these
+     * linkages must happen automatically and be guided by special Gyro
      * annotations on the user classes. I wish Guice had lifecycle support 
      * so I can reuse it.
      */

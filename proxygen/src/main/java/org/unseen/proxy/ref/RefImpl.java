@@ -138,16 +138,10 @@ public class RefImpl<A, V> implements Ref<A, V> {
   
   private StateHandler state = StateHandler.UNBOUND;
   
-  /**
-   * @param factory
-   */
   public RefImpl(Transformer<A, V> factory) {
     this.factory = factory;
   }
   
-  /**
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     lock().lock();
@@ -158,13 +152,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * This one is thread-unsafe by design. The reason is that the proxy methods
-   * which call here will already hold the lock() and we don't need to incur
-   * more performance penalty by redundantly taking/releasing it again.
-   * 
-   * @see org.unseen.proxy.ref.Ref#val()
-   */
   public final A arg() {
     switch (state.state) {
     case BOUND:
@@ -176,13 +163,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * This one is thread-unsafe by design. The reason is that the proxy methods
-   * which call here will already hold the lock() and we don't need to incur
-   * more performance penalty by redundantly taking/releasing it again.
-   * 
-   * @see org.unseen.proxy.ref.Ref#val()
-   */
   public final V val() {
     switch (state.state) {
     case BOUND:
@@ -194,9 +174,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @see org.unseen.proxy.ref.Ref#attributes()
-   */
   public final Map<String, Object> attributes() {
     lock.readLock().lock();
     try {
@@ -213,23 +190,14 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @see org.unseen.proxy.gen.Proxy#addListener(com.prosyst.mprm.backend.autowire.ServiceProxyListener)
-   */
   public final void addListener(RefListener listener) {
     listeners.add(listener);
   }
   
-  /**
-   * @see org.unseen.proxy.ref.Ref#removeListener(org.unseen.proxy.ref.RefListener)
-   */
   public final void removeListener(RefListener listener) {
     listeners.remove(listener);
   }
 
-  /**
-   * @see org.unseen.proxy.ref.Ref#state()
-   */
   public final State state() {
     lock.readLock().lock();
     try {
@@ -239,16 +207,10 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @see org.unseen.proxy.ref.Ref#lock()
-   */
   public final Lock lock() {
     return lock.readLock();
   }
 
-  /**
-   * @see org.unseen.proxy.ref.Ref#bind(java.lang.Object, java.util.Map)
-   */
   public final void bind(A arg, Map<String, Object> props) {
     toState(StateHandler.BINDING);
     
@@ -269,9 +231,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @see org.unseen.proxy.ref.Ref#update(java.lang.Object, java.util.Map)
-   */
   public final void update(A arg, Map<String, Object> props) {
     if (arg == null && props == null) {
       throw new RefException(this + ": Must update something");
@@ -300,9 +259,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     toState(StateHandler.BOUND);
   }
 
-  /**
-   * @see org.unseen.proxy.ref.Ref#unbind()
-   */
   public final void unbind() {
     if (!tryState(StateHandler.UNBINDING)) {
       return;
@@ -319,24 +275,14 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @param next
-   */
   private void toState(StateHandler next) {
     transition(next, true);
   }
   
-  /**
-   * @param next
-   * @return
-   */
   private boolean tryState(StateHandler next) {
     return transition(next, false);
   }
   
-  /**
-   * 
-   */
   private void failover() {
     lock.writeLock().lock();
     try {
@@ -346,11 +292,6 @@ public class RefImpl<A, V> implements Ref<A, V> {
     }
   }
   
-  /**
-   * @param next
-   * @param crash
-   * @return
-   */
   private boolean transition(StateHandler next, boolean crash) {
     StateHandler prev = null;
     
