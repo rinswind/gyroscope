@@ -74,7 +74,7 @@ public class Activator extends RefContainerImpl {
     /*
      * Bootstrap the bundle - contains mixed code: part creates the initial
      * singletons with Guice, part is declarative lifecycle instructions to
-     * Autowire.
+     * Gyro.
      */
     
     /*
